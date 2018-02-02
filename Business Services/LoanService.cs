@@ -837,7 +837,7 @@ namespace Business_Services
                 {
                     
                     account_number = string.Empty,
-                    account_nickname = string.Empty,
+                    account_nickname = "Choose Bank Account",
                     routing_number = string.Empty,
                     bank_name = string.Empty,
                     account_type = string.Empty,
