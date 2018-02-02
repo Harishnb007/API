@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{54D7407F-613D-4B70-97CC-3C68805DCDE0}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Business_Services</RootNamespace>
+    <AssemblyName>Business Services</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.Entity.Design" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AppService.cs" />
+    <Compile Include="B2C_WebAPI\API_Connection.cs" />
+    <Compile Include="IAppService.cs" />
+    <Compile Include="ILoanService.cs" />
+    <Compile Include="ITokenServices.cs" />
+    <Compile Include="IUserServices.cs" />
+    <Compile Include="LoanService.cs" />
+    <Compile Include="Models\AutoDraft.cs" />
+    <Compile Include="Models\AutodraftInsert.cs" />
+    <Compile Include="Models\BankAccount.cs" />
+    <Compile Include="Models\Calender.cs" />
+    <Compile Include="Models\ConfirmRegistration.cs" />
+    <Compile Include="Models\ContactDetails.cs" />
+    <Compile Include="Models\ContactUs.cs" />
+    <Compile Include="Models\DAL\LoanCareContext\BankAccount.cs" />
+    <Compile Include="Models\DAL\LoancareDBContext\AlertTemplate.cs" />
+    <Compile Include="Models\DAL\LoancareDBContext\FeedbackQuestionMaster.cs" />
+    <Compile Include="Models\DAL\LoancareDBContext\LegalPrivacyTerm.cs" />
+    <Compile Include="Models\DAL\LoancareDBContext\MDBService.cs" />
+    <Compile Include="Models\DAL\LoancareDBContext\MobileUser.cs" />
+    <Compile Include="Models\DAL\LoancareDBContext\PaymentAlert.cs" />
+    <Compile Include="Models\DAL\LoancareDBContext\PaymentTransactionMapping.cs" />
+    <Compile Include="Models\DAL\LoancareDBContext\UserAlert.cs" />
+    <Compile Include="Models\DAL\LoancareDBContext\UserFeedback.cs" />
+    <Compile Include="Models\DAL\LoancareEntites\BankAccounts.cs" />
+    <Compile Include="Models\DAL\LoancareEntites\SecurityQandA.cs" />
+    <Compile Include="Models\DAL\LoancareEntites\SharedContent.cs" />
+    <Compile Include="Models\DAL\LoancareEntites\UserAlerts.cs" />
+    <Compile Include="Models\DAL\LoancareEntites\UserFeedback.cs" />
+    <Compile Include="Models\DAL\LoancareEntites\UserMDb.cs" />
+    <Compile Include="Models\DAL\LoancareEntites\UserSubscriptions.cs" />
+    <Compile Include="Models\Escrow.cs" />
+    <Compile Include="Models\EstatementDetails.cs" />
+    <Compile Include="Models\GenerateNewToken.cs" />
+    <Compile Include="Models\GenericContent.cs" />
+    <Compile Include="Models\Helpers\Encryptor.cs" />
+    <Compile Include="Models\Helpers\ResponseModel.cs" />
+    <Compile Include="Models\Helpers\ResponseWithToken.cs" />
+    <Compile Include="Models\HelpScreen.cs" />
+    <Compile Include="Models\InsertPayment.cs" />
+    <Compile Include="Models\LC_WebApi_Models\Activity_AccountActivity.cs" />
+    <Compile Include="Models\LC_WebApi_Models\Auth_GetToken.cs" />
+    <Compile Include="Models\LC_WebApi_Models\AutoDraft_GetAutoDraft.cs" />
+    <Compile Include="Models\LC_WebApi_Models\Banks_GetBankList.cs" />
+    <Compile Include="Models\LC_WebApi_Models\Calender_GetPaymentFeeSchedule.cs" />
+    <Compile Include="Models\LC_WebApi_Models\Calender_GetPaymentInfo.cs" />
+    <Compile Include="Models\LC_WebApi_Models\Eft_disclosure.cs" />
+    <Compile Include="Models\LC_WebApi_Models\Escrow_CallEscrow.cs" />
+    <Compile Include="Models\LC_WebApi_Models\ForgotUser_UserId.cs" />
+    <Compile Include="Models\LC_WebApi_Models\Getdetails_estatement.cs" />
+    <Compile Include="Models\LC_WebApi_Models\getuserInfo.cs" />
+    <Compile Include="Models\LC_WebApi_Models\Loan_GetCurrentLoanInfo.cs" />
+    <Compile Include="Models\LC_WebApi_Models\MyAccount_GetAccountInfo.cs" />
+    <Compile Include="Models\LC_WebApi_Models\OnetimePayment_GetHolidayList.cs" />
+    <Compile Include="Models\LC_WebApi_Models\OneTimePayment_GetMockedPendingTransactions.cs" />
+    <Compile Include="Models\LC_WebApi_Models\OnetimePayment_GetPaymentInfo.cs" />
+    <Compile Include="Models\LC_WebApi_Models\personal_getborrowercontactInfo.cs" />
+    <Compile Include="Models\LC_WebApi_Models\personal_getcoborrowercontactInfo.cs" />
+    <Compile Include="Models\LC_WebApi_Models\User_GetUserInformation.cs" />
+    <Compile Include="Models\LC_WebApi_Models\User_UserInformation.cs" />
+    <Compile Include="Models\LegalPrivacyTerms.cs" />
+    <Compile Include="Models\Loan.cs" />
+    <Compile Include="Models\LoanContactDetail.cs" />
+    <Compile Include="Models\LoanInfo.cs" />
+    <Compile Include="Models\Loan_alert.cs" />
+    <Compile Include="Models\ManageNotification.cs" />
+    <Compile Include="Models\Payment.cs" />
+    <Compile Include="Models\PaymentDetails.cs" />
+    <Compile Include="Models\PaymentFeeShedule.cs" />
+    <Compile Include="Models\PaymentHistory.cs" />
+    <Compile Include="Models\PendingPayment.cs" />
+    <Compile Include="Models\PushNotificationUser.cs" />
+    <Compile Include="Models\Question.cs" />
+    <Compile Include="Models\SecurityQuestion.cs" />
+    <Compile Include="Models\Statement.cs" />
+    <Compile Include="Models\Token.cs" />
+    <Compile Include="Models\UpdateEmail.cs" />
+    <Compile Include="Models\UpdatePassword.cs" />
+    <Compile Include="Models\User.cs" />
+    <Compile Include="Models\UserAlertCount.cs" />
+    <Compile Include="Models\UserAuth.cs" />
+    <Compile Include="Models\UserLoaninfo.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TokenServices.cs" />
+    <Compile Include="UserServices.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="Models\Helpers\Dummy.json" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
