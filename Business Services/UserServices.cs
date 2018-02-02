@@ -932,12 +932,12 @@ namespace Business_Services
             }
         }
 
-public async Task<ResponseModel> UpdatePasswordAsync(string MobileToken, UpdatePassword loanDetails, string Password)
+        public async Task<ResponseModel> UpdatePasswordAsync(string MobileToken, UpdatePassword loanDetails, string Password)
         {
             try
             {
                 // To do - Use DI
-             
+
                 TokenServices tokenServices = new TokenServices();
 
                 Business_Services.Models.GenerateNewToken objgenerateToken = new GenerateNewToken();
@@ -949,10 +949,13 @@ public async Task<ResponseModel> UpdatePasswordAsync(string MobileToken, UpdateP
                 string objPWd = ObjUserId.Password;
                 int objCId = ObjUserId.ClientId;
 
+                LogWriter("current_password:", loanDetails.current_password);
+                LogWriter("Password:", loanDetails.password);
+
                 string lcToken = tokenServices.GetLctoken(MobileToken);
 
                 var lenthPassWord = loanDetails.password.Length;
-                if (lenthPassWord >= 8 && loanDetails.current_password == Password )
+                if (loanDetails.password != Password)
                 {
                     var responseIn = await API_Connection.GetAsync(lcToken, "/api/User/GetUserInformation");
                     string returnedDataUser = await responseIn.Content.ReadAsStringAsync();
@@ -968,8 +971,11 @@ public async Task<ResponseModel> UpdatePasswordAsync(string MobileToken, UpdateP
 
                     Dictionary<string, string> someDict = new Dictionary<string, string>();
                     someDict.Add("password", decodedStringpassword);
+                    LogWriter("Encodedpassword", decodedStringpassword);
                     someDict.Add("userId", decodedStringuserId);
+                    LogWriter("EncodeduserId", decodedStringuserId);
                     someDict.Add("existinguserId", decodedStringexistinguserId);
+                    LogWriter("EncodedexistinguserId", decodedStringexistinguserId);
                     someDict.Add("ssn", "");
                     var content = new FormUrlEncodedContent(someDict);
                     var response = await API_Connection.PostAsync(lcToken, "/api/User/UpdateUseridPassword/", content);
@@ -982,11 +988,13 @@ public async Task<ResponseModel> UpdatePasswordAsync(string MobileToken, UpdateP
                     {
                         loanDetails.password = loanDetails.current_password;
                         loanDetails.Message = ErrorMessage.msg;
+                        LogWriter("Message", loanDetails.Message);
                         loanDetails.is_Success = false;
                     }
                     if (ErrorMessage.updated == true)
                     {
                         loanDetails.Message = "Success";
+                        LogWriter("Message", loanDetails.Message);
                         loanDetails.is_Success = true;
                     }
 
@@ -1008,7 +1016,7 @@ public async Task<ResponseModel> UpdatePasswordAsync(string MobileToken, UpdateP
                         someDictMail.Add("emailData[3][update]", "undefined");
                         someDictMail.Add("update", "undefined");
 
-                        
+
                         var contentmail = new FormUrlEncodedContent(someDictMail);
                         var responsemail = await API_Connection.PostAsync(lcToken, "/api/EmailNotification/SendEmailConfirmationForTemplate/?template=UpdateUserPassword&toEmail=bGFtZXJlLm5pY2hvbGFzQGdtYWlsLmNvbQ==&pageName=manageSecurityPref-UpdateUserPassword&userID=&securityEnabled=true", contentmail);
                     }
@@ -1024,7 +1032,9 @@ public async Task<ResponseModel> UpdatePasswordAsync(string MobileToken, UpdateP
 
                     if (ErrorMessage.updated == false)
                     {
-                        loanDetails.Message = "Failed";
+                        loanDetails.Message = ErrorMessage.msg;
+                        LogWriter("Message", loanDetails.Message);
+                        loanDetails.Token = MobileToken;
                         return new ResponseModel(loanDetails, 1, "Failed");
                     }
                     else
@@ -1035,15 +1045,129 @@ public async Task<ResponseModel> UpdatePasswordAsync(string MobileToken, UpdateP
                 else
                 {
                     loanDetails.is_Success = false;
-                    loanDetails.Message = "Invalid Password";
-                    return new ResponseModel(null, 2, "Invalid Password");
+                    loanDetails.Message = "Password has been previously used";
+                    LogWriter("Message", loanDetails.Message);
+                    loanDetails.Token = MobileToken;
+                    return new ResponseModel(loanDetails, 2, "Invalid Password");
                 }
             }
             catch (Exception Ex)
             {
-                return new ResponseModel(null, 1, Ex.Message);
+                return new ResponseModel(loanDetails, 1, Ex.Message);
             }
         }
+        //public async Task<ResponseModel> UpdatePasswordAsync(string MobileToken, UpdatePassword loanDetails, string Password)
+        //        {
+        //            try
+        //            {
+        //                // To do - Use DI
+
+        //                TokenServices tokenServices = new TokenServices();
+
+        //                Business_Services.Models.GenerateNewToken objgenerateToken = new GenerateNewToken();
+
+        //                var Decryptdata = objgenerateToken.Decrypt(MobileToken);
+
+        //                dynamic ObjUserId = JsonConvert.DeserializeObject(Decryptdata);
+        //                string objUId = ObjUserId.UserId;
+        //                string objPWd = ObjUserId.Password;
+        //                int objCId = ObjUserId.ClientId;
+
+        //                string lcToken = tokenServices.GetLctoken(MobileToken);
+
+        //                var lenthPassWord = loanDetails.password.Length;
+        //                if (lenthPassWord >= 8 && loanDetails.password != Password )
+        //                {
+        //                    var responseIn = await API_Connection.GetAsync(lcToken, "/api/User/GetUserInformation");
+        //                    string returnedDataUser = await responseIn.Content.ReadAsStringAsync();
+        //                    dynamic getuserinfo = JsonConvert.DeserializeObject(returnedDataUser);
+        //                    string UserName = getuserinfo.user.userName;
+        //                    string User_Name = UserName.Trim();
+        //                    byte[] password = System.Text.ASCIIEncoding.ASCII.GetBytes(loanDetails.password);
+        //                    string decodedStringpassword = System.Convert.ToBase64String(password);
+
+        //                    byte[] userId = System.Text.ASCIIEncoding.ASCII.GetBytes(User_Name);
+        //                    string decodedStringuserId = System.Convert.ToBase64String(userId);
+        //                    string decodedStringexistinguserId = System.Convert.ToBase64String(userId);
+
+        //                    Dictionary<string, string> someDict = new Dictionary<string, string>();
+        //                    someDict.Add("password", decodedStringpassword);
+        //                    someDict.Add("userId", decodedStringuserId);
+        //                    someDict.Add("existinguserId", decodedStringexistinguserId);
+        //                    someDict.Add("ssn", "");
+        //                    var content = new FormUrlEncodedContent(someDict);
+        //                    var response = await API_Connection.PostAsync(lcToken, "/api/User/UpdateUseridPassword/", content);
+
+        //                    dynamic Message = await response.message.Content.ReadAsStringAsync();
+
+        //                    var ErrorMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Message);
+
+        //                    if (ErrorMessage.updated == false)
+        //                    {
+        //                        loanDetails.password = loanDetails.current_password;
+        //                        loanDetails.Message = ErrorMessage.msg;
+        //                        loanDetails.is_Success = false;
+        //                    }
+        //                    if (ErrorMessage.updated == true)
+        //                    {
+        //                        loanDetails.Message = "Success";
+        //                        loanDetails.is_Success = true;
+        //                    }
+
+        //                    if (ErrorMessage.updated == true)
+        //                    {
+
+        //                        Dictionary<string, string> someDictMail = new Dictionary<string, string>();
+        //                        someDictMail.Add("emailData[0][key]", "timeVal");
+        //                        someDictMail.Add("emailData[0][value]", Convert.ToString(DateTime.Now));
+        //                        someDictMail.Add("emailData[0][update]", "undefined");
+        //                        someDictMail.Add("emailData[1][key]", "Url");
+        //                        someDictMail.Add("emailData[1][value]", "freedommortgage.myloancare.com");
+        //                        someDictMail.Add("emailData[1][update]", "undefined");
+        //                        someDictMail.Add("emailData[2][key]", "client");
+        //                        someDictMail.Add("emailData[2][value]", "Freedom Mortgage");
+        //                        someDictMail.Add("emailData[2][update]", "undefined");
+        //                        someDictMail.Add("emailData[3][key]", "PROPERTY_STATE_CODE");
+        //                        someDictMail.Add("emailData[3][value]", "ME");
+        //                        someDictMail.Add("emailData[3][update]", "undefined");
+        //                        someDictMail.Add("update", "undefined");
+
+
+        //                        var contentmail = new FormUrlEncodedContent(someDictMail);
+        //                        var responsemail = await API_Connection.PostAsync(lcToken, "/api/EmailNotification/SendEmailConfirmationForTemplate/?template=UpdateUserPassword&toEmail=bGFtZXJlLm5pY2hvbGFzQGdtYWlsLmNvbQ==&pageName=manageSecurityPref-UpdateUserPassword&userID=&securityEnabled=true", contentmail);
+        //                    }
+
+        //                    var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", loanDetails.password } });
+        //                    var responseregeneratedToken = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
+
+        //                    var Token = responseregeneratedToken.tokenValue;
+
+        //                    var MobileTokenNew = objgenerateToken.GenerateToken(objUId, loanDetails.password, objCId, Token);
+
+        //                    loanDetails.Token = MobileTokenNew;
+
+        //                    if (ErrorMessage.updated == false)
+        //                    {
+        //                        loanDetails.Message = "Failed";
+        //                        return new ResponseModel(loanDetails, 1, "Failed");
+        //                    }
+        //                    else
+        //                    {
+        //                        return new ResponseModel(loanDetails);
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    loanDetails.is_Success = false;
+        //                    loanDetails.Message = "Invalid Password";
+        //                    return new ResponseModel(null, 2, "Invalid Password");
+        //                }
+        //            }
+        //            catch (Exception Ex)
+        //            {
+        //                return new ResponseModel(null, 1, Ex.Message);
+        //            }
+        //        }
 
 
         public ResponseModel getpinAsync(string loanNumber, string pin)
@@ -1193,15 +1317,22 @@ public async Task<ResponseModel> UpdatePasswordAsync(string MobileToken, UpdateP
            
             try
             {
-                string[] settings;
-                settings =new string[] { "311, 312, 313, 314, 315, 316, 317, 318, 320 "};
                 string sData = string.Empty;
-                foreach (var secQuestion in settings)
-                {                 
+                foreach (var secQuestion in secQuestions)
+                {
+                    //Modified by BBSR_Team on 2nd Jan 2017
 
-                   sData += "[]:" + true + ",311"; 
+                    string secretQuestion = secQuestion.secretQuestion;
+                    byte[] secrQuestion = System.Text.ASCIIEncoding.ASCII.GetBytes(secretQuestion);
+                    string decodedsecretQuestion = System.Convert.ToBase64String(secrQuestion);
+
+                    string secretAnswer = secQuestion.securityAnswer;
+                    byte[] secrAnswer = System.Text.ASCIIEncoding.ASCII.GetBytes(secretAnswer);
+                    string decodedsecretAnswer = System.Convert.ToBase64String(secrAnswer);
+
+                    sData += "$" + secQuestion.userID + ",null," + secQuestion.questionID + "," + decodedsecretQuestion + "," + decodedsecretAnswer; //+ "\\n"
+
                 }
-
                 var Content = new System.Net.Http.StringContent(sData, Encoding.UTF8, "application/x-www-form-urlencoded");
                 var response = await API_Connection.PostAsync(lcToken, "/api/User/UpdatePopupSecurityQuesions/", Content);
 

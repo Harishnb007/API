@@ -147,7 +147,7 @@ namespace LoanCare_Mobile_API.Controllers
                                 Is_New_MobileUser = Is_New_MobileUser,
                                 Legal_version = 0,
                                 Privacy_version = 0,
-                                Terms_version =0
+                                Terms_version = 0
                             };
                             context.MobileUsers.Add(obj_Login);
                             context.Entry(obj_Login).State = EntityState.Added;
