@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoanCare_Mobile_API", "LoanCare_Mobile_API\LoanCare_Mobile_API.csproj", "{48674FBD-DA3A-4B3B-A1A0-34F1A1BA6766}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Business Services", "Business Services\Business Services.csproj", "{54D7407F-613D-4B70-97CC-3C68805DCDE0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{48674FBD-DA3A-4B3B-A1A0-34F1A1BA6766}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48674FBD-DA3A-4B3B-A1A0-34F1A1BA6766}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48674FBD-DA3A-4B3B-A1A0-34F1A1BA6766}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48674FBD-DA3A-4B3B-A1A0-34F1A1BA6766}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54D7407F-613D-4B70-97CC-3C68805DCDE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54D7407F-613D-4B70-97CC-3C68805DCDE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54D7407F-613D-4B70-97CC-3C68805DCDE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54D7407F-613D-4B70-97CC-3C68805DCDE0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {ECD907A4-958D-4238-9D22-65C3A8EAC1D3}
+	EndGlobalSection
+EndGlobal

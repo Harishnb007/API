@@ -1,0 +1,122 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Business_Services.Models;
+using Newtonsoft.Json;
+using Business_Services.Models.Helpers;
+using System.Security.Cryptography;
+using System.Net.Http;
+using System.Net;
+using System.Web;
+using Business_Services.B2C_WebAPI;
+
+namespace Business_Services
+{
+    public class TokenServices : ITokenServices
+    {
+        public TokenServices()
+        {
+            
+        }
+
+        public string GenerateToken(string userId,string password,int ClientId, string lcAuthToken)
+        {
+            DateTime issuedOn = DateTime.Now;
+            DateTime expiresOn = DateTime.Now.AddSeconds(Convert.ToDouble(ConfigurationManager.AppSettings["AuthTokenExpiry"]));
+
+            var tokendomain = new Token
+            {
+               //IssuedOn = issuedOn,
+                UserId = userId,
+                Lcauth = lcAuthToken,
+                ExpiresOn = expiresOn,
+                Password = password,
+                ClientId = ClientId
+            };
+           
+            return Encryptor.Encrypt(JsonConvert.SerializeObject(tokendomain));
+        }
+
+        public async Task<string> AuthenticateAsync(string userName, string password)
+        {
+           
+            HttpContent content;
+            ResponseWithToken response;
+            Payment AuthUser = new Payment();
+            AuthUser.loan_number = "";
+            try
+            {
+                  content = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", userName }, { "password", password } });
+                  response = await API_Connection.PostAsync("/api/Auth/Authenticate", content);
+               
+                return response.tokenValue;
+            }
+            catch (Exception Ex) {
+
+                return "Problem occurred trying to validate the user credentials. Please try again.";
+            }
+        }
+
+        public async Task<ResponseModel> TestAuthAsync()
+        {
+            try
+            {
+                
+                string returnedData = "";
+                string tokenValue = "";
+                
+                HttpContent content = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", "0000100099" }, { "password", "Slloancare@1" } });
+                ResponseWithToken response2 = await API_Connection.PostAsync("/api/Auth/Authenticate", content);
+                    
+                tokenValue = response2.tokenValue;
+
+                var response3 = await API_Connection.GetAsync(tokenValue, "/api/MyAccount/GetAccountInfo/0000100099");
+                returnedData = await response3.Content.ReadAsStringAsync();
+
+                return new ResponseModel(returnedData);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                throw ex;
+            }
+        }
+       
+        public bool ValidateToken(string tokenData)
+        {
+            try
+            {
+                Token tokenObject = JsonConvert.DeserializeObject<Token>(Encryptor.Decrypt(tokenData));
+
+                if (tokenObject != null && !(DateTime.Now > tokenObject.ExpiresOn))
+                {
+                    //tokenObject.ExpiresOn = tokenObject.ExpiresOn.AddSeconds(Convert.ToDouble(ConfigurationManager.AppSettings["AuthTokenExpiry"]));
+                    return true;
+                }
+            }
+            catch (Exception exp)  // Have used generic exception since both JsonConvert & Encryptor can throw errors
+            {
+              
+                return false;
+            }
+
+            return false;
+        }
+
+        public string GetLctoken(string mobileToken)
+        {
+            Token tokenObject = JsonConvert.DeserializeObject<Token>(Encryptor.Decrypt(mobileToken));
+
+            if (tokenObject !=  null)
+            {
+                return tokenObject.Lcauth;
+            }
+
+            return null;
+        }
+    }
+}
