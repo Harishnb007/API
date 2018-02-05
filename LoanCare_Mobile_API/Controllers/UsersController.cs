@@ -171,10 +171,49 @@ namespace LoanCare_Mobile_API.Controllers
             return Ok(payment);
         }    
 
-        [Route("Setpin")]
-        [HttpPost]
-        public  IHttpActionResult Postsetpin(UsersMDb userDetail)
+        //[Route("Setpin")]
+        //[HttpPut]
+        //public  IHttpActionResult Postsetpin(UpdatePassword PinDetail)
+        //{
+        //    // To do - Move the following code to a single method & use it across the project
+        //    IEnumerable<string> tokenValues;
+        //    string tokenValue = "";
+        //    if (Request.Headers.TryGetValues("AuthorizationToken", out tokenValues))
+        //    {
+        //        tokenValue = tokenValues.FirstOrDefault();
+        //    }
+        //    var payment =  userService.PostsetpinAsync(PinDetail,tokenValue);
+        //    if (payment == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return Ok(payment);
+        //}
+
+        //[Route("Resetpin")]
+        //[HttpPost]
+        //public IHttpActionResult PostResetpin(UsersMDb userDetail)
+        //{
+        //    // To do - Move the following code to a single method & use it across the project
+        //    IEnumerable<string> tokenValues;
+        //    string tokenValue = "";
+        //    if (Request.Headers.TryGetValues("AuthorizationToken", out tokenValues))
+        //    {
+        //        tokenValue = tokenValues.FirstOrDefault();
+        //    }
+        //    var payment = userService.ResetpinAsync(userDetail);
+        //    if (payment == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return Ok(payment);
+        //}
+
+        [Route("SetPin")]
+        [HttpPut]
+        public async Task<IHttpActionResult> SetpinPost(UpdatePassword PinDetails)
         {
+
             // To do - Move the following code to a single method & use it across the project
             IEnumerable<string> tokenValues;
             string tokenValue = "";
@@ -182,7 +221,8 @@ namespace LoanCare_Mobile_API.Controllers
             {
                 tokenValue = tokenValues.FirstOrDefault();
             }
-            var payment =  userService.PostsetpinAsync(userDetail);
+           
+            var payment = await userService.SetPinAsync(tokenValue, PinDetails);
             if (payment == null)
             {
                 return NotFound();
@@ -190,10 +230,11 @@ namespace LoanCare_Mobile_API.Controllers
             return Ok(payment);
         }
 
-        [Route("Resetpin")]
-        [HttpPost]
-        public IHttpActionResult PostResetpin(UsersMDb userDetail)
+        [Route("ReSetPin")]
+        [HttpPut]
+        public async Task<IHttpActionResult> ReSetpinPost(UpdatePassword PinDetails)
         {
+
             // To do - Move the following code to a single method & use it across the project
             IEnumerable<string> tokenValues;
             string tokenValue = "";
@@ -201,19 +242,23 @@ namespace LoanCare_Mobile_API.Controllers
             {
                 tokenValue = tokenValues.FirstOrDefault();
             }
-            var payment = userService.PostsetpinAsync(userDetail);
+
+            var payment = await userService.ReSetPinAsync(tokenValue, PinDetails);
             if (payment == null)
             {
                 return NotFound();
             }
             return Ok(payment);
         }
+
+
+
 
         [Route("updatepwd")]
         [HttpPut]
         public async Task<IHttpActionResult> updatepassword(UpdatePassword loanDetails)
         {
-
+            
             // To do - Move the following code to a single method & use it across the project
             IEnumerable<string> tokenValues;
             string tokenValue = "";
@@ -371,10 +416,13 @@ namespace LoanCare_Mobile_API.Controllers
             }
         }
 
+       
+
+
         //Added by BBSR_Team on 9th Jan 2018
 
 
-       
+
 
         //Modified by BBSR Team on 16th Jan 2018 : User Registration
 

@@ -19,13 +19,13 @@ namespace Business_Services
         ResponseModel ContactUsAsync(string mobileToken);
         ResponseModel UpdateProfile(string user_id, Business_Services.Models.User user);
         Task<ResponseModel> DeleteBankAccountsForUser(string mobileToken, int id, string bank_name, string account_number, string routing_number, string account_type);
-
+        //ResponseModel ResetpinAsync(UsersMDb userDetail);
         //Modified by BBSR Team on 5th Jan 2018
         Task<ResponseModel> UpdateSecurityAnswers(string lcAuthToken, List<QuestionSummary> secQuestions);
         ResponseModel SendUserIdByMail(string loan_number, string last4digits_ssn);
         ResponseModel SendPasswordByMail(string user_id);
-        ResponseModel GetPrivacyForUser(string user_id);       
-        ResponseModel PostsetpinAsync(UsersMDb userDetail);
+        ResponseModel GetPrivacyForUser(string user_id);
+        //Task<ResponseModel> PostsetpinAsync(UpdatePassword PinDetail, string MobileToken);
         Task<ResponseModel> GetManageAccountForUser(string mobileToken, string LoanNumber);
         Task<ResponseModel> getUserDetailsAsync(string lcAuthToken, string loan_number);
         Task<ResponseModel> GetSecurityQuestions(string lcAuthToken);
@@ -36,7 +36,7 @@ namespace Business_Services
         ResponseModel getpinAsync(string loanNumber, string pin);
         Task<ResponseModel> UpdatePasswordAsync(string MobileToken, UpdatePassword loanDetails, string Password);
         Task<ResponseModel> GetPushNotificationForUser(string mobileToken, PushNotificationUser pushNotification);
-
+        Task<ResponseModel> ReSetPinAsync(string MobileToken, UpdatePassword PinDetail);
         //Modified by BBSR Team on 16th Jan 2018 : User Registration
        Task<ResponseModel> PostUserRegistrationAsync(Business_Services.Models.User userDetail);
         Task<ResponseModel> GetConfirmationAsync(Business_Services.Models.User userDetail);
@@ -49,6 +49,7 @@ namespace Business_Services
         Task<ResponseModel> ForgotPassword(Business_Services.Models.User userDetail);
         Task<ResponseModel> ValidateSecurityAnswer(Business_Services.Models.User userDetail);
         Task<ResponseModel> ResetSendPassword(Business_Services.Models.User userDetail);
+        Task<ResponseModel> SetPinAsync(string MobileToken, UpdatePassword loanDetails);
         //Modified by BBSR Team on 18th Jan 2018 : Forgot User / Password
     }
 }

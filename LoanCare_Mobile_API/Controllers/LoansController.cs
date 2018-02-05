@@ -119,6 +119,8 @@ namespace LoanCare_Mobile_API.Controllers
             return Ok(loan);
         }
 
+
+
        
 
         [Route("getpaymentdetails/{loan_number}")]
@@ -156,6 +158,25 @@ namespace LoanCare_Mobile_API.Controllers
             }
             return Ok(payment);
         }
+
+        [Route("getpdfStream/{statement_url}")]
+        public async Task<IHttpActionResult> getpdfStream(string statement_url)
+        {
+            // To do - Move the following code to a single method & use it across the project
+            IEnumerable<string> tokenValues;
+            string tokenValue = "";
+            if (Request.Headers.TryGetValues("AuthorizationToken", out tokenValues))
+            {
+                tokenValue = tokenValues.FirstOrDefault();
+            }
+            var payment = await loanService.GetpdfstreamAsync(tokenValue, statement_url);
+            if (payment == null)
+            {
+                return NotFound();
+            }
+            return Ok(payment);
+        }
+
 
 
         [Route("getupcomingpayment/{loan_number}")]

@@ -15,8 +15,7 @@ namespace Business_Services
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        string GenerateToken(string userId, string password, int ClientId, string lcAuthToken);
-
+        string GenerateToken(string userId, string password, int ClientId, string lcAuthToken, string UserName);
         /// <summary>
         /// Function to validate token against expiry
         /// </summary>

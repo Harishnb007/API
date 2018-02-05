@@ -17,6 +17,8 @@ using System.Data.Entity;
 using System.Security.Cryptography;
 using System.IO;
 using System.Configuration;
+using System.Net;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Business_Services
 {
@@ -370,18 +372,49 @@ namespace Business_Services
 
                     {
                         statement_date = Estatementdata.statementDate,
-                        statement_url = "/Statements/EStatementHandler.Pdf?loanNo=" + loan_number + "&statementDate=" + Estatementdata.statementDate + "&statementKey=" + Estatementdata.key
-
+                        statement_url = "https://lcuiqa.test.servicelinkfnf.com/Statements/EStatementHandler.Pdf?loanNo=" + loan_number + "&statementDate=" + Estatementdata.statementDate + "&statementKey=" + Estatementdata.key
+                        
                     }
 
                       );
 
                     //  estatement.estatement.Add(statement_Date);
                 }
+
                 EstatementDetails estatementresult = new EstatementDetails()
                 {
                     estatement = estatement
                 };
+                foreach (var estatemen in estatement) {
+                    MemoryStream mem = new MemoryStream();
+                    var responsestream = await API_Connection.GetAsync(lcToken, estatemen.statement_url);
+                    string returnedDatastream = await responsestream.Content.ReadAsStringAsync();
+                   // byte[] datastream = Encoding.ASCII.GetBytes(returnedDatastream);
+
+                    byte[] bytes;
+                    BinaryFormatter bf = new BinaryFormatter();
+                    MemoryStream ms = new MemoryStream();
+                    bf.Serialize(ms, returnedDatastream);
+                    bytes = ms.ToArray();
+                    System.IO.File.WriteAllBytes("C:\\Users\\harivigneshm.FNFSECURE.003\\Desktop\\pdfhello.pdf", bytes);
+                    //using (FileStream stream = new FileStream("C:\\Users\\harivigneshm.FNFSECURE.003\\Desktop\\pdf" + "\\" + datastream, FileMode.CreateNew))
+
+                    //{
+
+                    //    using (StreamWriter writer = new StreamWriter(stream, Encoding.UTF8))
+
+                    //    {
+
+                    //        byte[] buffer = datastream;
+
+                    //        stream.Write(buffer, 0, buffer.Length);
+
+                    //        writer.Close();
+
+                    //    }
+
+                    //}
+                }
 
                 return new ResponseModel(estatementresult);
             }
@@ -391,6 +424,53 @@ namespace Business_Services
                 return new ResponseModel(null, 1, Ex.Message);
             }
         }
+
+        public async Task<ResponseModel> GetpdfstreamAsync(string lcAuthToken, string statement_url)
+        {
+            // To do - Use DI
+
+            string lcToken = tokenServices.GetLctoken(lcAuthToken);
+            try
+            {
+               
+                List<EsatementDateurl> estatement = new List<EsatementDateurl>();
+
+                    MemoryStream mem = new MemoryStream();
+                    var responsestream = await API_Connection.GetAsync(lcToken, statement_url);
+                    string returnedDatastream = await responsestream.Content.ReadAsStringAsync();
+
+                    byte[] bytes;
+                    BinaryFormatter bf = new BinaryFormatter();
+                    MemoryStream ms = new MemoryStream();
+                    bf.Serialize(ms, returnedDatastream);
+                    bytes = ms.ToArray();
+                return new ResponseModel(bytes);
+            }
+            catch (Exception Ex)
+            {
+                return new ResponseModel(null, 1, Ex.Message);
+            }
+        }
+
+        //private static Stream ConvertToStream(string fileUrl)
+        //{
+        //    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(fileUrl);
+        //    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+
+        //    try
+        //    {
+        //        MemoryStream mem = new MemoryStream();
+        //        Stream stream = response.GetResponseStream();
+
+        //        stream.CopyTo(mem, 4096);
+
+        //        return mem;
+        //    }
+        //    finally
+        //    {
+        //        response.Close();
+        //    }
+        //}
 
         public async Task<ResponseModel> GetLoanInfoForLoanAsync(string lcAuthToken, string loan_number)
         {

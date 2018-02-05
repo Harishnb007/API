@@ -17,6 +17,12 @@ namespace Business_Services.Models
         public string current_password { get; set; }
 
         [JsonProperty]
+        public string Pin { get; set; }
+
+        [JsonProperty]
+        public string OldPin { get; set; }
+
+        [JsonProperty]
         public bool is_Success { get; set; }
 
         [JsonProperty]
