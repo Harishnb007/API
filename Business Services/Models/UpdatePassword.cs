@@ -19,6 +19,7 @@ namespace Business_Services.Models
         [JsonProperty]
         public string Pin { get; set; }
 
+        public string ConfirmPin { get; set; }
         [JsonProperty]
         public string OldPin { get; set; }
 
