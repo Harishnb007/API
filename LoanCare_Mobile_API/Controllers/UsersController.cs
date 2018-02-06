@@ -49,6 +49,10 @@ namespace LoanCare_Mobile_API.Controllers
                 tokenValue = tokenValues.FirstOrDefault();
             }
 
+           
+
+            // var payment = await userService.UpdatePasswordAsync(tokenValue, loanDetails, objPasswordUpd);
+
             var payment = await userService.getUserDetailsAsyn(tokenValue, userId);
             if (payment == null)
             {

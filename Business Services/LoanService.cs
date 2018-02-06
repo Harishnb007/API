@@ -38,7 +38,7 @@ namespace Business_Services
             string lcToken = tokenServices.GetLctoken(mobileToken);
 
             try
-            {
+            { 
                 var response = await API_Connection.GetAsync(lcToken, "/api/OneTimePayment/CancelOnetimePayment/?loanNo="
                     + paymentData.loan_number + "&schDate=" + paymentData.payment_date.ToString("MM/dd/yyyy") + "&isRegularDelete=true&dateCreated="
                     + paymentData.date_created);
@@ -389,14 +389,35 @@ namespace Business_Services
                     MemoryStream mem = new MemoryStream();
                     var responsestream = await API_Connection.GetAsync(lcToken, estatemen.statement_url);
                     string returnedDatastream = await responsestream.Content.ReadAsStringAsync();
-                   // byte[] datastream = Encoding.ASCII.GetBytes(returnedDatastream);
+                    byte[] datastream = Encoding.ASCII.GetBytes(returnedDatastream);
 
-                    byte[] bytes;
-                    BinaryFormatter bf = new BinaryFormatter();
-                    MemoryStream ms = new MemoryStream();
-                    bf.Serialize(ms, returnedDatastream);
-                    bytes = ms.ToArray();
-                    System.IO.File.WriteAllBytes("C:\\Users\\harivigneshm.FNFSECURE.003\\Desktop\\pdfhello.pdf", bytes);
+                    //byte[] bytes;
+                    //BinaryFormatter bf = new BinaryFormatter();
+                    //MemoryStream ms = new MemoryStream();
+                    //bf.Serialize(ms, returnedDatastream);
+                    //bytes = ms.ToArray();
+                    //System.IO.File.WriteAllBytes("C:\\Users\\harivigneshm.FNFSECURE.003\\Desktop\\pdfhello.pdf", bytes);
+
+
+
+
+                    using (FileStream stream = new FileStream("C:\\Users\\harivigneshm.FNFSECURE.003\\Desktop\\pdfhello.pdf" + "\\" + datastream, FileMode.CreateNew))
+
+                    {
+
+                        using (StreamWriter writer = new StreamWriter(stream, Encoding.UTF8))
+
+                        {
+
+                            byte[] buffer = datastream;
+
+                            stream.Write(buffer, 0, buffer.Length);
+
+                            writer.Close();
+
+                        }
+
+                    }
                     //using (FileStream stream = new FileStream("C:\\Users\\harivigneshm.FNFSECURE.003\\Desktop\\pdf" + "\\" + datastream, FileMode.CreateNew))
 
                     //{

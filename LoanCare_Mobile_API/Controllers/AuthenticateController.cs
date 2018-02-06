@@ -15,6 +15,10 @@ using System.Threading.Tasks;
 using System.Web.Http.Cors;
 using System.Data.Entity;
 using Business_Services.Models;
+using Newtonsoft.Json;
+using System.Security.Cryptography;
+using System.IO;
+
 
 namespace LoanCare_Mobile_API.Controllers
 {
@@ -116,6 +120,15 @@ namespace LoanCare_Mobile_API.Controllers
                 //Debug.WriteLine(userDetails.first_name);
 
                 var token = _tokenServices.GenerateToken(userId, Password, userDetails.ClientId, lcAuthToken, userDetails.username,resourcename,log);
+
+                var Decryptdata = Decrypt(token);
+
+                dynamic objPassword = JsonConvert.DeserializeObject(Decryptdata);
+
+              
+
+             
+
                 List<LoanSummarys> loanS = new List<LoanSummarys>();
                 //AuthTokenAndUserDetails Auth_data = new AuthTokenAndUserDetails
                 //{
@@ -313,6 +326,41 @@ namespace LoanCare_Mobile_API.Controllers
             return response;
         }
 
+        static string _Pwd = "This_is_just_a_token_text_for_dev";
+        // To do - move this to config file
+
+        static byte[] _Salt = new byte[] { 0x45, 0xF1, 0x61, 0x6e, 0x20, 0x00, 0x65, 0x64, 0x76, 0x65, 0x64, 0x03, 0x76 };
+        internal static string Decrypt(string cipherText)
+        {
+            byte[] cipherBytes = Convert.FromBase64String(cipherText);
+            Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(_Pwd, _Salt);
+            byte[] decryptedData = Decrypt(cipherBytes, pdb.GetBytes(32), pdb.GetBytes(16));
+            return System.Text.Encoding.Unicode.GetString(decryptedData);
+        }
+
+        private static byte[] Decrypt(byte[] cipherData, byte[] Key, byte[] IV)
+        {
+            MemoryStream ms = new MemoryStream();
+            CryptoStream cs = null;
+            try
+            {
+                Rijndael alg = Rijndael.Create();
+                alg.Key = Key;
+                alg.IV = IV;
+                cs = new CryptoStream(ms, alg.CreateDecryptor(), CryptoStreamMode.Write);
+                cs.Write(cipherData, 0, cipherData.Length);
+                cs.FlushFinalBlock();
+                return ms.ToArray();
+            }
+            catch
+            {
+                return null;
+            }
+            finally
+            {
+                cs.Close();
+            }
+        }
         /// <summary>
         /// Extend the session
         /// </summary>
@@ -331,7 +379,7 @@ namespace LoanCare_Mobile_API.Controllers
 
                 //To do - Write a call to TokenService to pull the username from the token
                 // To do - Pass username into the method below
-                return GetAuthTokenAsync("23423", "", "", false,"").Result;
+                return GetAuthTokenAsync("23423", "", "", false,"","","").Result;
             }
             return null;
         }

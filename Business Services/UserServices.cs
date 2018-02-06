@@ -1087,11 +1087,7 @@ namespace Business_Services
                 string objPWd = ObjUserId.Password;
                 int objCId = ObjUserId.ClientId;
 
-
-
                 string lcToken = tokenServices.GetLctoken(MobileToken);
-
-
 
                 var responseIn = await API_Connection.GetAsync(lcToken, "/api/User/GetUserInformation");
                 string returnedDataUser = await responseIn.Content.ReadAsStringAsync();
