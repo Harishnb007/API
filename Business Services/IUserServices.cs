@@ -18,7 +18,7 @@ namespace Business_Services
         Task<ResponseModel> GetBankAccountsForUser(string mobileToken);
         ResponseModel ContactUsAsync(string mobileToken);
         ResponseModel UpdateProfile(string user_id, Business_Services.Models.User user);
-        Task<ResponseModel> DeleteBankAccountsForUser(string mobileToken, int id, string bank_name, string account_number, string routing_number, string account_type);
+        Task<ResponseModel> DeleteBankAccountsForUser(string mobileToken, BankAccount objBank);
         //ResponseModel ResetpinAsync(UsersMDb userDetail);
         //Modified by BBSR Team on 5th Jan 2018
         Task<ResponseModel> UpdateSecurityAnswers(string lcAuthToken, List<QuestionSummary> secQuestions);

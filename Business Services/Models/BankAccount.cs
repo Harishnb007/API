@@ -17,5 +17,6 @@ namespace Business_Services.Models
         public bool isAuthorized { get; set; }
 
         public bool isNew { get; set; }
+        public string  id { get; set; }
     }
 }

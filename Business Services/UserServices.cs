@@ -57,22 +57,22 @@ namespace Business_Services
                 return new ResponseModel(null, 1, Ex.Message);
             }
         }
-        public async Task<ResponseModel> DeleteBankAccountsForUser(string mobileToken, int id, string bank_name, string routing_number, string account_number, string account_type)
+        public async Task<ResponseModel> DeleteBankAccountsForUser(string mobileToken, BankAccount objBank)
         {
             TokenServices tokenServices = new TokenServices();
             string lcToken = tokenServices.GetLctoken(mobileToken);
 
             try
             {
-                byte[] accountnum = System.Text.ASCIIEncoding.ASCII.GetBytes(account_number);
+                byte[] accountnum = System.Text.ASCIIEncoding.ASCII.GetBytes(objBank.account_number);
                 string decodedaccountnumber = System.Convert.ToBase64String(accountnum);
 
                 Dictionary<string, string> someDict = new Dictionary<string, string>();
-                someDict.Add("id", Convert.ToString(id));
-                someDict.Add("bankName", bank_name);
-                someDict.Add("routingNumber", routing_number);
-                someDict.Add("accountNumber", account_number);
-                someDict.Add("accountType", account_type);
+                someDict.Add("id", Convert.ToString(objBank.id));
+                someDict.Add("bankName", objBank.bank_name);
+                someDict.Add("routingNumber", objBank.routing_number);
+                someDict.Add("accountNumber", objBank.account_number);
+                someDict.Add("accountType", objBank.account_type);
                 someDict.Add("sourceFlag", "MSP");
                 someDict.Add("LoanId", "0");
 

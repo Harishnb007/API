@@ -97,9 +97,9 @@ namespace LoanCare_Mobile_API.Controllers
         }
 
 
-        [Route("bankaccountsDelete/{id}/{bankname}/{routingnum}/{accountnum}/{accounttype}")]
+        [Route("bankaccountsDelete")]
         [HttpDelete]
-        public async Task<IHttpActionResult> DeleteBankAccounts(int id, string bankname, string routingnum, string accountnum, string accounttype)
+        public async Task<IHttpActionResult> DeleteBankAccounts(BankAccount objBank)
         {
             IEnumerable<string> tokenValues;
             string tokenValue = "";
@@ -107,7 +107,7 @@ namespace LoanCare_Mobile_API.Controllers
             {
                 tokenValue = tokenValues.FirstOrDefault();
             }
-            var payment = await userService.DeleteBankAccountsForUser(tokenValue, id, bankname, routingnum, accountnum, accounttype);
+            var payment = await userService.DeleteBankAccountsForUser(tokenValue, objBank);
             if (payment == null)
             {
                 return NotFound();
