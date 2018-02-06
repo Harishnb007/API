@@ -63,7 +63,7 @@ namespace LoanCare_Mobile_API.Controllers
             var lcAuthTokenValueTask = _tokenServices.AuthenticateAsync(userCred.username, userCred.password);
             await Task.WhenAll(lcAuthTokenValueTask);
 
-            var GetTokenTask = GetAuthTokenAsync(userCred.username, userCred.password, lcAuthTokenValueTask.Result, userCred.Is_New_MobileUser,userCred.username);
+            var GetTokenTask = GetAuthTokenAsync(userCred.username, userCred.password, lcAuthTokenValueTask.Result, userCred.Is_New_MobileUser,userCred.username,userCred.resourcename,userCred.log);
             await Task.WhenAll(GetTokenTask);
 
             return GetTokenTask.Result;
@@ -104,7 +104,7 @@ namespace LoanCare_Mobile_API.Controllers
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        private async Task<HttpResponseMessage> GetAuthTokenAsync(string userId, string Password, string lcAuthToken, bool Is_New_MobileUser, string UserName)
+        private async Task<HttpResponseMessage> GetAuthTokenAsync(string userId, string Password, string lcAuthToken, bool Is_New_MobileUser, string UserName,string resourcename,string log)
         {
             AuthTokenAndUserDetails Auth_data = new AuthTokenAndUserDetails();
             IUserServices userService = new UserServices();
@@ -115,7 +115,7 @@ namespace LoanCare_Mobile_API.Controllers
                 Business_Services.Models.User userDetails = (Business_Services.Models.User)details.Result.data;
                 //Debug.WriteLine(userDetails.first_name);
 
-                var token = _tokenServices.GenerateToken(userId, Password, userDetails.ClientId, lcAuthToken, userDetails.username);
+                var token = _tokenServices.GenerateToken(userId, Password, userDetails.ClientId, lcAuthToken, userDetails.username,resourcename,log);
                 List<LoanSummarys> loanS = new List<LoanSummarys>();
                 //AuthTokenAndUserDetails Auth_data = new AuthTokenAndUserDetails
                 //{
@@ -192,6 +192,7 @@ namespace LoanCare_Mobile_API.Controllers
                 Auth_data.ClientId = userDetails.ClientId;
                 Auth_data.ClientName = userDetails.ClientName;
                 Auth_data.LoginId = userDetails.LoginId;
+            
                 foreach (var Add in userDetails.loanss)
                 {
                     loanS.Add(new LoanSummarys

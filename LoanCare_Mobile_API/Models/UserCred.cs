@@ -10,5 +10,7 @@ namespace LoanCare_Mobile_API.Models
         public string username { get; set; }
         public string password { get; set; }
         public bool Is_New_MobileUser { get; set; }
+        public string resourcename { get; set; }
+        public string log { get; set; }
     }
 }

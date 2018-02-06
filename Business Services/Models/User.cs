@@ -36,7 +36,6 @@ namespace Business_Services.Models
         public Address addresss { get; set; }
         public string status { get; set; }
         public string noOfAttempts { get; set; }
-
         public List<LoanSummary> loanss { get; set; }
     }
 

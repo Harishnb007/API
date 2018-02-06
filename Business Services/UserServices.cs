@@ -77,7 +77,7 @@ namespace Business_Services
                 someDict.Add("LoanId", "0");
 
                 var content = new FormUrlEncodedContent(someDict);
-                
+
                 var response = await API_Connection.DeleteAsync(lcToken, "/api/BankAccountInformation/DeleteBankDetails", content);
 
                 return new ResponseModel(response);
@@ -92,7 +92,7 @@ namespace Business_Services
         public async Task<ResponseModel> GetSecurityQuestions(string lcAuthToken)
         {
             TokenServices tokenServices = new TokenServices();
-            string lcToken = tokenServices.GetLctoken(lcAuthToken);            
+            string lcToken = tokenServices.GetLctoken(lcAuthToken);
             var responseQuestionInfo = await API_Connection.GetAsync(lcToken, "/api/User/GetSecurtiyQuestions/");
             string returnedData = await responseQuestionInfo.Content.ReadAsStringAsync();
 
@@ -195,7 +195,8 @@ namespace Business_Services
                 }
                 return new ResponseModel(banklist);
             }
-            catch (Exception Ex) {
+            catch (Exception Ex)
+            {
                 return new ResponseModel(null, 1, Ex.Message);
             }
         }
@@ -281,7 +282,8 @@ namespace Business_Services
                     return new ResponseModel(objForgotUser, 1, "Error");
                 }
             }
-            catch (Exception Ex) {
+            catch (Exception Ex)
+            {
                 return new ResponseModel(null, 1, Ex.Message);
             }
         }
@@ -310,16 +312,18 @@ namespace Business_Services
 
                 dynamic objForgotUser = JsonConvert.DeserializeObject(returnedData);
 
-                if (!returnedData.Contains("success")) {             
-                    
+                if (!returnedData.Contains("success"))
+                {
 
-                    return new ResponseModel(objForgotUser, 1,"Error");
-                }              
-                
+
+                    return new ResponseModel(objForgotUser, 1, "Error");
+                }
+
 
                 return new ResponseModel(objForgotUser);
             }
-            catch (Exception Ex) {
+            catch (Exception Ex)
+            {
                 return new ResponseModel(null, 1, Ex.Message);
             }
         }
@@ -347,8 +351,9 @@ namespace Business_Services
 
                 return new ResponseModel(objConf);
             }
-            catch (Exception Ex) {
-                return new ResponseModel(null,1,Ex.Message);
+            catch (Exception Ex)
+            {
+                return new ResponseModel(null, 1, Ex.Message);
             }
         }
 
@@ -399,7 +404,8 @@ namespace Business_Services
 
                 return new ResponseModel(objResetPassword);
             }
-            catch (Exception Ex) {
+            catch (Exception Ex)
+            {
                 return new ResponseModel(null, 1, Ex.Message);
             }
         }
@@ -516,7 +522,8 @@ namespace Business_Services
 
                 return new ResponseModel(userDetails);
             }
-            catch (Exception Ex) {
+            catch (Exception Ex)
+            {
 
                 return new ResponseModel(null, 1, Ex.Message);
             }
@@ -655,7 +662,8 @@ namespace Business_Services
                 };
                 return new ResponseModel(UserLoanIfo);
             }
-            catch (Exception Ex) {
+            catch (Exception Ex)
+            {
                 return new ResponseModel(null, 1, Ex.Message);
             }
         }
@@ -719,7 +727,8 @@ namespace Business_Services
 
                 return new ResponseModel(response);
             }
-            catch (Exception Ex) {
+            catch (Exception Ex)
+            {
                 return new ResponseModel(null, 1, Ex.Message);
             }
         }
@@ -772,7 +781,8 @@ namespace Business_Services
 
                 return new ResponseModel(response);
             }
-            catch (Exception Ex) {
+            catch (Exception Ex)
+            {
                 return new ResponseModel(null, 1, Ex.Message);
             }
         }
@@ -879,14 +889,15 @@ namespace Business_Services
 
                 return new ResponseModel(contactUs_details);
             }
-            catch (Exception Ex) {
+            catch (Exception Ex)
+            {
 
                 return new ResponseModel(null, 1, Ex.Message);
             }
         }
 
-        
-       
+
+
 
         public ResponseModel SendPasswordByMail(string user_id)
         {
@@ -906,7 +917,7 @@ namespace Business_Services
         }
         public void LogWrite(string PropertyName, string logMessage)
         {
-             try
+            try
             {
                 using (StreamWriter w = File.AppendText(@"E:\API_Log\Log.txt"))
                 {
@@ -1076,28 +1087,27 @@ namespace Business_Services
                 string objPWd = ObjUserId.Password;
                 int objCId = ObjUserId.ClientId;
 
-               
+
 
                 string lcToken = tokenServices.GetLctoken(MobileToken);
 
-             
-               
-                    var responseIn = await API_Connection.GetAsync(lcToken, "/api/User/GetUserInformation");
-                    string returnedDataUser = await responseIn.Content.ReadAsStringAsync();
-                    dynamic getuserinfo = JsonConvert.DeserializeObject(returnedDataUser);
-                    string UserName = getuserinfo.user.userName;
-                    string User_Name = UserName.Trim();
-                    byte[] password = System.Text.ASCIIEncoding.ASCII.GetBytes(PinDetail.password);
-                    string decodedStringpassword = System.Convert.ToBase64String(password);
 
-                        byte[] Pin = System.Text.ASCIIEncoding.ASCII.GetBytes(PinDetail.Pin);
-                        string decodedStringPin = System.Convert.ToBase64String(Pin);
+
+                var responseIn = await API_Connection.GetAsync(lcToken, "/api/User/GetUserInformation");
+                string returnedDataUser = await responseIn.Content.ReadAsStringAsync();
+                dynamic getuserinfo = JsonConvert.DeserializeObject(returnedDataUser);
+                string UserName = getuserinfo.user.userName;
+                string User_Name = UserName.Trim();
+
+
+                byte[] Pin = System.Text.ASCIIEncoding.ASCII.GetBytes(PinDetail.Pin);
+                string decodedStringPin = System.Convert.ToBase64String(Pin);
 
                 byte[] userId = System.Text.ASCIIEncoding.ASCII.GetBytes(User_Name);
-                    string decodedStringuserId = System.Convert.ToBase64String(userId);
-                    string decodedStringexistinguserId = System.Convert.ToBase64String(userId);
+                string decodedStringuserId = System.Convert.ToBase64String(userId);
+                string decodedStringexistinguserId = System.Convert.ToBase64String(userId);
 
-                    Dictionary<string, string> someDict = new Dictionary<string, string>();
+                Dictionary<string, string> someDict = new Dictionary<string, string>();
 
                 someDict.Add("password", "");
                 someDict.Add("userId", "");
@@ -1108,59 +1118,76 @@ namespace Business_Services
                 someDict.Add("ContactType", "");
 
                 var content = new FormUrlEncodedContent(someDict);
-                    var response = await API_Connection.PostAsync(lcToken, "/api/User/UpdateUseridPassword/", content);
+                var response = await API_Connection.PostAsync(lcToken, "/api/User/UpdateUseridPassword/", content);
 
-                    dynamic Message = await response.message.Content.ReadAsStringAsync();
+                dynamic Message = await response.message.Content.ReadAsStringAsync();
 
-                    var ErrorMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Message);
-             
+                var ErrorMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Message);
+
 
                 if (ErrorMessage.updated == true)
+                {
+
+                    Business_Services.Models.DAL.LoancareDBContext.MobileUser MUser = new Business_Services.Models.DAL.LoancareDBContext.MobileUser();
+                    using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
                     {
+                        var setpin = ctx.MobileUsers.Where(s => s.User_Id == PinDetail.User_Id).FirstOrDefault();
+                        if (setpin != null)
+                        {
+                            using (var context = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
+                            {
+                                setpin.mae_steps_completed = "2";
+                                context.Entry(setpin).State = EntityState.Modified;
+                                context.SaveChanges();
+
+                            }
+                        }
+                    }
+
                     string freedommortageURL = ErrorMessage.client.privateLabelURL;
                     string FreedomMortage = ErrorMessage.client.clientName;
                     PinDetail.Message = ErrorMessage.msg;
-                     Dictionary<string, string> someDictMail = new Dictionary<string, string>();
-                        someDictMail.Add("emailData[0][key]", "timeVal");
-                        someDictMail.Add("emailData[0][value]", Convert.ToString(DateTime.Now));
-                        someDictMail.Add("emailData[0][update]", "undefined");
-                        someDictMail.Add("emailData[1][key]", "Url");
-                        someDictMail.Add("emailData[1][value]", freedommortageURL);
-                        someDictMail.Add("emailData[1][update]", "undefined");
-                        someDictMail.Add("emailData[2][key]", "client");
-                        someDictMail.Add("emailData[2][value]", FreedomMortage);
-                        someDictMail.Add("emailData[2][update]", "undefined");
-                        someDictMail.Add("emailData[3][key]", "PROPERTY_STATE_CODE");
-                        someDictMail.Add("emailData[3][value]", "MA");
-                        someDictMail.Add("emailData[3][update]", "undefined");
-                        someDictMail.Add("update", "undefined");
+                    Dictionary<string, string> someDictMail = new Dictionary<string, string>();
+                    someDictMail.Add("emailData[0][key]", "timeVal");
+                    someDictMail.Add("emailData[0][value]", Convert.ToString(DateTime.Now));
+                    someDictMail.Add("emailData[0][update]", "undefined");
+                    someDictMail.Add("emailData[1][key]", "Url");
+                    someDictMail.Add("emailData[1][value]", freedommortageURL);
+                    someDictMail.Add("emailData[1][update]", "undefined");
+                    someDictMail.Add("emailData[2][key]", "client");
+                    someDictMail.Add("emailData[2][value]", FreedomMortage);
+                    someDictMail.Add("emailData[2][update]", "undefined");
+                    someDictMail.Add("emailData[3][key]", "PROPERTY_STATE_CODE");
+                    someDictMail.Add("emailData[3][value]", "MA");
+                    someDictMail.Add("emailData[3][update]", "undefined");
+                    someDictMail.Add("update", "undefined");
 
 
-                        var contentmail = new FormUrlEncodedContent(someDictMail);
-                        var responsemail = await API_Connection.PostAsync(lcToken, "/api/EmailNotification/SendEmailConfirmationForTemplate/?template=UpdateUserPassword&toEmail=bGFtZXJlLm5pY2hvbGFzQGdtYWlsLmNvbQ==&pageName=manageSecurityPref-UpdateUserPassword&userID=&securityEnabled=true", contentmail);
-                    }
+                    var contentmail = new FormUrlEncodedContent(someDictMail);
+                    var responsemail = await API_Connection.PostAsync(lcToken, "/api/EmailNotification/SendEmailConfirmationForTemplate/?template=UpdateUserPassword&toEmail=bGFtZXJlLm5pY2hvbGFzQGdtYWlsLmNvbQ==&pageName=manageSecurityPref-UpdateUserPassword&userID=&securityEnabled=true", contentmail);
+                }
 
-                    var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password",objPWd } });
-                    var responseregeneratedToken = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
+                var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", objPWd } });
+                var responseregeneratedToken = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
 
-                    var Token = responseregeneratedToken.tokenValue;
+                var Token = responseregeneratedToken.tokenValue;
 
-                    var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token);
+                var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token);
 
-                    PinDetail.Token = MobileTokenNew;
+                PinDetail.Token = MobileTokenNew;
 
-                    if (ErrorMessage.updated == false)
-                    {
+                if (ErrorMessage.updated == false)
+                {
                     PinDetail.Message = ErrorMessage.msg;
                     PinDetail.Token = MobileToken;
-                        return new ResponseModel(PinDetail, 1, "Failed");
-                    }
-                    else
-                    {
-                        return new ResponseModel(PinDetail);
-                    }
-                
-               
+                    return new ResponseModel(PinDetail, 1, "Failed");
+                }
+                else
+                {
+                    return new ResponseModel(PinDetail);
+                }
+
+
             }
             catch (Exception Ex)
             {
@@ -1222,7 +1249,7 @@ namespace Business_Services
                 dynamic Message = await response.message.Content.ReadAsStringAsync();
 
                 var ErrorMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Message);
-              
+
 
                 if (ErrorMessage.updated == true)
                 {
@@ -1260,7 +1287,7 @@ namespace Business_Services
 
                 if (ErrorMessage.updated == false)
                 {
-                    PinDetail.Message = ErrorMessage.msg;                  
+                    PinDetail.Message = ErrorMessage.msg;
                     PinDetail.Token = MobileToken;
                     return new ResponseModel(PinDetail, 1, "Failed");
                 }
@@ -1283,17 +1310,17 @@ namespace Business_Services
             Business_Services.Models.User setpin = new Business_Services.Models.User();
             try
             {
-  
-                    if (loanNumber == loanNumber && pin == "1234")
-                    {
 
-                        setpin.is_successful = true;
-                    }
-                    else
-                    {
-                        setpin.is_successful = false;
-                    }
-               // }
+                if (loanNumber == loanNumber && pin == "1234")
+                {
+
+                    setpin.is_successful = true;
+                }
+                else
+                {
+                    setpin.is_successful = false;
+                }
+                // }
                 return new ResponseModel(setpin);
             }
             catch (Exception Ex)
@@ -1325,7 +1352,7 @@ namespace Business_Services
         //    try
         //    {
         //        string lcToken = tokenServices.GetLctoken(MobileToken);
-             
+
         //        string UserName = ObjUserName;
         //        string User_Name = UserName.Trim();
 
@@ -1349,7 +1376,7 @@ namespace Business_Services
         //        someDict.Add("Pin", decodedStringPin);
         //        someDict.Add("OldPin", "");
         //        someDict.Add("ContactType", "");               
-  
+
         //        var content = new FormUrlEncodedContent(someDict);
         //        var response = await API_Connection.PostAsync(lcToken, "/api/User/UpdateUseridPassword/", content);
 
@@ -1378,7 +1405,7 @@ namespace Business_Services
 
         //public ResponseModel ResetpinAsync(UsersMDb userDetail)
         //{
-        //    // Business_Services.Models.DAL.User setpin = new Models.DAL.User();
+        //    Business_Services.Models.DAL.User setpin = new Models.DAL.User();
         //    Business_Services.Models.User setpinsuccess = new Models.User();
         //    try
         //    {
@@ -1408,7 +1435,7 @@ namespace Business_Services
         //        return new ResponseModel(null, 1, "Invalid Pin");
         //    }
         //}
-        
+
         //Modified by BBSR Team on 5th Jan 2018
         //public async Task<string> UpdateSecurityAnswers(string lcAuthToken, List<QuestionSummary> secQuestions)
         public async Task<ResponseModel> UpdateSecurityAnswers(string lcAuthToken, List<QuestionSummary> secQuestions)
@@ -1435,25 +1462,25 @@ namespace Business_Services
 
                     sData += "$" + secQuestion.userID + ",null," + secQuestion.questionID + "," + decodedsecretQuestion + "," + decodedsecretAnswer; //+ "\\n"
                 }
-              
-                var content = new System.Net.Http.StringContent(sData, System.Text.Encoding.UTF8, "application/x-www-form-urlencoded");            
+
+                var content = new System.Net.Http.StringContent(sData, System.Text.Encoding.UTF8, "application/x-www-form-urlencoded");
                 var response = await API_Connection.PostAsync(lcToken, "/api/User/Updatesecurityquesions/", content);
                 return new ResponseModel(response);
             }
             catch (Exception Ex)
-            {                
+            {
                 return new ResponseModel(secQuestions, 1, "Error! Failed to Update Security Preferences!");
             }
         }
 
-        public async Task<ResponseModel> InsertSecurityAnswerAsyn(string lcAuthToken, List<QuestionSummary> secQuestions,string objUserIdUpd)
+        public async Task<ResponseModel> InsertSecurityAnswerAsyn(string lcAuthToken, List<QuestionSummary> secQuestions, string objUserIdUpd)
         {
 
             //HttpContent content = null;
             TokenServices tokenServices = new TokenServices();
             string lcToken = tokenServices.GetLctoken(lcAuthToken);
 
-           
+
             try
             {
                 string sData = string.Empty;
@@ -1478,7 +1505,7 @@ namespace Business_Services
                 string Updated_value = await response.message.Content.ReadAsStringAsync();
                 dynamic Updated_SecurityQuesion = JsonConvert.DeserializeObject(Updated_value);
 
-                string InsertResponse =  Updated_SecurityQuesion.updated;
+                string InsertResponse = Updated_SecurityQuesion.updated;
 
                 if (InsertResponse == "True")
                 {
@@ -1499,7 +1526,7 @@ namespace Business_Services
                 return new ResponseModel(Updated_SecurityQuesion);
             }
             catch (Exception Ex)
-            {                
+            {
                 return new ResponseModel(secQuestions, 1, "Error! Failed to Update Security Preferences!");
             }
         }
@@ -1531,7 +1558,8 @@ namespace Business_Services
 
                 return new ResponseModel(objUser);
             }
-            catch (Exception Ex) {
+            catch (Exception Ex)
+            {
                 return new ResponseModel(null, 1, Ex.Message);
             }
 
@@ -1552,7 +1580,8 @@ namespace Business_Services
 
                 return new ResponseModel(objUser);
             }
-            catch (Exception Ex) {
+            catch (Exception Ex)
+            {
                 return new ResponseModel(null, 1, Ex.Message);
             }
 
@@ -1583,7 +1612,8 @@ namespace Business_Services
 
                 return new ResponseModel(objUser);
             }
-            catch (Exception Ex) {
+            catch (Exception Ex)
+            {
 
                 return new ResponseModel(null, 1, Ex.Message);
             }

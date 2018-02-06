@@ -23,7 +23,7 @@ namespace Business_Services
             
         }
 
-        public string GenerateToken(string userId,string password,int ClientId, string lcAuthToken,string UserName)
+        public string GenerateToken(string userId,string password,int ClientId, string lcAuthToken,string UserName,string resourcename,string log)
         {
             DateTime issuedOn = DateTime.Now;
             DateTime expiresOn = DateTime.Now.AddSeconds(Convert.ToDouble(ConfigurationManager.AppSettings["AuthTokenExpiry"]));
@@ -36,7 +36,9 @@ namespace Business_Services
                 ExpiresOn = expiresOn,
                 Password = password,
                 ClientId = ClientId,
-                UserName = UserName
+                UserName = UserName,
+                resourcename =resourcename,
+                log = log
             };
            
             return Encryptor.Encrypt(JsonConvert.SerializeObject(tokendomain));

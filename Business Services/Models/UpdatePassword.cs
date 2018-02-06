@@ -33,5 +33,7 @@ namespace Business_Services.Models
         [JsonProperty]
 
         public string Message { get; set; }
+        [JsonProperty]
+        public string User_Id { get; set; }
     }
 }
