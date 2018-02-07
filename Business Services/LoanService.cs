@@ -1181,7 +1181,10 @@ namespace Business_Services
         }
         public async Task<ResponseModel> GetPendingPaymentsAsync(string mobileToken, string loanNumber)
         {
-
+            List<PendingPayment> pendingPayments = new List<PendingPayment>();
+            PendingPayment tempPayment = new PendingPayment();
+            AutoDraft_GetAutoDraft pendingInfoAutoDraft = new AutoDraft_GetAutoDraft();
+            List<OneTimePayment_GetMockedPendingTransactions> pendingInfoPayment = new List<OneTimePayment_GetMockedPendingTransactions>();
             try
             {
                
@@ -1191,12 +1194,10 @@ namespace Business_Services
                 string returnedData = null;
                 var response = await API_Connection.GetAsync(lcToken, "/api/OneTimePayment/GetMockedPendingTransactions/?loanNo=" + loanNumber + "&schDate=&");
                 returnedData = await response.Content.ReadAsStringAsync();
-                List<OneTimePayment_GetMockedPendingTransactions> pendingInfoPayment = JsonConvert.DeserializeObject<List<OneTimePayment_GetMockedPendingTransactions>>(returnedData);
+                pendingInfoPayment = JsonConvert.DeserializeObject<List<OneTimePayment_GetMockedPendingTransactions>>(returnedData);
                 pendingInfoPayment = pendingInfoPayment.OrderBy(x => x.schDT).ToList();
 
-                List<PendingPayment> pendingPayments = new List<PendingPayment>();
-                PendingPayment tempPayment = new PendingPayment();
-                AutoDraft_GetAutoDraft pendingInfoAutoDraft = new AutoDraft_GetAutoDraft();
+               
                 try
                 {
                     var autoDraftResponse = await API_Connection.GetAsync(lcToken, "api/AutoDraft/GetAutoDraft/" + loanNumber + "? _");
@@ -1220,7 +1221,22 @@ namespace Business_Services
                 }
                 catch (Exception ex)
                 {
-                    return new ResponseModel(null, 1, ex.Message);
+                    foreach (OneTimePayment_GetMockedPendingTransactions a in pendingInfoPayment)
+                    {
+                        tempPayment = new PendingPayment()
+                        {
+                            payment_date = Convert.ToDateTime(a.schDT),
+                            total_amount = a.amtRecvd,
+                            payment_description = a.getPaymentType(a.paymentType),
+                            account_number = a.accountNumber,
+                            date_created = a.dateCreated
+                        };
+
+                        pendingPayments.Add(tempPayment);
+                    }
+
+
+                    return new ResponseModel(pendingPayments);
                 }
 
                 foreach (OneTimePayment_GetMockedPendingTransactions a in pendingInfoPayment)
@@ -1242,7 +1258,7 @@ namespace Business_Services
             }
             catch (Exception ex)
             {
-                return new ResponseModel(null, 1, ex.Message);
+                return new ResponseModel(pendingPayments, 1, ex.Message);
             }
 
         }
