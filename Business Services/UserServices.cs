@@ -1120,7 +1120,11 @@ namespace Business_Services
 
                 var ErrorMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Message);
 
+                if (ErrorMessage.msg == "Incorrect Old Pin")
+                {
+                    PinDetail.Message = "Pin has been previously set";
 
+                }
                 if (ErrorMessage.updated == true)
                 {
 
@@ -1139,30 +1143,31 @@ namespace Business_Services
                             }
                         }
                     }
+                    if (ErrorMessage.updated == true)
+                    {
+                        string freedommortageURL = ErrorMessage.client.privateLabelURL;
+                        string FreedomMortage = ErrorMessage.client.clientName;
+                        PinDetail.Message = ErrorMessage.msg;
+                        Dictionary<string, string> someDictMail = new Dictionary<string, string>();
+                        someDictMail.Add("emailData[0][key]", "timeVal");
+                        someDictMail.Add("emailData[0][value]", Convert.ToString(DateTime.Now));
+                        someDictMail.Add("emailData[0][update]", "undefined");
+                        someDictMail.Add("emailData[1][key]", "Url");
+                        someDictMail.Add("emailData[1][value]", freedommortageURL);
+                        someDictMail.Add("emailData[1][update]", "undefined");
+                        someDictMail.Add("emailData[2][key]", "client");
+                        someDictMail.Add("emailData[2][value]", FreedomMortage);
+                        someDictMail.Add("emailData[2][update]", "undefined");
+                        someDictMail.Add("emailData[3][key]", "PROPERTY_STATE_CODE");
+                        someDictMail.Add("emailData[3][value]", "MA");
+                        someDictMail.Add("emailData[3][update]", "undefined");
+                        someDictMail.Add("update", "undefined");
 
-                    string freedommortageURL = ErrorMessage.client.privateLabelURL;
-                    string FreedomMortage = ErrorMessage.client.clientName;
-                    PinDetail.Message = ErrorMessage.msg;
-                    Dictionary<string, string> someDictMail = new Dictionary<string, string>();
-                    someDictMail.Add("emailData[0][key]", "timeVal");
-                    someDictMail.Add("emailData[0][value]", Convert.ToString(DateTime.Now));
-                    someDictMail.Add("emailData[0][update]", "undefined");
-                    someDictMail.Add("emailData[1][key]", "Url");
-                    someDictMail.Add("emailData[1][value]", freedommortageURL);
-                    someDictMail.Add("emailData[1][update]", "undefined");
-                    someDictMail.Add("emailData[2][key]", "client");
-                    someDictMail.Add("emailData[2][value]", FreedomMortage);
-                    someDictMail.Add("emailData[2][update]", "undefined");
-                    someDictMail.Add("emailData[3][key]", "PROPERTY_STATE_CODE");
-                    someDictMail.Add("emailData[3][value]", "MA");
-                    someDictMail.Add("emailData[3][update]", "undefined");
-                    someDictMail.Add("update", "undefined");
 
-
-                    var contentmail = new FormUrlEncodedContent(someDictMail);
-                    var responsemail = await API_Connection.PostAsync(lcToken, "/api/EmailNotification/SendEmailConfirmationForTemplate/?template=UpdateUserPassword&toEmail=bGFtZXJlLm5pY2hvbGFzQGdtYWlsLmNvbQ==&pageName=manageSecurityPref-UpdateUserPassword&userID=&securityEnabled=true", contentmail);
+                        var contentmail = new FormUrlEncodedContent(someDictMail);
+                        var responsemail = await API_Connection.PostAsync(lcToken, "/api/EmailNotification/SendEmailConfirmationForTemplate/?template=UpdateUserPassword&toEmail=bGFtZXJlLm5pY2hvbGFzQGdtYWlsLmNvbQ==&pageName=manageSecurityPref-UpdateUserPassword&userID=&securityEnabled=true", contentmail);
+                    }
                 }
-
                 var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", objPWd } });
                 var responseregeneratedToken = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
 
@@ -1172,7 +1177,7 @@ namespace Business_Services
 
                 PinDetail.Token = MobileTokenNew;
 
-                if (ErrorMessage.updated == false)
+                if (ErrorMessage.updated == false && ErrorMessage.msg != "Incorrect Old Pin")
                 {
                     PinDetail.Message = ErrorMessage.msg;
                     PinDetail.Token = MobileToken;
