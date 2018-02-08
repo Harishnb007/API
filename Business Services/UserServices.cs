@@ -312,15 +312,54 @@ namespace Business_Services
 
                 dynamic objForgotUser = JsonConvert.DeserializeObject(returnedData);
 
+                secQuesCollectionforgotuser listsecquestion = new secQuesCollectionforgotuser();
+                List<SecurityQuestionForgotUser> objSecurity = new List<SecurityQuestionForgotUser>();
+
+                SequrityQuestionUserLoan objsequserloan = new SequrityQuestionUserLoan()
+                {
+                    id = objForgotUser.userLoan.id,
+                    loanNo = objForgotUser.userLoan.loanNo
+
+                };
+
+                SequrityQuestionUser objsequstionuser = new SequrityQuestionUser()
+                {
+
+                    id = objForgotUser.user.id,
+                    ssn = objForgotUser.user.ssn
+                };
+
+                foreach (var SecQues in objForgotUser.secQuesCollection)
+                {
+
+                    SecurityQuestionForgotUser ObjsecQuesCollection = new SecurityQuestionForgotUser()
+                    {
+
+                        isNew = SecQues.isNew,
+                        phrases = SecQues.phrases,
+                        questionID = SecQues.questionID,
+                        questionNo = SecQues.questionNo,
+                        secretQuestion = SecQues.secretQuestion,
+                        securityAnswer = SecQues.securityAnswer,
+                        skipChildrenRead = SecQues.skipChildrenRead,
+                        userFrom = SecQues.userFrom,
+                        userID = SecQues.userID
+                    };
+                    objSecurity.Add(ObjsecQuesCollection);
+                }
+                listsecquestion.secQuesCollection = objSecurity;
+                listsecquestion.user = objsequstionuser;
+                listsecquestion.userLoan = objsequserloan;
+
                 if (!returnedData.Contains("success"))
                 {
 
 
-                    return new ResponseModel(objForgotUser, 1, "Error");
+                    return new ResponseModel(listsecquestion, 1, "Error");
                 }
 
 
-                return new ResponseModel(objForgotUser);
+                return new ResponseModel(listsecquestion);
             }
             catch (Exception Ex)
             {
