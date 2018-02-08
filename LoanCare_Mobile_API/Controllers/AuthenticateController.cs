@@ -125,10 +125,6 @@ namespace LoanCare_Mobile_API.Controllers
 
                 dynamic objPassword = JsonConvert.DeserializeObject(Decryptdata);
 
-              
-
-             
-
                 List<LoanSummarys> loanS = new List<LoanSummarys>();
                 //AuthTokenAndUserDetails Auth_data = new AuthTokenAndUserDetails
                 //{

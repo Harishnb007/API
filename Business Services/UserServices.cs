@@ -102,6 +102,8 @@ namespace Business_Services
 
             questionDetails.questions = new List<SecurityQuestionSummary>();
 
+
+            questionDetails.pin = objQuestion.pin;
             string strQuestion;
             string strAnswer;
 
@@ -149,6 +151,41 @@ namespace Business_Services
 
             return new ResponseModel(questionDetails);
         }
+
+        public async Task<ResponseModel> myloanGetPinAsyn(string lcAuthToken,string Pin)
+        {
+           
+            try {
+                Business_Services.Models.User getpinloan = new Models.User();
+                TokenServices tokenServices = new TokenServices();
+                string lcToken = tokenServices.GetLctoken(lcAuthToken);
+                var responseQuestionInfo = await API_Connection.GetAsync(lcToken, "/api/User/GetSecurtiyQuestions/");
+                string returnedData = await responseQuestionInfo.Content.ReadAsStringAsync();
+
+                dynamic objQuestion = JsonConvert.DeserializeObject(returnedData);
+                string getpin = objQuestion.pin;
+                
+                if (Pin == getpin)
+                {
+
+                    getpinloan.is_successful = true;
+                }
+                else
+                {
+                    getpinloan.is_successful = false;
+                }
+                // }
+                return new ResponseModel(getpinloan);
+            }
+            catch (Exception Ex)
+            {
+
+                return new ResponseModel(null, 1, Ex.Message);
+            }
+        }
+
+           
+        
 
 
 
@@ -357,8 +394,6 @@ namespace Business_Services
 
                     return new ResponseModel(listsecquestion, 1, "Error");
                 }
-
-
                 return new ResponseModel(listsecquestion);
             }
             catch (Exception Ex)
@@ -475,29 +510,29 @@ namespace Business_Services
                 string returnedDataPhoneNo = await responsephoneNo.Content.ReadAsStringAsync();
                 personal_getborrowercontactInfo getuserinfoPhoneNo = JsonConvert.DeserializeObject<personal_getborrowercontactInfo>(returnedDataPhoneNo);
 
-                var responseUserIn = await API_Connection.GetAsync(lcAuthToken, "/api/User/GetUserInformation");
-                string returnedDataUser = await responseUserIn.Content.ReadAsStringAsync();
-                dynamic getuserinfo = JsonConvert.DeserializeObject(returnedDataUser);
+                //var responseUserIn = await API_Connection.GetAsync(lcAuthToken, "/api/User/GetUserInformation");
+                //string returnedDataUser = await responseUserIn.Content.ReadAsStringAsync();
+                //dynamic getuserinfo = JsonConvert.DeserializeObject(returnedDataUser);
                 // User_GetUserInformation getuserinfo = JsonConvert.DeserializeObject<User_GetUserInformation>(returnedDataUser);
 
-                var responseLP = await API_Connection.GetAsync(lcAuthToken, "/api/User/LanguagePref/?userId=" + getuserinfo.user.userName);
+                var responseLP = await API_Connection.GetAsync(lcAuthToken, "/api/User/LanguagePref/?userId=" + objUserName.user.userName);
                 string returnedDataLP = await responseLP.Content.ReadAsStringAsync();
 
 
                 Business_Services.Models.User userDetails = new Business_Services.Models.User();
 
 
-                if (getuserinfo.currentUserLoan.roleId == 5)
+                if (objUserName.currentUserLoan.roleId == 5)
                 {
-                    var responseuser = await API_Connection.GetAsync(lcAuthToken, "api/Personal/GetBorrowerContactInfo/" + getuserinfo.currentUserLoan.loanNo);
+                    var responseuser = await API_Connection.GetAsync(lcAuthToken, "api/Personal/GetBorrowerContactInfo/" + objUserName.currentUserLoan.loanNo);
                     string returnedDatausername = await responseuser.Content.ReadAsStringAsync();
                     personal_getborrowercontactInfo getusernameinfo = JsonConvert.DeserializeObject<personal_getborrowercontactInfo>(returnedDatausername);
                     userDetails.first_name = getusernameinfo.contactinfo.contactInfo.firstName;
                     userDetails.last_name = getusernameinfo.contactinfo.contactInfo.lastOrOrganizationName;
                 }
-                else if (getuserinfo.currentUserLoan.roleId == 4)
+                else if (objUserName.currentUserLoan.roleId == 4)
                 {
-                    var responseusercoborrower = await API_Connection.GetAsync(lcAuthToken, "api/Personal/GetCoBorrowerContactInfo/" + getuserinfo.currentUserLoan.loanNo);
+                    var responseusercoborrower = await API_Connection.GetAsync(lcAuthToken, "api/Personal/GetCoBorrowerContactInfo/" + objUserName.currentUserLoan.loanNo);
                     string returnedDatausernamecoborrower = await responseusercoborrower.Content.ReadAsStringAsync();
                     dynamic obj4 = JsonConvert.DeserializeObject(returnedDatausernamecoborrower);
                     personal_getborrowercontactInfo getusernamecoborrowerinfo = JsonConvert.DeserializeObject<personal_getborrowercontactInfo>(returnedDatausernamecoborrower);
@@ -531,7 +566,7 @@ namespace Business_Services
                     catch (Exception ex)
                     {
                         var Message = ex.Message;
-                        userDetails.username = getuserinfo.user.userName;
+                        userDetails.username = objUserName.user.userName;
                         userDetails.email = getuserinfoUserName.msg.emailAddress;
                         userDetails.addresss.isForeign = getuserinfoPhoneNo.contactinfo.contactInfo.isInternationalAddress;
                         userDetails.addresss.street = getuserinfoPhoneNo.contactinfo.contactInfo.mailingAddressStreet;
@@ -545,7 +580,7 @@ namespace Business_Services
                         return new ResponseModel(userDetails);
                     }
                 }
-                userDetails.username = getuserinfo.user.userName;
+                userDetails.username = objUserName.user.userName;
                 userDetails.email = getuserinfoUserName.msg.emailAddress;
                 userDetails.addresss.isForeign = getuserinfoPhoneNo.contactinfo.contactInfo.isInternationalAddress;
                 userDetails.addresss.street = getuserinfoPhoneNo.contactinfo.contactInfo.mailingAddressStreet;
@@ -1345,23 +1380,30 @@ namespace Business_Services
 
 
 
-        public ResponseModel getpinAsync(string loanNumber, string pin)
+        public async Task<ResponseModel> getpinAsync(string MobileToken,string loanNumber, string pin)
         {
-            Business_Services.Models.User setpin = new Business_Services.Models.User();
+            Business_Services.Models.User getpinloan = new Models.User();
+            TokenServices tokenServices = new TokenServices();
             try
             {
+                string lcToken = tokenServices.GetLctoken(MobileToken);
 
-                if (loanNumber == loanNumber && pin == "1234")
+                var responsePin = await API_Connection.GetAsync(lcToken, "/api/User/GetMPSecurtiyQuestionsPostLogin/");
+                string returnedDataPin = await responsePin.Content.ReadAsStringAsync();
+                dynamic getuserinfo = JsonConvert.DeserializeObject(returnedDataPin);
+
+
+                if (pin == getuserinfo.pin)
                 {
 
-                    setpin.is_successful = true;
+                    getpinloan.is_successful = true;
                 }
                 else
                 {
-                    setpin.is_successful = false;
+                   // setpin.is_successful = false;
                 }
                 // }
-                return new ResponseModel(setpin);
+                return new ResponseModel(getuserinfo.pin);
             }
             catch (Exception Ex)
             {
@@ -1567,7 +1609,7 @@ namespace Business_Services
             }
             catch (Exception Ex)
             {
-                return new ResponseModel(secQuestions, 1, "Error! Failed to Update Security Preferences!");
+                return new ResponseModel(secQuestions, 1, Ex.Message);
             }
         }
 

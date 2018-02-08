@@ -79,26 +79,44 @@ namespace LoanCare_Mobile_API.Controllers
             return Ok(payment);
         }
 
-
-
-        [Route("MyLoanSetpin/{LoanNumber}/{pin}")]
+        [Route("MyLoanSetPin/{LoanNumber}/{Pin}")]
         [HttpGet]
-        public IHttpActionResult Getpin(string LoanNumber, string pin)
+        public async Task<IHttpActionResult> myloanGetPin(string Pin)
         {
-            // To do - Move the following code to a single method & use it across the project
             IEnumerable<string> tokenValues;
             string tokenValue = "";
             if (Request.Headers.TryGetValues("AuthorizationToken", out tokenValues))
             {
                 tokenValue = tokenValues.FirstOrDefault();
             }
-            var payment = userService.getpinAsync(LoanNumber, pin);
+            var payment = await userService.myloanGetPinAsyn(tokenValue,Pin);
             if (payment == null)
             {
                 return NotFound();
             }
             return Ok(payment);
         }
+
+
+
+        //[Route("MyLoanSetpin/{LoanNumber}/{pin}")]
+        //[HttpGet]
+        //public IHttpActionResult Getpin(string LoanNumber, string pin)
+        //{
+        //    // To do - Move the following code to a single method & use it across the project
+        //    IEnumerable<string> tokenValues;
+        //    string tokenValue = "";
+        //    if (Request.Headers.TryGetValues("AuthorizationToken", out tokenValues))
+        //    {
+        //        tokenValue = tokenValues.FirstOrDefault();
+        //    }
+        //    var payment = userService.myloanGetPinAsyn(tokenValue, pin);
+        //    if (payment == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return Ok(payment);
+        //}
 
 
         [Route("bankaccountsDelete")]

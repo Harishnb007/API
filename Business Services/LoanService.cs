@@ -1466,13 +1466,45 @@ namespace Business_Services
                 return new ResponseModel(null, 1, "Error! Failed to set-up AutoDraft!");
             }
         }
+        public void LogWriter(string PropertyName, string logMessage)
+        {
+            LogWrite(PropertyName, logMessage);
+        }
+        public void LogWrite(string PropertyName, string logMessage)
+        {
+            try
+            {
+                using (StreamWriter w = File.AppendText(@"E:\API_Log\Log.txt"))
+                {
+                    Log(PropertyName, logMessage, w);
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+        }
 
+        public void Log(string PropertyName, string logMessage, TextWriter txtWriter)
+        {
+            try
+            {
+                txtWriter.Write("\r\nLog Entry : ");
+                txtWriter.WriteLine("{0} {1}", DateTime.Now.ToLongTimeString(), DateTime.Now.ToLongDateString());
+                txtWriter.WriteLine(" {0} {1}", PropertyName, logMessage);
+                txtWriter.WriteLine("-------------------------------");
+            }
+            catch (Exception ex)
+            {
+            }
+        }
         public async Task<ResponseModel> PostupdateemailForAsync(string MobileToken, UpdateEmail loanDetails)
         {
             // To do - Use DI
             Business_Services.Models.GenerateNewToken objgenerateToken = new GenerateNewToken();
             try
             {
+                LogWriter("Email:", loanDetails.email);
+                LogWriter("LoanNumber:", loanDetails.loanNo);
                 var Decryptdata = objgenerateToken.Decrypt(MobileToken);
 
                 dynamic ObjUserId = JsonConvert.DeserializeObject(Decryptdata);
@@ -1498,7 +1530,8 @@ namespace Business_Services
                 var content = new FormUrlEncodedContent(someDict);
 
                 var response = await API_Connection.PostAsync(lcToken, "/api/MyAccount/SetUpdateEmail/", content);
-
+              
+             
                 var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", objPWd } });
                 var responseregeneratedToken = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
 

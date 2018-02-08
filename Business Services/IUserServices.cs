@@ -33,7 +33,8 @@ namespace Business_Services
         //Added by BBSR_Team on 9th Jan 2018
         Task<ResponseModel> ForgotUser_Id(string Loan_Number, string SSN);
         Task<ResponseModel> InsertSecurityAnswerAsyn(string lcAuthToken, List<QuestionSummary> secQuestions, string objUserIdUpd);
-        ResponseModel getpinAsync(string loanNumber, string pin);
+        Task<ResponseModel> getpinAsync(string MobileToken, string loanNumber, string pin);
+        Task<ResponseModel> myloanGetPinAsyn(string lcAuthToken, string Pin);
         Task<ResponseModel> UpdatePasswordAsync(string MobileToken, UpdatePassword loanDetails, string Password);
         Task<ResponseModel> GetPushNotificationForUser(string mobileToken, PushNotificationUser pushNotification);
         Task<ResponseModel> ReSetPinAsync(string MobileToken, UpdatePassword PinDetail);
