@@ -242,7 +242,7 @@ namespace Business_Services
                         bank_name = bdetail.bankName,
                         account_number = decodedaccountNumber,
                         account_nickname = bdetail.bankName.Length > 10 ? bdetail.bankName.Substring(0, 10) : bdetail.bankName,
-                        account_type = bdetail.accountType,
+                        account_type = (bdetail.accountType == "C" ? "Checking Account" : "Saving Account"),
                         legal_name = bdetail.legalName,
                         routing_number = bdetail.routingNumber,
                         isNew = false, //Added by Avinash

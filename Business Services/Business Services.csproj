@@ -116,6 +116,7 @@
     <Compile Include="Models\LC_WebApi_Models\OnetimePayment_GetPaymentInfo.cs" />
     <Compile Include="Models\LC_WebApi_Models\personal_getborrowercontactInfo.cs" />
     <Compile Include="Models\LC_WebApi_Models\personal_getcoborrowercontactInfo.cs" />
+    <Compile Include="Models\LC_WebApi_Models\secQuesCollection.cs" />
     <Compile Include="Models\LC_WebApi_Models\User_GetUserInformation.cs" />
     <Compile Include="Models\LC_WebApi_Models\User_UserInformation.cs" />
     <Compile Include="Models\LegalPrivacyTerms.cs" />

@@ -954,14 +954,14 @@ namespace Business_Services
                 original_mortgageAmt = loanInfo.payment.pmtAmt,
                 bank_account = new BankAccount
                 {
-                    
+
                     account_number = string.Empty,
                     account_nickname = "Choose Bank Account",
                     routing_number = string.Empty,
                     bank_name = string.Empty,
                     account_type = string.Empty,
                     legal_name = string.Empty
-                   
+
                 },
                 payment_date = loanInfo.payment.schDT,
                 initial_schDate = loanInfo.payment.schDT,
@@ -979,7 +979,11 @@ namespace Business_Services
                 loanType = loanInfo.payment.loanType,
                 userRowId = loanInfo.payment.userRowId,
                 principal_balance = loanInfo.payment.principalBalance,
-                payment_Type = "0"
+                payment_Type = "0",
+                late_fees_due_input = loanInfo.payment.addlFees,
+                nsf_fees_due_input = loanInfo.payment.nsfFeesDue,
+                other_fees_due_input = loanInfo.payment.otherFeesDue
+
             };
 
             return new ResponseModel(paymentData);
@@ -1082,6 +1086,25 @@ namespace Business_Services
                 principal_balance = loanInfo.payment.principalBalance,
                 payment_Type = loanInfo.payment.paymentType
             };
+
+            if (paymentData.payment_Type == "3")
+            {
+                for (int i = 0; i <= loanInfo.payment.fees.Count - 1; i++)
+                {
+                    if (loanInfo.payment.fees[i].feeCode == "1")
+                    {
+                        paymentData.late_fees_due_input = loanInfo.payment.fees[i].feeAmt;
+                    }
+                    if (loanInfo.payment.fees[i].feeCode == "2")
+                    {
+                        paymentData.nsf_fees_due_input = loanInfo.payment.fees[i].feeAmt;
+                    }
+                    if (loanInfo.payment.fees[i].feeCode == "3")
+                    {
+                        paymentData.other_fees_due_input = loanInfo.payment.fees[i].feeAmt;
+                    }
+                }
+            }
             return new ResponseModel(paymentData);
 
         }
@@ -1226,7 +1249,7 @@ namespace Business_Services
             List<OneTimePayment_GetMockedPendingTransactions> pendingInfoPayment = new List<OneTimePayment_GetMockedPendingTransactions>();
             try
             {
-               
+
                 // To do - Use DI
                 TokenServices tokenServices = new TokenServices();
                 string lcToken = tokenServices.GetLctoken(mobileToken);
@@ -1236,7 +1259,7 @@ namespace Business_Services
                 pendingInfoPayment = JsonConvert.DeserializeObject<List<OneTimePayment_GetMockedPendingTransactions>>(returnedData);
                 pendingInfoPayment = pendingInfoPayment.OrderBy(x => x.schDT).ToList();
 
-               
+
                 try
                 {
                     var autoDraftResponse = await API_Connection.GetAsync(lcToken, "api/AutoDraft/GetAutoDraft/" + loanNumber + "? _");
@@ -1269,7 +1292,7 @@ namespace Business_Services
                             payment_description = a.getPaymentType(a.paymentType),
                             account_number = a.accountNumber,
                             date_created = a.dateCreated,
-                            paymentCount = Convert.ToInt32(a.pmtAmt)
+                            paymentCount = Convert.ToInt32(a.pmts)
                         };
 
                         pendingPayments.Add(tempPayment);
@@ -1288,7 +1311,7 @@ namespace Business_Services
                         payment_description = a.getPaymentType(a.paymentType),
                         account_number = a.accountNumber,
                         date_created = a.dateCreated,
-                        paymentCount = Convert.ToInt32(a.pmtAmt)
+                        paymentCount = Convert.ToInt32(a.pmts)
                     };
 
                     pendingPayments.Add(tempPayment);
@@ -2154,7 +2177,7 @@ namespace Business_Services
 
             try
             {
-          
+
                 if (paymentdata.override_payment == true)
                 {
                     var responseCancelPayment = await API_Connection.GetAsync(lcToken, "/api/OneTimePayment/CancelOnetimePayment/?loanNo=" +
@@ -2172,7 +2195,8 @@ namespace Business_Services
                 someDict.Add("loanNo", paymentdata.loan_number);
                 someDict.Add("schDT", paymentdata.payment_date.ToString("MM/dd/yyyy"));
                 someDict.Add("intialSchDt", paymentdata.initial_schDate.ToString("MM/dd/yyyy"));
-                someDict.Add("PaymentEffectiveDate", paymentdata.payment_date.ToString("yyyy-MM-ddTHH:mm:ss"));
+                someDict.Add("PaymentEffectiveDate", "0001-01-01T00: 00:00");
+                //paymentdata.payment_date.ToString("yyyy -MM-ddTHH:mm:ss"));
                 someDict.Add("pmtAmt", paymentdata.payment_amount.ToString());
                 someDict.Add("addlFees", paymentdata.late_fees_due.ToString());
                 someDict.Add("nSFFeesDue", paymentdata.nsf_fees_due.ToString());
@@ -2251,7 +2275,7 @@ namespace Business_Services
                     {
                         someDict.Add("paymentType", "3");
                         someDict.Add("PaymentTypeFull", "Fee only");
-                        someDict.Add("isPayment", "true");
+                        someDict.Add("isPayment", "false");
                     }
 
                     #region "Commented"
