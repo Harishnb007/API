@@ -332,16 +332,16 @@ namespace Business_Services
 
                     var response = await API_Connection.PostUserRegisAsync("/api/EmailNotification/SendEmailConfirmationForTemplate/?template=Forgotuserid&toEmail=" + decodeduserEmail + "&pageName=forgotUserId&userID=" + objForgotUser.user.id, content);
 
-                    return new ResponseModel(response);
+                    return new ResponseModel(null,1,response);
                 }
                 else
                 {
-                    return new ResponseModel(objForgotUser, 1, "Error");
+                    return new ResponseModel(returnedData, 1, returnedData);
                 }
             }
             catch (Exception Ex)
             {
-                return new ResponseModel(null, 1, Ex.Message);
+                return new ResponseModel(null, 1, "Your account has not been registered or wrong credentials are provided. Please check your LoanNo and SSN/TaxID.");
             }
         }
 
@@ -368,67 +368,71 @@ namespace Business_Services
                 string returnedData = await UserDetails.Content.ReadAsStringAsync();
 
                 dynamic objForgotUser = JsonConvert.DeserializeObject(returnedData);
-
-                secQuesCollectionforgotuser listsecquestion = new secQuesCollectionforgotuser();
-                List<SecurityQuestionForgotUser> objSecurity = new List<SecurityQuestionForgotUser>();
-
-                SequrityQuestionUserLoan objsequserloan = new SequrityQuestionUserLoan()
+                if (returnedData.Contains("success"))
                 {
-                    id = objForgotUser.userLoan.id,
-                    loanNo = objForgotUser.userLoan.loanNo
+                    secQuesCollectionforgotuser listsecquestion = new secQuesCollectionforgotuser();
+                    List<SecurityQuestionForgotUser> objSecurity = new List<SecurityQuestionForgotUser>();
 
-                };
+                    SequrityQuestionUserLoan objsequserloan = new SequrityQuestionUserLoan()
+                    {
+                        id = objForgotUser.userLoan.id,
+                        loanNo = objForgotUser.userLoan.loanNo
 
-                SequrityQuestionUser objsequstionuser = new SequrityQuestionUser()
-                {
+                    };
 
-                    id = objForgotUser.user.id,
-                    ssn = objForgotUser.user.ssn
-                };
-
-                foreach (var SecQues in objForgotUser.secQuesCollection)
-                {
-
-                    SecurityQuestionForgotUser ObjsecQuesCollection = new SecurityQuestionForgotUser()
+                    SequrityQuestionUser objsequstionuser = new SequrityQuestionUser()
                     {
 
-                        isNew = SecQues.isNew,
-                        phrases = SecQues.phrases,
-                        questionID = SecQues.questionID,
-                        questionNo = SecQues.questionNo,
-                        secretQuestion = SecQues.secretQuestion,
-                        securityAnswer = SecQues.securityAnswer,
-                        skipChildrenRead = SecQues.skipChildrenRead,
-                        userFrom = SecQues.userFrom,
-                        userID = SecQues.userID
+                        id = objForgotUser.user.id,
+                        ssn = objForgotUser.user.ssn
                     };
-                    objSecurity.Add(ObjsecQuesCollection);
-                }
-                SecurityQuestionstatus objSecurityQuestionstatus = new SecurityQuestionstatus();
-                if (objSecurity.Count == 0)
-                {
-                    objSecurityQuestionstatus.SecurityStatus = false;
-                }
-                else {
-                    objSecurityQuestionstatus.SecurityStatus = true;
-                }
-               
-                
-                listsecquestion.secQuesCollection = objSecurity;
-                listsecquestion.user = objsequstionuser;
-                listsecquestion.userLoan = objsequserloan;
-                listsecquestion.secQuesstatus = objSecurityQuestionstatus;
-                if (!returnedData.Contains("success"))
-                {
+
+                    foreach (var SecQues in objForgotUser.secQuesCollection)
+                    {
+
+                        SecurityQuestionForgotUser ObjsecQuesCollection = new SecurityQuestionForgotUser()
+                        {
+
+                            isNew = SecQues.isNew,
+                            phrases = SecQues.phrases,
+                            questionID = SecQues.questionID,
+                            questionNo = SecQues.questionNo,
+                            secretQuestion = SecQues.secretQuestion,
+                            securityAnswer = SecQues.securityAnswer,
+                            skipChildrenRead = SecQues.skipChildrenRead,
+                            userFrom = SecQues.userFrom,
+                            userID = SecQues.userID
+                        };
+                        objSecurity.Add(ObjsecQuesCollection);
+                    }
+                    SecurityQuestionstatus objSecurityQuestionstatus = new SecurityQuestionstatus();
+                    if (objSecurity.Count == 0)
+                    {
+                        objSecurityQuestionstatus.SecurityStatus = false;
+                    }
+                    else
+                    {
+                        objSecurityQuestionstatus.SecurityStatus = true;
+                    }
 
 
-                    return new ResponseModel(listsecquestion, 1, "Error");
+                    listsecquestion.secQuesCollection = objSecurity;
+                    listsecquestion.user = objsequstionuser;
+                    listsecquestion.userLoan = objsequserloan;
+                    listsecquestion.secQuesstatus = objSecurityQuestionstatus;
+                    if (!returnedData.Contains("success"))
+                    {
+
+
+                        return new ResponseModel(listsecquestion, 1, "Error");
+                    }
+                    return new ResponseModel(listsecquestion);
                 }
-                return new ResponseModel(listsecquestion);
+                return new ResponseModel(null,1,returnedData);
             }
             catch (Exception Ex)
             {
-                return new ResponseModel(null, 1, Ex.Message);
+                return new ResponseModel(null, 1, "Your account has not been registered or wrong credentials are provided. Please check your LoanNo and SSN/TaxID.");
             }
         }
 
@@ -615,7 +619,7 @@ namespace Business_Services
                 string strQuestionID;
                 string strUserID;
 
-        
+
                 foreach (var questionNumber in objQuestion.secQuestions)
                 {
                     // Send request to pull all question
@@ -626,7 +630,7 @@ namespace Business_Services
                     //Modified by BBSR Team on 12th Jan 2018
 
                     strQuestion = questionNumber.secretQuestion;
-                   
+
 
                     strAnswer = questionNumber.securityAnswer;
                     if (strUserID == "0" && strAnswer == "")
@@ -894,6 +898,7 @@ namespace Business_Services
                 var UserDetails = await API_Connection.PostUserAsync("/api/Register/SendUserId/", forgotcontent);
                 //Modified by BBSR_Team on 11th Jan 2018
 
+
                 string returnedData = await UserDetails.Content.ReadAsStringAsync();
                 dynamic objForgotUser = JsonConvert.DeserializeObject(returnedData);
 
@@ -931,7 +936,7 @@ namespace Business_Services
 
                 var content = new FormUrlEncodedContent(someDict);
 
-                var response = await API_Connection.PostUserRegisAsync("/api/EmailNotification/SendEmailConfirmationForTemplate/?template=Forgotuserid&toEmail=" + decodeduserEmail + "&pageName=forgotUserId&userID=" + objForgotUser.user.id, content);
+                var response = await API_Connection.PostUserRegisAsync("/api/EmailNotification/SendEmailConfirmationForTemplate/?template=Forgotuserid&toEmail=" + strUserEmail + "&pageName=forgotUserId&userID=" + objForgotUser.user.id, content);
 
                 return new ResponseModel(response);
             }
@@ -985,7 +990,8 @@ namespace Business_Services
 
                 var content = new FormUrlEncodedContent(someDict);
 
-                var response = await API_Connection.PostUserRegisAsync("/api/EmailNotification/SendEmailConfirmationForTemplate/?template=Forgotpassword&toEmail=" + decodeduserEmail + "&pageName=forgotPassword&userID=" + objForgotUser.user.id, content);
+                var response = await API_Connection.PostUserRegisAsync("/api/EmailNotification/SendEmailConfirmationForTemplate/?template=Forgotpassword&toEmail=" + strUserEmail + "&pageName=forgotPassword&userID=" + objForgotUser.user.id, content);
+
 
                 return new ResponseModel(response);
             }
