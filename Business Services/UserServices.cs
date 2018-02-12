@@ -1156,7 +1156,6 @@ namespace Business_Services
             try
             {
                 // To do - Use DI
-
                 TokenServices tokenServices = new TokenServices();
 
                 Business_Services.Models.GenerateNewToken objgenerateToken = new GenerateNewToken();
@@ -1290,10 +1289,10 @@ namespace Business_Services
                 }
                 else {
                     loanDetails.is_Success = false;
-                    loanDetails.Message = "Invalid Password";
+                    loanDetails.Message = "Invalid Current Password";
                     LogWriter("Message", loanDetails.Message);
                     loanDetails.Token = MobileToken;
-                    return new ResponseModel(loanDetails, 2, "Invalid Password");
+                    return new ResponseModel(loanDetails, 2, "Invalid Current Password");
                 }
                
             }
