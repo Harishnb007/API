@@ -364,6 +364,15 @@ namespace Business_Services
                 string returnedData = await response.Content.ReadAsStringAsync();
                 Getdetails_estatement getEstatementInfo = JsonConvert.DeserializeObject<Getdetails_estatement>(returnedData);
 
+                var eventId = 4;
+                var resourceName = "eStatement+Enroll";
+                var toEmail = "";
+                var log = "Viewed+eStatement";
+                var actionName = "VIEW";
+
+                var trackresponse = await API_Connection.GetAsync("/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+
                 List<EsatementDateurl> estatement = new List<EsatementDateurl>();
 
                 foreach (var Estatementdata in getEstatementInfo.data)
@@ -372,70 +381,70 @@ namespace Business_Services
 
                     {
                         statement_date = Estatementdata.statementDate,
-                        statement_url = "https://lcuiqa.test.servicelinkfnf.com/Statements/EStatementHandler.Pdf?loanNo=" + loan_number + "&statementDate=" + Estatementdata.statementDate + "&statementKey=" + Estatementdata.key
+                        statement_url ="/Statements/EStatementHandler.Pdf?loanNo=" + loan_number + "&statementDate=" + Estatementdata.statementDate + "&statementKey=" + Estatementdata.key
                         
                     }
 
                       );
 
-                    //  estatement.estatement.Add(statement_Date);
+                   //  estatement.Add(statement_Date);
                 }
 
                 EstatementDetails estatementresult = new EstatementDetails()
                 {
                     estatement = estatement
                 };
-                foreach (var estatemen in estatement) {
-                    MemoryStream mem = new MemoryStream();
-                    var responsestream = await API_Connection.GetAsync(lcToken, estatemen.statement_url);
-                    string returnedDatastream = await responsestream.Content.ReadAsStringAsync();
-                    byte[] datastream = Encoding.ASCII.GetBytes(returnedDatastream);
+                //foreach (var estatemen in estatement) {
+                //    MemoryStream mem = new MemoryStream();
+                //    var responsestream = await API_Connection.GetAsync(lcToken, estatemen.statement_url);
+                //    string returnedDatastream = await responsestream.Content.ReadAsStringAsync();
+                //    byte[] datastream = Encoding.ASCII.GetBytes(returnedDatastream);
 
-                    //byte[] bytes;
-                    //BinaryFormatter bf = new BinaryFormatter();
-                    //MemoryStream ms = new MemoryStream();
-                    //bf.Serialize(ms, returnedDatastream);
-                    //bytes = ms.ToArray();
-                    //System.IO.File.WriteAllBytes("C:\\Users\\harivigneshm.FNFSECURE.003\\Desktop\\pdfhello.pdf", bytes);
-
-
+                //    //byte[] bytes;
+                //    //BinaryFormatter bf = new BinaryFormatter();
+                //    //MemoryStream ms = new MemoryStream();
+                //    //bf.Serialize(ms, returnedDatastream);
+                //    //bytes = ms.ToArray();
+                //    //System.IO.File.WriteAllBytes("C:\\Users\\harivigneshm.FNFSECURE.003\\Desktop\\pdfhello.pdf", bytes);
 
 
-                    using (FileStream stream = new FileStream("C:\\Users\\harivigneshm.FNFSECURE.003\\Desktop\\pdfhello.pdf" + "\\" + datastream, FileMode.CreateNew))
 
-                    {
 
-                        using (StreamWriter writer = new StreamWriter(stream, Encoding.UTF8))
+                //    //using (FileStream stream = new FileStream("C:\\Users\\harivigneshm.FNFSECURE.003\\Desktop\\pdfhello.pdf" + "\\" + datastream, FileMode.CreateNew))
 
-                        {
+                //    //{
 
-                            byte[] buffer = datastream;
+                //    //    using (StreamWriter writer = new StreamWriter(stream, Encoding.UTF8))
 
-                            stream.Write(buffer, 0, buffer.Length);
+                //    //    {
 
-                            writer.Close();
+                //    //        byte[] buffer = datastream;
 
-                        }
+                //    //        stream.Write(buffer, 0, buffer.Length);
 
-                    }
-                    //using (FileStream stream = new FileStream("C:\\Users\\harivigneshm.FNFSECURE.003\\Desktop\\pdf" + "\\" + datastream, FileMode.CreateNew))
+                //    //        writer.Close();
 
-                    //{
+                //    //    }
 
-                    //    using (StreamWriter writer = new StreamWriter(stream, Encoding.UTF8))
+                //    //}
+                //    //using (FileStream stream = new FileStream("C:\\Users\\harivigneshm.FNFSECURE.003\\Desktop\\pdf" + "\\" + datastream, FileMode.CreateNew))
 
-                    //    {
+                //    //{
 
-                    //        byte[] buffer = datastream;
+                //    //    using (StreamWriter writer = new StreamWriter(stream, Encoding.UTF8))
 
-                    //        stream.Write(buffer, 0, buffer.Length);
+                //    //    {
 
-                    //        writer.Close();
+                //    //        byte[] buffer = datastream;
 
-                    //    }
+                //    //        stream.Write(buffer, 0, buffer.Length);
 
-                    //}
-                }
+                //    //        writer.Close();
+
+                //    //    }
+
+                //    //}
+                //}
 
                 return new ResponseModel(estatementresult);
             }
@@ -506,6 +515,15 @@ namespace Business_Services
                 LoanInfo LoanList = new LoanInfo();
                 List<LoanDetails> LoanDetail = new List<LoanDetails>();
                 LoanDetails LoanDetailProperty = new LoanDetails();
+
+                var eventId = 7;
+                var resourceName = "Manage+Account";
+                var toEmail = "";
+                var log = "Viewed+Manage+Accounts";
+                var actionName = "VIEW";
+
+                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
                 foreach (string loanNumber in userInfo.user.userLoansList)
                 {
@@ -1379,6 +1397,15 @@ namespace Business_Services
                 var content = new FormUrlEncodedContent(someDict);
                 var response = await API_Connection.PostAsync(lcToken, "/api/BankAccountInformation/SaveBankDetails", content);
 
+
+                var eventId = 5;
+                var resourceName = "One-Time+Payment";
+                var toEmail = "";
+                var log = "Manage+Bank+Account+Page+-+AddBank";
+                var actionName = "ADD";
+
+                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
                 return new ResponseModel(response);
             }
             catch (Exception Ex)
@@ -1528,6 +1555,14 @@ namespace Business_Services
                 someDict.Add("loanNo", decodedStringloannotify);
 
                 var content = new FormUrlEncodedContent(someDict);
+                var eventId = 5;
+                var resourceName = "One-Time+Payment";
+                var toEmail = "";
+                var log = "Viewed+Update+Email+page";
+                var actionName = "VIEW";
+
+                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
                 var response = await API_Connection.PostAsync(lcToken, "/api/MyAccount/SetUpdateEmail/", content);
               

@@ -10,6 +10,8 @@ namespace Business_Services.Models.LC_WebApi_Models
     {
         public SequrityQuestionUser user { get; set; }
         public SequrityQuestionUserLoan userLoan { get; set; }
+
+        public SecurityQuestionstatus secQuesstatus { get; set; }
        public List<SecurityQuestionForgotUser> secQuesCollection { get; set; }
     }
     public class SequrityQuestionUser {
@@ -47,5 +49,10 @@ namespace Business_Services.Models.LC_WebApi_Models
         public string userFrom { get; set; }
 
         public int questionNo { get; set; }
+    }
+
+    public class SecurityQuestionstatus {
+
+        public bool SecurityStatus { get; set; }
     }
 }

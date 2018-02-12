@@ -114,12 +114,12 @@ namespace LoanCare_Mobile_API.Controllers
             IUserServices userService = new UserServices();
             try
             {
-                var details = userService.getUserDetailsAsync(lcAuthToken, userId);
+                var details = userService.getUserDetailsAsync(lcAuthToken, userId,Is_New_MobileUser);
                 await Task.WhenAll(details);
                 Business_Services.Models.User userDetails = (Business_Services.Models.User)details.Result.data;
                 //Debug.WriteLine(userDetails.first_name);
 
-                var token = _tokenServices.GenerateToken(userId, Password, userDetails.ClientId, lcAuthToken, userDetails.username,resourcename,log);
+                var token = _tokenServices.GenerateToken(userDetails.username, Password, userDetails.ClientId, lcAuthToken, userDetails.username,resourcename,log);
 
                 var Decryptdata = Decrypt(token);
 
@@ -128,51 +128,51 @@ namespace LoanCare_Mobile_API.Controllers
                 List<LoanSummarys> loanS = new List<LoanSummarys>();
                 //AuthTokenAndUserDetails Auth_data = new AuthTokenAndUserDetails
                 //{
-                using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
-                {
-                    var setpin = ctx.MobileUsers.Where(s => s.User_Id == userId).FirstOrDefault();
+                //using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
+                //{
+                //    var setpin = ctx.MobileUsers.Where(s => s.User_Id == userDetails.username).FirstOrDefault();
 
-                    if (setpin == null)
-                    {
-                        if (Is_New_MobileUser == false)
-                        {
+                //    if (setpin == null)
+                //    {
+                //        if (Is_New_MobileUser == false)
+                //        {
 
-                            Is_New_MobileUser = false;
-                        }
-                        else if (Is_New_MobileUser == true)
-                        {
+                //            Is_New_MobileUser = false;
+                //        }
+                //        else if (Is_New_MobileUser == true)
+                //        {
 
-                            Is_New_MobileUser = true;
-                        }
-                        using (var context = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
-                        {
-                            Business_Services.Models.DAL.LoancareDBContext.MobileUser obj_Login = new Business_Services.Models.DAL.LoancareDBContext.MobileUser()
-                            {
-                                pin = "",
-                                User_Id = userId,
-                                mae_steps_completed = "0",
-                                Mobile_Token_Id = "",
-                                created_on = DateTime.Now,
-                                Is_New_MobileUser = Is_New_MobileUser,
-                                Legal_version = 0,
-                                Privacy_version = 0,
-                                Terms_version = 0
-                            };
-                            context.MobileUsers.Add(obj_Login);
-                            context.Entry(obj_Login).State = EntityState.Added;
-                            context.SaveChanges();
-                            Auth_data.mae_steps_completed = "0";
-                        }
-                    }
-                    else if (setpin != null)
-                    {
-                        Auth_data.mae_steps_completed = setpin.mae_steps_completed;
-                    }
-                    else if (setpin.mae_steps_completed == "")
-                    {
-                        setpin.mae_steps_completed = "0";
-                    }
-                }
+                //            Is_New_MobileUser = true;
+                //        }
+                //        using (var context = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
+                //        {
+                //            Business_Services.Models.DAL.LoancareDBContext.MobileUser obj_Login = new Business_Services.Models.DAL.LoancareDBContext.MobileUser()
+                //            {
+                //                pin = "",
+                //                User_Id = userDetails.username,
+                //                mae_steps_completed = "0",
+                //                Mobile_Token_Id = "",
+                //                created_on = DateTime.Now,
+                //                Is_New_MobileUser = Is_New_MobileUser,
+                //                Legal_version = 0,
+                //                Privacy_version = 0,
+                //                Terms_version = 0
+                //            };
+                //            context.MobileUsers.Add(obj_Login);
+                //            context.Entry(obj_Login).State = EntityState.Added;
+                //            context.SaveChanges();
+                //            Auth_data.mae_steps_completed = "0";
+                //        }
+                //    }
+                //    else if (setpin != null)
+                //    {
+                //        Auth_data.mae_steps_completed = setpin.mae_steps_completed;
+                //    }
+                //    else if (setpin.mae_steps_completed == "")
+                //    {
+                //        setpin.mae_steps_completed = "0";
+                //    }
+                //}
 
                 Auth_data.AuthorizationToken = token;
                 Auth_data.Expires = DateTime.Now.AddSeconds(Convert.ToDouble(ConfigurationManager.AppSettings["AuthTokenExpiry"]));
@@ -200,8 +200,8 @@ namespace LoanCare_Mobile_API.Controllers
                 Auth_data.id = userDetails.id;
                 Auth_data.ClientId = userDetails.ClientId;
                 Auth_data.ClientName = userDetails.ClientName;
-                Auth_data.LoginId = userDetails.LoginId;
-            
+                Auth_data.LoginId = userDetails.username;
+                Auth_data.mae_steps_completed = userDetails.mae_steps_completed;
                 foreach (var Add in userDetails.loanss)
                 {
                     loanS.Add(new LoanSummarys

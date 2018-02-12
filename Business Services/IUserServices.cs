@@ -27,7 +27,7 @@ namespace Business_Services
         ResponseModel GetPrivacyForUser(string user_id);
         //Task<ResponseModel> PostsetpinAsync(UpdatePassword PinDetail, string MobileToken);
         Task<ResponseModel> GetManageAccountForUser(string mobileToken, string LoanNumber);
-        Task<ResponseModel> getUserDetailsAsync(string lcAuthToken, string loan_number);
+        Task<ResponseModel> getUserDetailsAsync(string lcAuthToken, string loan_number, bool Is_New_MobileUser);
         Task<ResponseModel> GetSecurityQuestions(string lcAuthToken);
         Task<ResponseModel> ForgotPassword(string Loan_Number, string ssn);
         //Added by BBSR_Team on 9th Jan 2018
