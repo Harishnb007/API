@@ -1269,7 +1269,7 @@ namespace Business_Services
                             payment_description = a.getPaymentType(a.paymentType),
                             account_number = a.accountNumber,
                             date_created = a.dateCreated,
-                            paymentCount = Convert.ToInt32(a.noOfPayments)
+                            paymentCount = Convert.ToInt32(a.pmtAmt)
                         };
 
                         pendingPayments.Add(tempPayment);
@@ -1288,7 +1288,7 @@ namespace Business_Services
                         payment_description = a.getPaymentType(a.paymentType),
                         account_number = a.accountNumber,
                         date_created = a.dateCreated,
-                        paymentCount = Convert.ToInt32(a.noOfPayments)
+                        paymentCount = Convert.ToInt32(a.pmtAmt)
                     };
 
                     pendingPayments.Add(tempPayment);
