@@ -633,7 +633,7 @@ namespace Business_Services
 
 
                     strAnswer = questionNumber.securityAnswer;
-                    if (strUserID == "0" && strAnswer == "")
+                    if (strUserID != "0" && strAnswer != "")
                     {
                         using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
                         {
