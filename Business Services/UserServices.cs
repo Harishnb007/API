@@ -591,6 +591,54 @@ namespace Business_Services
                             context.SaveChanges();
                             userDetails.mae_steps_completed = "0";
                         }
+
+                        var responseQuestionInfo = await API_Connection.GetAsync(lcAuthToken, "/api/User/GetSecurtiyQuestions/");
+                        string returnedDatasecurity = await responseQuestionInfo.Content.ReadAsStringAsync();
+
+                        dynamic objQuestion = JsonConvert.DeserializeObject(returnedDatasecurity);
+
+                        Business_Services.Models.SecurityQuestion questionDetails = new Business_Services.Models.SecurityQuestion();
+
+                        questionDetails.questions = new List<SecurityQuestionSummary>();
+
+
+                        questionDetails.pin = objQuestion.pin;
+                        string strQuestion;
+                        string strAnswer;
+
+                        string strQuestionID;
+                        string strUserID;
+
+
+                        foreach (var questionNumber in objQuestion.secQuestions)
+                        {
+                            // Send request to pull all question
+
+                            //Modified by BBSR Team on 12th Jan 2018
+                            strQuestionID = questionNumber.questionID;
+                            strUserID = questionNumber.userID;
+                            //Modified by BBSR Team on 12th Jan 2018
+
+                            strQuestion = questionNumber.secretQuestion;
+
+
+                            strAnswer = questionNumber.securityAnswer;
+                            if (strUserID != "0" && strAnswer != "")
+                            {
+                                using (var ctxsecurity = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
+                                {
+                                    var setpinSecurity = ctxsecurity.MobileUsers.Where(s => s.User_Id == userName).FirstOrDefault();
+
+                                    using (var context = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
+                                    {
+                                        setpinSecurity.mae_steps_completed = "1";
+                                        context.Entry(setpinSecurity).State = EntityState.Modified;
+                                        context.SaveChanges();
+                                    }
+
+                                }
+                            }
+                        }
                     }
                     else if (setpin != null)
                     {
@@ -602,54 +650,6 @@ namespace Business_Services
                     }
                 }
 
-
-                var responseQuestionInfo = await API_Connection.GetAsync(lcAuthToken, "/api/User/GetSecurtiyQuestions/");
-                string returnedDatasecurity = await responseQuestionInfo.Content.ReadAsStringAsync();
-
-                dynamic objQuestion = JsonConvert.DeserializeObject(returnedDatasecurity);
-
-                Business_Services.Models.SecurityQuestion questionDetails = new Business_Services.Models.SecurityQuestion();
-
-                questionDetails.questions = new List<SecurityQuestionSummary>();
-
-
-                questionDetails.pin = objQuestion.pin;
-                string strQuestion;
-                string strAnswer;
-
-                string strQuestionID;
-                string strUserID;
-
-
-                foreach (var questionNumber in objQuestion.secQuestions)
-                {
-                    // Send request to pull all question
-
-                    //Modified by BBSR Team on 12th Jan 2018
-                    strQuestionID = questionNumber.questionID;
-                    strUserID = questionNumber.userID;
-                    //Modified by BBSR Team on 12th Jan 2018
-
-                    strQuestion = questionNumber.secretQuestion;
-
-
-                    strAnswer = questionNumber.securityAnswer;
-                    if (strUserID != "0" && strAnswer != "")
-                    {
-                        using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
-                        {
-                            var setpin = ctx.MobileUsers.Where(s => s.User_Id == userName).FirstOrDefault();
-
-                            using (var context = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
-                            {
-                                setpin.mae_steps_completed = "1";
-                                context.Entry(setpin).State = EntityState.Modified;
-                                context.SaveChanges();
-                            }
-
-                        }
-                    }
-                }
 
                 using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
                 {
