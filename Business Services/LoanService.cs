@@ -943,6 +943,7 @@ namespace Business_Services
             {
                 noOfPayments = paymentCounter != 6 ? loanInfo.payment.pmts : "0";
                 paymentAmt = paymentCounter != 6 ? loanInfo.payment.pmtAmt : Convert.ToDecimal(0.00);
+                paymentAmt = paymentAmt * Convert.ToInt32(noOfPayments);
             }
 
             Payment paymentData = new Payment
@@ -1087,7 +1088,7 @@ namespace Business_Services
                 payment_Type = loanInfo.payment.paymentType
             };
 
-            if (paymentData.payment_Type == "3")
+            if (loanInfo.payment.fees.Count != 0)
             {
                 for (int i = 0; i <= loanInfo.payment.fees.Count - 1; i++)
                 {
