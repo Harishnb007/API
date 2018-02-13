@@ -138,7 +138,7 @@ namespace Business_Services
 
 
                     strAnswer = questionNumber.securityAnswer;
-                    
+
 
                     //Decode the Encoded value from the B2C site
                     if (!string.IsNullOrEmpty(strAnswer))
@@ -163,30 +163,31 @@ namespace Business_Services
             return new ResponseModel(questionDetails);
         }
 
-        public async Task<ResponseModel> myloanGetPinAsyn(string lcAuthToken,string Pin)
+        public async Task<ResponseModel> myloanGetPinAsyn(string lcAuthToken, string Pin)
         {
-           
-            try {
+
+            try
+            {
                 Business_Services.Models.User getpinloan = new Models.User();
                 TokenServices tokenServices = new TokenServices();
                 string lcToken = tokenServices.GetLctoken(lcAuthToken);
-                var responseQuestionInfo = await API_Connection.GetAsync(lcToken, "/api/User/GetSecurtiyQuestions/");
+                var responseQuestionInfo = await API_Connection.GetAsync(lcToken, "/api/User/ValidateForMobileUserPin?pin=" + Pin);
                 string returnedData = await responseQuestionInfo.Content.ReadAsStringAsync();
 
                 dynamic objQuestion = JsonConvert.DeserializeObject(returnedData);
-                string getpin = objQuestion.pin;
-                
-                if (Pin == getpin)
-                {
+                //string getpin = objQuestion;
 
-                    getpinloan.is_successful = true;
-                }
-                else
-                {
-                    getpinloan.is_successful = false;
-                }
+                //if (Pin == getpin)
+                //{
+
+                //    getpinloan.is_successful = true;
+                //}
+                //else
+                //{
+                //    getpinloan.is_successful = false;
+                //}
                 // }
-                return new ResponseModel(getpinloan);
+                return new ResponseModel(objQuestion);
             }
             catch (Exception Ex)
             {
@@ -195,8 +196,8 @@ namespace Business_Services
             }
         }
 
-           
-        
+
+
 
 
 
@@ -332,7 +333,7 @@ namespace Business_Services
 
                     var response = await API_Connection.PostUserRegisAsync("/api/EmailNotification/SendEmailConfirmationForTemplate/?template=Forgotuserid&toEmail=" + decodeduserEmail + "&pageName=forgotUserId&userID=" + objForgotUser.user.id, content);
 
-                    return new ResponseModel(null,1,response);
+                    return new ResponseModel(null, 1, response);
                 }
                 else
                 {
@@ -428,7 +429,7 @@ namespace Business_Services
                     }
                     return new ResponseModel(listsecquestion);
                 }
-                return new ResponseModel(null,1,returnedData);
+                return new ResponseModel(null, 1, returnedData);
             }
             catch (Exception Ex)
             {
@@ -523,7 +524,7 @@ namespace Business_Services
             try
             {
                 Business_Services.Models.User Auth_data = new Models.User();
-                  var responseUserInfo = await API_Connection.GetAsync(lcAuthToken, "/api/User/GetUserInformation");
+                var responseUserInfo = await API_Connection.GetAsync(lcAuthToken, "/api/User/GetUserInformation");
                 string returnedData = await responseUserInfo.Content.ReadAsStringAsync();
                 dynamic objUserName = JsonConvert.DeserializeObject(returnedData);
 
@@ -553,7 +554,7 @@ namespace Business_Services
                 var responseLP = await API_Connection.GetAsync(lcAuthToken, "/api/User/LanguagePref/?userId=" + objUserName.user.userName);
                 string returnedDataLP = await responseLP.Content.ReadAsStringAsync();
 
-                Business_Services.Models.User userDetails = new Business_Services.Models.User();
+                 Business_Services.Models.User userDetails = new Business_Services.Models.User();
 
                 using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
                 {
@@ -1293,16 +1294,17 @@ namespace Business_Services
                         return new ResponseModel(loanDetails, 2, "Invalid Password");
                     }
                 }
-                else {
+                else
+                {
                     loanDetails.is_Success = false;
                     loanDetails.Message = "Invalid Current Password";
                     LogWriter("Message", loanDetails.Message);
                     loanDetails.Token = MobileToken;
                     return new ResponseModel(loanDetails, 2, "Invalid Current Password");
                 }
-               
+
             }
-            
+
             catch (Exception Ex)
             {
                 return new ResponseModel(loanDetails, 1, Ex.Message);
@@ -1371,7 +1373,7 @@ namespace Business_Services
                     Business_Services.Models.DAL.LoancareDBContext.MobileUser MUser = new Business_Services.Models.DAL.LoancareDBContext.MobileUser();
                     using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
                     {
-                        var setpin = ctx.MobileUsers.Where(s => s.User_Id == PinDetail.User_Id).FirstOrDefault();
+                        var setpin = ctx.MobileUsers.Where(s => s.User_Id == UserName).FirstOrDefault();
                         if (setpin != null)
                         {
                             using (var context = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
@@ -1546,7 +1548,7 @@ namespace Business_Services
 
 
 
-        public async Task<ResponseModel> getpinAsync(string MobileToken,string loanNumber, string pin)
+        public async Task<ResponseModel> getpinAsync(string MobileToken, string loanNumber, string pin)
         {
             Business_Services.Models.User getpinloan = new Models.User();
             TokenServices tokenServices = new TokenServices();
@@ -1566,7 +1568,7 @@ namespace Business_Services
                 }
                 else
                 {
-                   // setpin.is_successful = false;
+                    // setpin.is_successful = false;
                 }
                 // }
                 return new ResponseModel(getuserinfo.pin);

@@ -79,7 +79,7 @@ namespace LoanCare_Mobile_API.Controllers
             return Ok(payment);
         }
 
-        [Route("MyLoanSetPin/{LoanNumber}/{Pin}")]
+        [Route("MyLoanSetPin/{Pin}")]
         [HttpGet]
         public async Task<IHttpActionResult> myloanGetPin(string Pin)
         {

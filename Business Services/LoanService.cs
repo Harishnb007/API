@@ -1563,6 +1563,7 @@ namespace Business_Services
                 string objUId = ObjUserId.UserId;
                 string objPWd = ObjUserId.Password;
                 int objCId = ObjUserId.ClientId;
+                string objusername = ObjUserId.UserName;
                 string lcToken = tokenServices.GetLctoken(MobileToken);
 
                 byte[] email = System.Text.ASCIIEncoding.ASCII.GetBytes(loanDetails.email);
@@ -1580,6 +1581,30 @@ namespace Business_Services
                 someDict.Add("loanNo", decodedStringloannotify);
 
                 var content = new FormUrlEncodedContent(someDict);
+
+                var response = await API_Connection.PostAsync(lcToken, "/api/MyAccount/SetUpdateEmail/", content);
+                Dictionary<string, string> someDictsendmail = new Dictionary<string, string>();
+                someDictsendmail.Add("emailData[0][key]", "loginName");
+                someDictsendmail.Add("emailData[0][value]", objusername);
+                someDictsendmail.Add("emailData[0][update]", "undefined");
+                someDictsendmail.Add("emailData[1][key]", "LoanNo");
+                someDictsendmail.Add("emailData[1][value]", loanDetails.loanNo);
+                someDictsendmail.Add("emailData[1][update]", "undefined");
+                someDictsendmail.Add("emailData[2][key]", "clientPhone");
+                someDictsendmail.Add("emailData[2][value]", "855-876-9219");
+                someDictsendmail.Add("emailData[2][update]", "undefined");
+                someDictsendmail.Add("emailData[3][key]", "Url");
+                someDictsendmail.Add("emailData[3][value]", "freedommortgage.myloancare.com");
+                someDictsendmail.Add("emailData[3][update]", "undefined");
+                someDictsendmail.Add("emailData[4][key]", "PROPERTY_STATE_CODE");
+                someDictsendmail.Add("emailData[4][value]", "AZ");
+                someDictsendmail.Add("emailData[4][update]", "undefined");
+                someDictsendmail.Add("update", "undefined");
+                var contentmail = new FormUrlEncodedContent(someDictsendmail);
+                var UpdateEmailsend = "updateEmail";
+                var UserID = "";
+                var responseSendconfirmation = await API_Connection.PostAsync(lcToken, "/api/EmailNotification/SendEmailConfirmationForTemplate/?template=UpdateUserEmail&toEmail="+ loanDetails.email + "&pageName="+ UpdateEmailsend + "&userID="+UserID, contentmail);
+
                 var eventId = 5;
                 var resourceName = "One-Time+Payment";
                 var toEmail = "";
@@ -1589,9 +1614,6 @@ namespace Business_Services
                 var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
                 string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
-                var response = await API_Connection.PostAsync(lcToken, "/api/MyAccount/SetUpdateEmail/", content);
-              
-             
                 var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", objPWd } });
                 var responseregeneratedToken = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
 
