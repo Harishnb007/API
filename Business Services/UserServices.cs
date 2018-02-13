@@ -333,7 +333,7 @@ namespace Business_Services
 
                     var response = await API_Connection.PostUserRegisAsync("/api/EmailNotification/SendEmailConfirmationForTemplate/?template=Forgotuserid&toEmail=" + decodeduserEmail + "&pageName=forgotUserId&userID=" + objForgotUser.user.id, content);
 
-                    return new ResponseModel(null, 1, response);
+                    return new ResponseModel(null, 0, "Your User ID has been sent to your email account that is on record. Please check your e-mail. If you have issues receiving the email, please contact customer support.");
                 }
                 else
                 {
@@ -556,7 +556,7 @@ namespace Business_Services
 
                  Business_Services.Models.User userDetails = new Business_Services.Models.User();
 
-                using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
+                 using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
                 {
                     var setpin = ctx.MobileUsers.Where(s => s.User_Id == userName).FirstOrDefault();
 

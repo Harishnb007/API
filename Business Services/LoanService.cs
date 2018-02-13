@@ -1604,7 +1604,7 @@ namespace Business_Services
                 var contentmail = new FormUrlEncodedContent(someDictsendmail);
                 var UpdateEmailsend = "updateEmail";
                 var UserID = "";
-                var responseSendconfirmation = await API_Connection.PostAsync(lcToken, "/api/EmailNotification/SendEmailConfirmationForTemplate/?template=UpdateUserEmail&toEmail="+ loanDetails.email + "&pageName="+ UpdateEmailsend + "&userID="+UserID, contentmail);
+                var responseSendconfirmation = await API_Connection.PostAsync(lcToken, "/api/EmailNotification/SendEmailConfirmationForTemplate/?template=UpdateUserEmail&toEmail="+ decodedStringemail + "&pageName="+ UpdateEmailsend + "&userID="+UserID, contentmail);
 
                 var eventId = 5;
                 var resourceName = "One-Time+Payment";
