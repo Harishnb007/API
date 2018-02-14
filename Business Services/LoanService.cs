@@ -894,6 +894,8 @@ namespace Business_Services
             int paymentCounter = 0;
             string noOfPayments = string.Empty;
             decimal paymentAmt = 0.0M;
+            AutoDraft_GetAutoDraft pendingInfoAutoDraft = new AutoDraft_GetAutoDraft();
+            bool autodraft = false;
             try
             {
                 var response = await API_Connection.GetAsync(lcToken, "/api/OnetimePayment/GetPaymentInfo/?loanNo=" + loanNumber + "&schDate=" + "");
@@ -906,6 +908,22 @@ namespace Business_Services
                 returnedData = await pendingresponse.Content.ReadAsStringAsync();
                 pendingInfoPayment = JsonConvert.DeserializeObject<List<OneTimePayment_GetMockedPendingTransactions>>(returnedData);
 
+                try
+                {
+                    var autoDraftResponse = await API_Connection.GetAsync(lcToken, "api/AutoDraft/GetAutoDraft/" + loanNumber + "? _");
+                    returnedData = await autoDraftResponse.Content.ReadAsStringAsync();
+                    pendingInfoAutoDraft = JsonConvert.DeserializeObject<AutoDraft_GetAutoDraft>(returnedData);
+
+                    if (pendingInfoAutoDraft.autoDraftInfo.totalDftAmount != null)
+                    {
+                        autodraft = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    
+
+                }
             }
             catch (Exception ex)
             {
@@ -948,6 +966,7 @@ namespace Business_Services
 
             Payment paymentData = new Payment
             {
+                isAutoDraftAvailable = autodraft,
                 due_date = Convert.ToDateTime(loanInfo.payment.dueDate).ToString("MM/dd/yy"),
                 loan_number = loanNumber,
                 account_status = account_status,
@@ -1021,7 +1040,8 @@ namespace Business_Services
                     PendingPayment tempPayment = new PendingPayment()
                     {
                         payment_date = Convert.ToDateTime(a.schDT),
-                        paymentCount = Convert.ToInt32(a.pmts)
+                        paymentCount = Convert.ToInt32(a.pmts),
+                        date_created = a.dateCreated
                     };
 
                     pendingPayments.Add(tempPayment);
@@ -1038,8 +1058,9 @@ namespace Business_Services
 
             string lcToken = tokenServices.GetLctoken(mobileToken);
             OnetimePayment_GetPaymentInfo loanInfo = new OnetimePayment_GetPaymentInfo();
-
             bool account_status = false;
+            AutoDraft_GetAutoDraft pendingInfoAutoDraft = new AutoDraft_GetAutoDraft();
+            bool autodraft = false;
 
             try
             {
@@ -1049,14 +1070,28 @@ namespace Business_Services
                 account_status = true;
                 loanInfo = JsonConvert.DeserializeObject<OnetimePayment_GetPaymentInfo>(returnedData);
 
+                try
+                {
+                    var autoDraftResponse = await API_Connection.GetAsync(lcToken, "api/AutoDraft/GetAutoDraft/" + loanNumber + "? _");
+                    returnedData = await autoDraftResponse.Content.ReadAsStringAsync();
+                    pendingInfoAutoDraft = JsonConvert.DeserializeObject<AutoDraft_GetAutoDraft>(returnedData);
+
+                    if (pendingInfoAutoDraft.autoDraftInfo.totalDftAmount != null)
+                    {
+                        autodraft = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                }
             }
             catch (Exception Ex)
             {
                 return new ResponseModel(null, 1, Ex.Message);
             }
             Payment paymentData = new Payment
-
             {
+                isAutoDraftAvailable = autodraft,
                 loan_number = loanNumber,
                 account_status = account_status,
                 payment_amount = loanInfo.payment.pmtAmt,
