@@ -101,7 +101,7 @@ namespace Business_Services.Models.LC_WebApi_Models
         [JsonProperty]
         internal string routingNumber { get; set; }
         [JsonProperty]
-        internal string bankName { get; set; }
+        internal string bankName { get; set; } 
         [JsonProperty]
         internal string accountType { get; set; }
     }

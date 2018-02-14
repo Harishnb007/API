@@ -40,6 +40,6 @@ namespace Business_Services.Models
         public decimal nsf_fees_due_input { get; set; }
         public decimal other_fees_due_input { get; set; }
 
-        public bool isAutoDraftAvailable { get; set; }
+        public bool isAutoDraftAvailable { get; set; } 
     }
 }
