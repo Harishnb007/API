@@ -1135,7 +1135,7 @@ namespace Business_Services
                     {
                         paymentData.nsf_fees_due_input = loanInfo.payment.fees[i].feeAmt;
                     }
-                    if (loanInfo.payment.fees[i].feeCode == "3")
+                    if (loanInfo.payment.fees[i].feeCode == "K")
                     {
                         paymentData.other_fees_due_input = loanInfo.payment.fees[i].feeAmt;
                     }
@@ -2236,15 +2236,6 @@ namespace Business_Services
             try
             {
 
-                if (paymentdata.override_payment == true)
-                {
-                    var responseCancelPayment = await API_Connection.GetAsync(lcToken, "/api/OneTimePayment/CancelOnetimePayment/?loanNo=" +
-                                 paymentdata.loan_number + "&schDate=" + paymentdata.initial_schDate.ToString("MM/dd/yyyy") +
-                                 "&isRegularDelete=false&dateCreated=" + paymentdata.date_created + "&=");
-                    string returnedData = await responseCancelPayment.Content.ReadAsStringAsync();
-                }
-
-
                 someDict.Add("loanSource", "MAINFRAME");
                 someDict.Add("dateCreated", "0001-01-01T00:00:00");
                 someDict.Add("isNew", "true");
@@ -2400,8 +2391,20 @@ namespace Business_Services
                 var content = new FormUrlEncodedContent(someDict);
                 var response = await API_Connection.PostAsync(lcToken, "/api/OnetimePayment/InsertPaymentInfo/", content);
 
-                return new ResponseModel(paymentdata);
 
+                if (paymentdata.override_payment == true)
+                {
+                    var responseCancelPayment = await API_Connection.GetAsync(lcToken, "/api/OneTimePayment/CancelOnetimePayment/?loanNo=" +
+                                 paymentdata.loan_number + "&schDate=" + paymentdata.initial_schDate.ToString("MM/dd/yyyy") +
+                                 "&isRegularDelete=false&dateCreated=" + paymentdata.date_created + "&=");
+                    string returnedData = await responseCancelPayment.Content.ReadAsStringAsync();
+
+                    return new ResponseModel(paymentdata);
+                }
+                else
+                {
+                    return new ResponseModel(paymentdata);
+                }
             }
             catch (Exception ex)
             {
