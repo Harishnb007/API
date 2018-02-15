@@ -16,7 +16,7 @@ namespace Business_Services
         
         Task<ResponseModel> getUserDetailsAsyn(string lcAuthToken, string loan_number);
         Task<ResponseModel> GetBankAccountsForUser(string mobileToken);
-        ResponseModel ContactUsAsync(string mobileToken);
+        Task<ResponseModel> ContactUsAsync(string mobileToken);
         ResponseModel UpdateProfile(string user_id, Business_Services.Models.User user);
         Task<ResponseModel> DeleteBankAccountsForUser(string mobileToken, BankAccount objBank);
         //ResponseModel ResetpinAsync(UsersMDb userDetail);

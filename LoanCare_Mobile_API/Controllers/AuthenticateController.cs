@@ -202,6 +202,7 @@ namespace LoanCare_Mobile_API.Controllers
                 Auth_data.ClientName = userDetails.ClientName;
                 Auth_data.LoginId = userDetails.username;
                 Auth_data.mae_steps_completed = userDetails.mae_steps_completed;
+                Auth_data.SecurityQuestionFlag = userDetails.SecurityQuestionFlag;
                 foreach (var Add in userDetails.loanss)
                 {
                     loanS.Add(new LoanSummarys

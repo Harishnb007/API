@@ -93,6 +93,17 @@ namespace Business_Services
             string lcToken = tokenServices.GetLctoken(mobileToken);
             try
             {
+
+                var eventId = 2;
+                var resourceName = "Payment";
+                var toEmail = "";
+                var log = "Viewed+Autodraft";
+                var actionName = "VIEW";
+
+                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+
+
                 var response = await API_Connection.GetAsync(lcToken, "/api/AutoDraft/GetAutoDraft/" + loanNumber);
                 string returnedData = await response.Content.ReadAsStringAsync();
                 AutoDraft_GetAutoDraft autodraftInfo = JsonConvert.DeserializeObject<AutoDraft_GetAutoDraft>(returnedData);
@@ -174,6 +185,16 @@ namespace Business_Services
             {
                 TokenServices tokenServices = new TokenServices();
                 string lcToken = tokenServices.GetLctoken(mobileToken);
+
+                var eventId = 1;
+                var resourceName = "Others";
+                var toEmail = "";
+                var log = "Viewed+Notification";
+                var actionName = "VIEW";
+
+                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+
 
                 var response = await API_Connection.GetAsync(lcToken, "/api/EStatement/GetAllNotificationByLoanNumber/?loanNo=" + loanNumber);
                 var returnNotification = await response.Content.ReadAsStringAsync();
@@ -283,6 +304,17 @@ namespace Business_Services
             string lcToken = tokenServices.GetLctoken(mobileToken);
             try
             {
+
+                var eventId = 7;
+                var resourceName = "Account";
+                var toEmail = "";
+                var log = "Viewed+Escrow";
+                var actionName = "VIEW";
+
+                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+
+
                 var response = await API_Connection.GetAsync(lcToken, "/api/Escrow/CallEscrow/?LoanNo=" + loanNumber);
                 string returnedData = await response.Content.ReadAsStringAsync();
                 Escrow_CallEscrow escrowInfo = JsonConvert.DeserializeObject<Escrow_CallEscrow>(returnedData);
@@ -365,7 +397,7 @@ namespace Business_Services
                 Getdetails_estatement getEstatementInfo = JsonConvert.DeserializeObject<Getdetails_estatement>(returnedData);
 
                 var eventId = 4;
-                var resourceName = "eStatement+Enroll";
+                var resourceName = "eStatement";
                 var toEmail = "";
                 var log = "Viewed+eStatement";
                 var actionName = "VIEW";
@@ -517,7 +549,7 @@ namespace Business_Services
                 LoanDetails LoanDetailProperty = new LoanDetails();
 
                 var eventId = 7;
-                var resourceName = "Manage+Account";
+                var resourceName = "Account";
                 var toEmail = "";
                 var log = "Viewed+Manage+Accounts";
                 var actionName = "VIEW";
@@ -609,10 +641,25 @@ namespace Business_Services
         public async Task<ResponseModel> getcontactdetailsAsync(string lcAuthToken, string loan_number)
         {
             // To do - Use DI
+            Business_Services.Models.GenerateNewToken objgenerateToken = new GenerateNewToken();
             try
             {
 
                 string lcToken = tokenServices.GetLctoken(lcAuthToken);
+
+                var Decryptdata = objgenerateToken.Decrypt(lcAuthToken);
+
+                dynamic ObjUserId = JsonConvert.DeserializeObject(Decryptdata);
+                string objUName = ObjUserId.UserName;
+
+                var eventId = 5;
+                var resourceName = "Profile+Information";
+                var toEmail = "";
+                var log = "Viewed+Contactdetails";
+                var actionName = "VIEW";
+
+                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
                 var response = await API_Connection.GetAsync(lcToken, "/api/MyAccount/GetAccountInfo/" + loan_number);
                 string returnedData = await response.Content.ReadAsStringAsync();
@@ -625,9 +672,9 @@ namespace Business_Services
                 dynamic obj = JsonConvert.DeserializeObject(returnedDataPhoneNo);
                 personal_getborrowercontactInfo getuserinfoPhoneNo = JsonConvert.DeserializeObject<personal_getborrowercontactInfo>(returnedDataPhoneNo);
 
-                var responseUserName = await API_Connection.GetAsync(lcToken, "/api/User/GetUserInformation");
-                string returnedDataUserName = await responseUserName.Content.ReadAsStringAsync();
-                dynamic getuserinfoUserName = JsonConvert.DeserializeObject(returnedDataUserName);
+                //var responseUserName = await API_Connection.GetAsync(lcToken, "/api/User/GetUserInformation");
+                //string returnedDataUserName = await responseUserName.Content.ReadAsStringAsync();
+                //dynamic getuserinfoUserName = JsonConvert.DeserializeObject(returnedDataUserName);
 
 
                 if (getuserinfoPhoneNo.contactinfo.contactInfo.primaryTelecomNumber.type == "H")
@@ -733,7 +780,7 @@ namespace Business_Services
 
                 LoanContactDetail LoanDetails = new LoanContactDetail
                 {
-                    Username = getuserinfoUserName.user.userName,
+                    Username = objUName,
                     email = LoanDetailsemail.email,
                     is_Foreign = getuserinfoPhoneNo.contactinfo.contactInfo.isInternationalAddress,
                     street = getuserinfoPhoneNo.contactinfo.contactInfo.mailingAddressStreet,
@@ -769,6 +816,16 @@ namespace Business_Services
             // To do - Use DI
 
             string lcToken = tokenServices.GetLctoken(mobileToken);
+
+            var eventId = 7;
+            var resourceName = "Account";
+            var toEmail = "";
+            var log = "Viewed+Loan+Details";
+            var actionName = "VIEW";
+
+            var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+            string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+
             Loan LoanStatus = new Loan();
             var response = await API_Connection.GetAsync(lcToken, "/api/Loan/GetCurrentLoanInfo/" + loanNumber);
             string returnedData = await response.Content.ReadAsStringAsync();
@@ -885,6 +942,15 @@ namespace Business_Services
             // To do - Use DI
 
             string lcToken = tokenServices.GetLctoken(MobileToken);
+            var eventId = 2;
+            var resourceName = "Payment";
+            var toEmail = "";
+            var log = "Viewed+Payment";
+            var actionName = "VIEW";
+
+            var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+            string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+
             OnetimePayment_GetPaymentInfo loanInfo = new OnetimePayment_GetPaymentInfo();
             DateTime Schdate = new DateTime();
             Schdate = DateTime.Now;
@@ -1015,6 +1081,10 @@ namespace Business_Services
             // To do - Use DI
 
             string lcToken = tokenServices.GetLctoken(MobileToken);
+
+            
+
+
             List<OneTimePayment_GetMockedPendingTransactions> pendingInfoPayment = new List<OneTimePayment_GetMockedPendingTransactions>();
 
             List<PendingPayment> pendingPayments = new List<PendingPayment>();
@@ -1046,6 +1116,14 @@ namespace Business_Services
 
                 pendingPayments.Add(tempPayment);
             }
+            //var eventId = 2;
+            //var resourceName = "Payment";
+            //var toEmail = "";
+            //var log = "Viewed+Pending+Payment";
+            //var actionName = "VIEW";
+
+            //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+            //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
             return new ResponseModel(pendingPayments);
         }
@@ -1056,6 +1134,16 @@ namespace Business_Services
             // To do - Use DI
 
             string lcToken = tokenServices.GetLctoken(mobileToken);
+
+            var eventId = 2;
+            var resourceName = "Edit+Payment";
+            var toEmail = "";
+            var log = "Viewed+Edit+Payment";
+            var actionName = "VIEW";
+
+            var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+            string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+
             OnetimePayment_GetPaymentInfo loanInfo = new OnetimePayment_GetPaymentInfo();
             bool account_status = false;
             AutoDraft_GetAutoDraft pendingInfoAutoDraft = new AutoDraft_GetAutoDraft();
@@ -1152,6 +1240,16 @@ namespace Business_Services
             string lcToken = tokenServices.GetLctoken(MobileToken);
             try
             {
+
+                var eventId = 2;
+                var resourceName = "Payment";
+                var toEmail = "";
+                var log = "Viewed+Payment+Schedule";
+                var actionName = "VIEW";
+
+                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+
                 var responseduedate = await API_Connection.GetAsync(lcToken, "/api/OnetimePayment/GetPaymentInfo/?loanNo=" + loanNumber + "&schDate=" + "");
                 string returnedduedateData = await responseduedate.Content.ReadAsStringAsync();
                 Calender_GetPaymentInfo calenderDuedate = JsonConvert.DeserializeObject<Calender_GetPaymentInfo>(returnedduedateData);
@@ -1197,6 +1295,16 @@ namespace Business_Services
             string lcToken = tokenServices.GetLctoken(mobileToken);
             try
             {
+
+                var eventId = 2;
+                var resourceName = "Payment";
+                var toEmail = "";
+                var log = "Viewed+Payment+History";
+                var actionName = "VIEW";
+
+                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+
                 var response = await API_Connection.GetAsync(lcToken, "/api/Loan/GetLoanActivity/" + loanNumber);
                 string returnedData = await response.Content.ReadAsStringAsync();
                 Activity_AccountActivity historyInfo = JsonConvert.DeserializeObject<Activity_AccountActivity>(returnedData);
@@ -1226,6 +1334,16 @@ namespace Business_Services
             string lcToken = tokenServices.GetLctoken(mobileToken);
             try
             {
+
+                var eventId = 2;
+                var resourceName = "Payment";
+                var toEmail = "";
+                var log = "Viewed+Payment+Description";
+                var actionName = "VIEW";
+
+                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+
                 var response = await API_Connection.GetAsync(lcToken, "/api/Loan/GetLoanActivity/" + loanNumber);
                 string returnedData = await response.Content.ReadAsStringAsync();
                 Activity_AccountActivity historyInfo = JsonConvert.DeserializeObject<Activity_AccountActivity>(returnedData);
@@ -1288,6 +1406,9 @@ namespace Business_Services
                 // To do - Use DI
                 TokenServices tokenServices = new TokenServices();
                 string lcToken = tokenServices.GetLctoken(mobileToken);
+
+                
+
                 string returnedData = null;
                 var response = await API_Connection.GetAsync(lcToken, "/api/OneTimePayment/GetMockedPendingTransactions/?loanNo=" + loanNumber + "&schDate=&");
                 returnedData = await response.Content.ReadAsStringAsync();
@@ -1333,6 +1454,14 @@ namespace Business_Services
                         pendingPayments.Add(tempPayment);
                     }
 
+                    //var eventId = 2;
+                    //var resourceName = "Payment";
+                    //var toEmail = "";
+                    //var log = "Viewed+Pending+Payment";
+                    //var actionName = "VIEW";
+
+                    //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                    //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
                     return new ResponseModel(pendingPayments);
                 }
@@ -1466,6 +1595,7 @@ namespace Business_Services
 
                 var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
                 string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+
                 return new ResponseModel(response);
             }
             catch (Exception Ex)
@@ -1641,7 +1771,7 @@ namespace Business_Services
                 var responseSendconfirmation = await API_Connection.PostAsync(lcToken, "/api/EmailNotification/SendEmailConfirmationForTemplate/?template=UpdateUserEmail&toEmail="+ decodedStringemail + "&pageName="+ UpdateEmailsend + "&userID="+UserID, contentmail);
 
                 var eventId = 5;
-                var resourceName = "One-Time+Payment";
+                var resourceName = "Update+Email";
                 var toEmail = "";
                 var log = "Viewed+Update+Email+page";
                 var actionName = "VIEW";
@@ -2469,6 +2599,17 @@ namespace Business_Services
             string lcToken = tokenServices.GetLctoken(mobileToken);
             try
             {
+
+                var eventId = 2;
+                var resourceName = "Payment";
+                var toEmail = "";
+                var log = "Viewed+Payment+Details";
+                var actionName = "VIEW";
+
+                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+
+
                 var response = await API_Connection.GetAsync(lcToken, "/api/Loan/GetCurrentLoanInfo/" + loanNumber);
                 string returnedData = await response.Content.ReadAsStringAsync();
                 Loan_GetCurrentLoanInfo loanInfo = JsonConvert.DeserializeObject<Loan_GetCurrentLoanInfo>(returnedData);

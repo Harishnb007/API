@@ -140,7 +140,7 @@ namespace LoanCare_Mobile_API.Controllers
        
         [Route("contactus")]
         [HttpGet]
-        public IHttpActionResult Contactus()
+        public async Task<IHttpActionResult> Contactus()
         {
             // To do - Move the following code to a single method & use it across the project
             IEnumerable<string> tokenValues;

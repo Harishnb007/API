@@ -102,6 +102,16 @@ namespace Business_Services
         {
             TokenServices tokenServices = new TokenServices();
             string lcToken = tokenServices.GetLctoken(lcAuthToken);
+
+            var eventId = 5;
+            var resourceName = "Profile";
+            var toEmail = "";
+            var log = "Viewed+Security+Question";
+            var actionName = "VIEW";
+
+            var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+            string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+
             var responseQuestionInfo = await API_Connection.GetAsync(lcToken, "/api/User/GetSecurtiyQuestions/");
             string returnedData = await responseQuestionInfo.Content.ReadAsStringAsync();
 
@@ -220,11 +230,11 @@ namespace Business_Services
                 var response = await API_Connection.GetAsync(lcToken, "/api/BankAccountInformation/GetBanksByUserId");
                 string returnedData = await response.Content.ReadAsStringAsync();
 
-                var eventId = 5;
-                var resourceName = "One-Time+Payment";
+                var eventId = 2;
+                var resourceName = "Payment";
                 var toEmail = "";
                 var log = "Viewed+Manage+Bank+Account+page";
-                var actionName = "VIEW"; 
+                var actionName = "VIEW";
 
                 var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
                 string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
@@ -263,6 +273,16 @@ namespace Business_Services
         {
             TokenServices tokenServices = new TokenServices();
             string lcToken = tokenServices.GetLctoken(mobileToken);
+
+            var eventId = 7;
+            var resourceName = "Account";
+            var toEmail = "";
+            var log = "Viewed+Manage+Account+page";
+            var actionName = "VIEW";
+
+            var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+            string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+
             UserAlertCount Users = new UserAlertCount();
             var responseuser = await API_Connection.GetAsync(lcToken, "api/Personal/GetBorrowerContactInfo/" + LoanNumber);
             string returnedDatausername = await responseuser.Content.ReadAsStringAsync();
@@ -655,9 +675,11 @@ namespace Business_Services
                 {
                     var setpin = ctx.MobileUsers.Where(s => s.User_Id == userName).FirstOrDefault();
 
-                    if (setpin != null) {
+                    if (setpin != null)
+                    {
 
-                        if (setpin.mae_steps_completed == "1" || setpin.mae_steps_completed == "2") {
+                        if (setpin.mae_steps_completed == "1" || setpin.mae_steps_completed == "2")
+                        {
 
                             var responseQuestionInfo = await API_Connection.GetAsync(lcAuthToken, "/api/User/GetSecurtiyQuestions/");
                             string returnedDatasecurity = await responseQuestionInfo.Content.ReadAsStringAsync();
@@ -690,21 +712,14 @@ namespace Business_Services
 
 
                                 strAnswer = questionNumber.securityAnswer;
-                                if (strUserID == "0" && strAnswer == "")
+                                if (strUserID != "0" && strAnswer != "")
                                 {
                                     userDetails.SecurityQuestionFlag = true;
                                 }
-                                else {
-                                    userDetails.SecurityQuestionFlag = false;
-                                }
                             }
                         }
-
                     }
-                    
-
                     userDetails.mae_steps_completed = setpin.mae_steps_completed;
-
                 }
 
 
@@ -1051,14 +1066,16 @@ namespace Business_Services
         }
 
 
-        public ResponseModel ContactUsAsync(string mobileToken)
+        public async Task<ResponseModel> ContactUsAsync(string mobileToken)
         {
             // To do - Use DI
 
             TokenServices tokenServices = new TokenServices();
             string lcToken = tokenServices.GetLctoken(mobileToken);
             try
-            {
+             {
+
+                
 
                 ContactUs contactUs_details = new ContactUs();
 
@@ -1149,6 +1166,15 @@ namespace Business_Services
                 contactUs_details.mailing_address = AddressList;
                 contactUs_details.business_hours = BusinesshrsList;
                 contactUs_details.email_topics = Etopics;
+
+                //var eventId = 6;
+                //var resourceName = "Account+Services";
+                //var toEmail = "";
+                //var log = "Viewed+Contact+Us+Page";
+                //var actionName = "VIEW";
+
+                //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
                 return new ResponseModel(contactUs_details);
             }
@@ -1772,6 +1798,7 @@ namespace Business_Services
                 var actionName = "UPDATE";
 
                 var trackresponse = await API_Connection.GetAsync("/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
             }
             catch (Exception Ex)
             {
