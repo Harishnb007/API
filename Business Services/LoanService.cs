@@ -2235,6 +2235,14 @@ namespace Business_Services
 
             try
             {
+                if (paymentdata.override_payment == true)
+                {
+                    var responseCancelPayment = await API_Connection.GetAsync(lcToken, "/api/OneTimePayment/CancelOnetimePayment/?loanNo=" +
+                                 paymentdata.loan_number + "&schDate=" + paymentdata.initial_schDate.ToString("MM/dd/yyyy") +
+                                 "&isRegularDelete=false&dateCreated=" + paymentdata.date_created + "&=");
+                    string returnedData = await responseCancelPayment.Content.ReadAsStringAsync();
+
+                }
 
                 someDict.Add("loanSource", "MAINFRAME");
                 someDict.Add("dateCreated", "0001-01-01T00:00:00");
@@ -2391,20 +2399,7 @@ namespace Business_Services
                 var content = new FormUrlEncodedContent(someDict);
                 var response = await API_Connection.PostAsync(lcToken, "/api/OnetimePayment/InsertPaymentInfo/", content);
 
-
-                if (paymentdata.override_payment == true)
-                {
-                    var responseCancelPayment = await API_Connection.GetAsync(lcToken, "/api/OneTimePayment/CancelOnetimePayment/?loanNo=" +
-                                 paymentdata.loan_number + "&schDate=" + paymentdata.initial_schDate.ToString("MM/dd/yyyy") +
-                                 "&isRegularDelete=false&dateCreated=" + paymentdata.date_created + "&=");
-                    string returnedData = await responseCancelPayment.Content.ReadAsStringAsync();
-
-                    return new ResponseModel(paymentdata);
-                }
-                else
-                {
-                    return new ResponseModel(paymentdata);
-                }
+                return new ResponseModel(paymentdata);
             }
             catch (Exception ex)
             {
