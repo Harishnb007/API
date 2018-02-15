@@ -1035,17 +1035,16 @@ namespace Business_Services
 
             foreach (OneTimePayment_GetMockedPendingTransactions a in pendingInfoPayment)
             {
-                if (a.paymentType == 0)
-                {
-                    PendingPayment tempPayment = new PendingPayment()
-                    {
-                        payment_date = Convert.ToDateTime(a.schDT),
-                        paymentCount = Convert.ToInt32(a.pmts),
-                        date_created = a.dateCreated
-                    };
 
-                    pendingPayments.Add(tempPayment);
-                }
+                PendingPayment tempPayment = new PendingPayment()
+                {
+                    payment_date = Convert.ToDateTime(a.schDT),
+                    paymentCount = Convert.ToInt32(a.pmts),
+                    date_created = a.dateCreated
+                    
+                };
+
+                pendingPayments.Add(tempPayment);
             }
 
             return new ResponseModel(pendingPayments);
