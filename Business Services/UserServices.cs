@@ -556,7 +556,7 @@ namespace Business_Services
 
                  Business_Services.Models.User userDetails = new Business_Services.Models.User();
 
-                 using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
+                using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
                 {
                     var setpin = ctx.MobileUsers.Where(s => s.User_Id == userName).FirstOrDefault();
 
@@ -654,6 +654,54 @@ namespace Business_Services
                 using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
                 {
                     var setpin = ctx.MobileUsers.Where(s => s.User_Id == userName).FirstOrDefault();
+
+                    if (setpin != null) {
+
+                        if (setpin.mae_steps_completed == "1" || setpin.mae_steps_completed == "2") {
+
+                            var responseQuestionInfo = await API_Connection.GetAsync(lcAuthToken, "/api/User/GetSecurtiyQuestions/");
+                            string returnedDatasecurity = await responseQuestionInfo.Content.ReadAsStringAsync();
+
+                            dynamic objQuestion = JsonConvert.DeserializeObject(returnedDatasecurity);
+
+                            Business_Services.Models.SecurityQuestion questionDetails = new Business_Services.Models.SecurityQuestion();
+
+                            questionDetails.questions = new List<SecurityQuestionSummary>();
+
+
+                            questionDetails.pin = objQuestion.pin;
+                            string strQuestion;
+                            string strAnswer;
+
+                            string strQuestionID;
+                            string strUserID;
+
+
+                            foreach (var questionNumber in objQuestion.secQuestions)
+                            {
+                                // Send request to pull all question
+
+                                //Modified by BBSR Team on 12th Jan 2018
+                                strQuestionID = questionNumber.questionID;
+                                strUserID = questionNumber.userID;
+                                //Modified by BBSR Team on 12th Jan 2018
+
+                                strQuestion = questionNumber.secretQuestion;
+
+
+                                strAnswer = questionNumber.securityAnswer;
+                                if (strUserID == "0" && strAnswer == "")
+                                {
+                                    userDetails.SecurityQuestionFlag = true;
+                                }
+                                else {
+                                    userDetails.SecurityQuestionFlag = false;
+                                }
+                            }
+                        }
+
+                    }
+                    
 
                     userDetails.mae_steps_completed = setpin.mae_steps_completed;
 
