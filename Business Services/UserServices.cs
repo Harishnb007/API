@@ -224,7 +224,7 @@ namespace Business_Services
                 var resourceName = "One-Time+Payment";
                 var toEmail = "";
                 var log = "Viewed+Manage+Bank+Account+page";
-                var actionName = "VIEW";
+                var actionName = "VIEW"; 
 
                 var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
                 string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();

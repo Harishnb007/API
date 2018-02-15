@@ -39,5 +39,7 @@ namespace Business_Services.Models
         public decimal late_fees_due_input { get; set; }
         public decimal nsf_fees_due_input { get; set; }
         public decimal other_fees_due_input { get; set; }
+
+        public bool isAutoDraftAvailable { get; set; } 
     }
 }
