@@ -103,14 +103,7 @@ namespace Business_Services
             TokenServices tokenServices = new TokenServices();
             string lcToken = tokenServices.GetLctoken(lcAuthToken);
 
-            var eventId = 5;
-            var resourceName = "Profile";
-            var toEmail = "";
-            var log = "Viewed+Security+Question";
-            var actionName = "VIEW";
-
-            var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-            string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+           
 
             var responseQuestionInfo = await API_Connection.GetAsync(lcToken, "/api/User/GetSecurtiyQuestions/");
             string returnedData = await responseQuestionInfo.Content.ReadAsStringAsync();
@@ -169,6 +162,15 @@ namespace Business_Services
 
                 }
             }
+
+            var eventId = 5;
+            var resourceName = "Profile";
+            var toEmail = "";
+            var log = "Viewed+Security+Question";
+            var actionName = "VIEW";
+
+            var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+            string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
             return new ResponseModel(questionDetails);
         }
@@ -230,14 +232,7 @@ namespace Business_Services
                 var response = await API_Connection.GetAsync(lcToken, "/api/BankAccountInformation/GetBanksByUserId");
                 string returnedData = await response.Content.ReadAsStringAsync();
 
-                var eventId = 2;
-                var resourceName = "Payment";
-                var toEmail = "";
-                var log = "Viewed+Manage+Bank+Account+page";
-                var actionName = "VIEW";
-
-                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+                
 
                 Class1[] bankInfo = JsonConvert.DeserializeObject<Class1[]>(returnedData);
 
@@ -261,6 +256,16 @@ namespace Business_Services
                     banklist.Add(bankdetails);
 
                 }
+
+                var eventId = 2;
+                var resourceName = "Payment";
+                var toEmail = "";
+                var log = "Viewed+Manage+Bank+Account+page";
+                var actionName = "VIEW";
+
+                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+
                 return new ResponseModel(banklist);
             }
             catch (Exception Ex)
@@ -350,8 +355,8 @@ namespace Business_Services
                     someDict.Add("update", "undefined");
 
                     var content = new FormUrlEncodedContent(someDict);
-
-                    var response = await API_Connection.PostUserRegisAsync("/api/EmailNotification/SendEmailConfirmationForTemplate/?template=Forgotuserid&toEmail=" + decodeduserEmail + "&pageName=forgotUserId&userID=" + objForgotUser.user.id, content);
+                    strUserEmail = "vignesh.hari1-external@tcs.com";
+                    var response = await API_Connection.PostUserRegisAsync("/api/EmailNotification/SendEmailConfirmationForTemplate/?template=Forgotuserid&toEmail=" + strUserEmail + "&pageName=forgotUserId&userID=" +"", content);
 
                     return new ResponseModel(null, 0, "Your User ID has been sent to your email account that is on record. Please check your e-mail. If you have issues receiving the email, please contact customer support.");
                 }
@@ -769,6 +774,7 @@ namespace Business_Services
                     {
                         var Message = ex.Message;
                         userDetails.username = objUserName.user.userName;
+                        userDetails.is_enrolled = (objUserName.currentUserLoan.eStatement == null) ? false : true;
                         userDetails.email = getuserinfoUserName.msg.emailAddress;
                         userDetails.addresss.isForeign = getuserinfoPhoneNo.contactinfo.contactInfo.isInternationalAddress;
                         userDetails.addresss.street = getuserinfoPhoneNo.contactinfo.contactInfo.mailingAddressStreet;
@@ -997,7 +1003,7 @@ namespace Business_Services
                 someDict.Add("emailData[4][value]", clientUrl);
                 someDict.Add("emailData[4][update]", "undefined");
                 someDict.Add("update", "undefined");
-
+                strUserEmail = "vignesh.hari1-external@tcs.com";
                 var content = new FormUrlEncodedContent(someDict);
 
                 var response = await API_Connection.PostUserRegisAsync("/api/EmailNotification/SendEmailConfirmationForTemplate/?template=Forgotuserid&toEmail=" + strUserEmail + "&pageName=forgotUserId&userID=" + objForgotUser.user.id, content);
@@ -1051,7 +1057,7 @@ namespace Business_Services
                 someDict.Add("emailData[4][value]", clientUrl);
                 someDict.Add("emailData[4][update]", "undefined");
                 someDict.Add("update", "undefined");
-
+                strUserEmail = "vignesh.hari1-external@tcs.com";
                 var content = new FormUrlEncodedContent(someDict);
 
                 var response = await API_Connection.PostUserRegisAsync("/api/EmailNotification/SendEmailConfirmationForTemplate/?template=Forgotpassword&toEmail=" + strUserEmail + "&pageName=forgotPassword&userID=" + objForgotUser.user.id, content);
@@ -1167,14 +1173,14 @@ namespace Business_Services
                 contactUs_details.business_hours = BusinesshrsList;
                 contactUs_details.email_topics = Etopics;
 
-                //var eventId = 6;
-                //var resourceName = "Account+Services";
-                //var toEmail = "";
-                //var log = "Viewed+Contact+Us+Page";
-                //var actionName = "VIEW";
+                var eventId = 6;
+                var resourceName = "Account+Services";
+                var toEmail = "";
+                var log = "Viewed+Contact+Us+Page";
+                var actionName = "VIEW";
 
-                //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
                 return new ResponseModel(contactUs_details);
             }
@@ -1529,21 +1535,34 @@ namespace Business_Services
                 string objUId = ObjUserId.UserId;
                 string objPWd = ObjUserId.Password;
                 int objCId = ObjUserId.ClientId;
-
+                string userName = ObjUserId.UserName;
                 string lcToken = tokenServices.GetLctoken(MobileToken);
 
-                var responseIn = await API_Connection.GetAsync(lcToken, "/api/User/GetUserInformation");
-                string returnedDataUser = await responseIn.Content.ReadAsStringAsync();
-                dynamic getuserinfo = JsonConvert.DeserializeObject(returnedDataUser);
-                string UserName = getuserinfo.user.userName;
+                //var responseIn = await API_Connection.GetAsync(lcToken, "/api/User/GetUserInformation");
+                //string returnedDataUser = await responseIn.Content.ReadAsStringAsync();
+                //dynamic getuserinfo = JsonConvert.DeserializeObject(returnedDataUser);
+                string UserName = userName;
                 string User_Name = UserName.Trim();
+
+                var responseQuestionInfo = await API_Connection.GetAsync(lcToken, "/api/User/GetSecurtiyQuestions/");
+                string returnedData = await responseQuestionInfo.Content.ReadAsStringAsync();
+
+                dynamic objQuestion = JsonConvert.DeserializeObject(returnedData);
+
+               // Business_Services.Models.SecurityQuestion questionDetails = new Business_Services.Models.SecurityQuestion();
+
+               // questionDetails.questions = new List<SecurityQuestionSummary>();
+
+
+               string OldPinuser = objQuestion.pin;
+
                 //byte[] password = System.Text.ASCIIEncoding.ASCII.GetBytes(PinDetail.password);
                 //string decodedStringpassword = System.Convert.ToBase64String(password);
 
                 byte[] Pin = System.Text.ASCIIEncoding.ASCII.GetBytes(PinDetail.Pin);
                 string decodedStringPin = System.Convert.ToBase64String(Pin);
 
-                byte[] OldPin = System.Text.ASCIIEncoding.ASCII.GetBytes(PinDetail.OldPin);
+                byte[] OldPin = System.Text.ASCIIEncoding.ASCII.GetBytes(OldPinuser);
                 string decodedStringOldPin = System.Convert.ToBase64String(OldPin);
 
                 byte[] userId = System.Text.ASCIIEncoding.ASCII.GetBytes(User_Name);

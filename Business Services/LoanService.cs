@@ -305,15 +305,7 @@ namespace Business_Services
             try
             {
 
-                var eventId = 7;
-                var resourceName = "Account";
-                var toEmail = "";
-                var log = "Viewed+Escrow";
-                var actionName = "VIEW";
-
-                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
-
+               
 
                 var response = await API_Connection.GetAsync(lcToken, "/api/Escrow/CallEscrow/?LoanNo=" + loanNumber);
                 string returnedData = await response.Content.ReadAsStringAsync();
@@ -359,6 +351,17 @@ namespace Business_Services
                     propertyInsuranceList.Add(insuranceData);
                 }
 
+                var eventId = 7;
+                var resourceName = "Account";
+                var toEmail = "";
+                var log = "Viewed+Escrow";
+                var actionName = "VIEW";
+
+                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+
+
+
                 return new ResponseModel(new Escrow
                 {
                     current_escrow_advance = escrowInfo.balAdvance,
@@ -402,7 +405,7 @@ namespace Business_Services
                 var log = "Viewed+eStatement";
                 var actionName = "VIEW";
 
-                var trackresponse = await API_Connection.GetAsync("/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                var trackresponse = await API_Connection.GetAsync(lcToken,"/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
                 string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
                 List<EsatementDateurl> estatement = new List<EsatementDateurl>();
@@ -548,14 +551,14 @@ namespace Business_Services
                 List<LoanDetails> LoanDetail = new List<LoanDetails>();
                 LoanDetails LoanDetailProperty = new LoanDetails();
 
-                var eventId = 7;
-                var resourceName = "Account";
-                var toEmail = "";
-                var log = "Viewed+Manage+Accounts";
-                var actionName = "VIEW";
+                //var eventId = 7;
+                //var resourceName = "Account";
+                //var toEmail = "";
+                //var log = "Viewed+Manage+Accounts";
+                //var actionName = "VIEW";
 
-                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+                //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
                 foreach (string loanNumber in userInfo.user.userLoansList)
                 {
@@ -610,15 +613,24 @@ namespace Business_Services
             string lcToken = tokenServices.GetLctoken(lcAuthToken);
             try
             {
+                Business_Services.Models.GenerateNewToken objgenerateToken = new GenerateNewToken();
+
+               
+                var Decryptdata = objgenerateToken.Decrypt(lcAuthToken);
+
+                dynamic ObjUserId = JsonConvert.DeserializeObject(Decryptdata);
+                bool objisenrolled = ObjUserId.eStatement;
+
+
                 var response = await API_Connection.GetAsync(lcToken, "/api/MyAccount/GetAccountInfo/" + loan_number);
                 string returnedData = await response.Content.ReadAsStringAsync();
                 MyAccount_GetAccountInfo getuserinfo = JsonConvert.DeserializeObject<MyAccount_GetAccountInfo>(returnedData);
                 LoanContactDetail LoanDetailsemail = new LoanContactDetail();
                 LoanDetailsemail.email = getuserinfo.msg.emailAddress;
 
-                var responseisenrolled = await API_Connection.GetAsync(lcToken, "/api/User/GetUserInformation");
-                string returnedisenrolled = await responseisenrolled.Content.ReadAsStringAsync();
-                User_GetUserInformation userInfo = JsonConvert.DeserializeObject<User_GetUserInformation>(returnedisenrolled);
+                //var responseisenrolled = await API_Connection.GetAsync(lcToken, "/api/User/GetUserInformation");
+                //string returnedisenrolled = await responseisenrolled.Content.ReadAsStringAsync();
+                //User_GetUserInformation userInfo = JsonConvert.DeserializeObject<User_GetUserInformation>(returnedisenrolled);
 
 
 
@@ -626,8 +638,18 @@ namespace Business_Services
                 {
                     email = LoanDetailsemail.email,
                     LoanNumber = loan_number,
-                    is_enrolled = (userInfo.currentUserLoan.eStatement == null) ? false : true
+                    is_enrolled = objisenrolled
                 };
+
+                var eventId = 7;
+                var resourceName = "Account";
+                var toEmail = "";
+                var log = "Viewed+Loans";
+                var actionName = "VIEW";
+
+                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+
                 return new ResponseModel(LoanDetails);
             }
             catch (Exception Ex)
@@ -652,14 +674,7 @@ namespace Business_Services
                 dynamic ObjUserId = JsonConvert.DeserializeObject(Decryptdata);
                 string objUName = ObjUserId.UserName;
 
-                var eventId = 5;
-                var resourceName = "Profile+Information";
-                var toEmail = "";
-                var log = "Viewed+Contactdetails";
-                var actionName = "VIEW";
-
-                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+                
 
                 var response = await API_Connection.GetAsync(lcToken, "/api/MyAccount/GetAccountInfo/" + loan_number);
                 string returnedData = await response.Content.ReadAsStringAsync();
@@ -800,6 +815,16 @@ namespace Business_Services
                     phone_other_3_number = LoanDetailsemail.phone_other_3_number,
                     phone_other_3_type = LoanDetailsemail.phone_other_3_type
                 };
+
+                var eventId = 5;
+                var resourceName = "Profile+Information";
+                var toEmail = "";
+                var log = "Viewed+Contactdetails";
+                var actionName = "VIEW";
+
+                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+
                 return new ResponseModel(LoanDetails);
             }
             catch (Exception EX)
@@ -815,25 +840,25 @@ namespace Business_Services
         {
             // To do - Use DI
 
-            string lcToken = tokenServices.GetLctoken(mobileToken);
+            Business_Services.Models.GenerateNewToken objgenerateToken = new GenerateNewToken();
+           
+                string lcToken = tokenServices.GetLctoken(mobileToken);
 
-            var eventId = 7;
-            var resourceName = "Account";
-            var toEmail = "";
-            var log = "Viewed+Loan+Details";
-            var actionName = "VIEW";
+                var Decryptdata = objgenerateToken.Decrypt(mobileToken);
 
-            var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-            string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+                dynamic ObjUserId = JsonConvert.DeserializeObject(Decryptdata);
+                bool objisenrolled = ObjUserId.eStatement;
 
-            Loan LoanStatus = new Loan();
+
+
+              Loan LoanStatus = new Loan();
             var response = await API_Connection.GetAsync(lcToken, "/api/Loan/GetCurrentLoanInfo/" + loanNumber);
             string returnedData = await response.Content.ReadAsStringAsync();
             Loan_GetCurrentLoanInfo loanInfo = JsonConvert.DeserializeObject<Loan_GetCurrentLoanInfo>(returnedData);
 
-            var responseUserInfo = await API_Connection.GetAsync(lcToken, "/api/User/GetUserInformation");
-            string returnedDataUserInfo = await responseUserInfo.Content.ReadAsStringAsync();
-            dynamic userInfo = JsonConvert.DeserializeObject(returnedDataUserInfo);
+            //var responseUserInfo = await API_Connection.GetAsync(lcToken, "/api/User/GetUserInformation");
+            //string returnedDataUserInfo = await responseUserInfo.Content.ReadAsStringAsync();
+            //dynamic userInfo = JsonConvert.DeserializeObject(returnedDataUserInfo);
 
             var acctInforesponse = await API_Connection.GetAsync(lcToken, "/api/MyAccount/GetAccountInfo/" + loanNumber);
             string acctInfoData = await acctInforesponse.Content.ReadAsStringAsync();
@@ -871,7 +896,7 @@ namespace Business_Services
                 AutoLoan.loan_total_amount = Convert.ToDecimal(loanInfo.netPresent);
                 AutoLoan.loan_duedate = loanInfo.dueDate.Substring(5, 2) + "/" + loanInfo.dueDate.Substring(8, 2) + "/" + loanInfo.dueDate.Substring(2, 2);
                 AutoLoan.loan_type = loanInfo.loanType;
-                AutoLoan.is_enrolled = (userInfo.currentUserLoan.eStatement == null) ? false : true;
+                AutoLoan.is_enrolled = objisenrolled;
                 AutoLoan.loan_interest_rate = loanInfo.intRate;
                 AutoLoan.escrow_balance = Convert.ToDecimal(loanInfo.escrowBalance);
                 AutoLoan.property_value = Convert.ToDecimal(loanInfo.propertyValue);
@@ -898,6 +923,14 @@ namespace Business_Services
                 LoanStatus.account_status = 1;
             }
 
+            var eventId = 7;
+            var resourceName = "Account";
+            var toEmail = "";
+            var log = "Viewed+Loan+Details";
+            var actionName = "VIEW";
+
+            var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+            string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
             return new ResponseModel(new Loan
             {
@@ -908,7 +941,7 @@ namespace Business_Services
                 loan_total_amount = Convert.ToDecimal(loanInfo.netPresent),
                 loan_duedate = loanInfo.dueDate.Substring(5, 2) + "/" + loanInfo.dueDate.Substring(8, 2) + "/" + loanInfo.dueDate.Substring(2, 2),
                 loan_type = loanInfo.loanType,
-                is_enrolled = (userInfo.currentUserLoan.eStatement == null) ? false : true,
+                is_enrolled = objisenrolled,
                 loan_interest_rate = loanInfo.intRate,
                 escrow_balance = Convert.ToDecimal(loanInfo.escrowBalance),
                 property_value = Convert.ToDecimal(loanInfo.propertyValue),
@@ -942,15 +975,7 @@ namespace Business_Services
             // To do - Use DI
 
             string lcToken = tokenServices.GetLctoken(MobileToken);
-            var eventId = 2;
-            var resourceName = "Payment";
-            var toEmail = "";
-            var log = "Viewed+Payment";
-            var actionName = "VIEW";
-
-            var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-            string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
-
+            
             OnetimePayment_GetPaymentInfo loanInfo = new OnetimePayment_GetPaymentInfo();
             DateTime Schdate = new DateTime();
             Schdate = DateTime.Now;
@@ -1072,6 +1097,16 @@ namespace Business_Services
 
             };
 
+            var eventId = 2;
+            var resourceName = "Payment";
+            var toEmail = "";
+            var log = "Viewed+Payment";
+            var actionName = "VIEW";
+
+            var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+            string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+
+
             return new ResponseModel(paymentData);
         }
 
@@ -1135,15 +1170,7 @@ namespace Business_Services
 
             string lcToken = tokenServices.GetLctoken(mobileToken);
 
-            var eventId = 2;
-            var resourceName = "Edit+Payment";
-            var toEmail = "";
-            var log = "Viewed+Edit+Payment";
-            var actionName = "VIEW";
-
-            var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-            string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
-
+            
             OnetimePayment_GetPaymentInfo loanInfo = new OnetimePayment_GetPaymentInfo();
             bool account_status = false;
             AutoDraft_GetAutoDraft pendingInfoAutoDraft = new AutoDraft_GetAutoDraft();
@@ -1228,6 +1255,16 @@ namespace Business_Services
                     }
                 }
             }
+
+            var eventId = 2;
+            var resourceName = "Edit+Payment";
+            var toEmail = "";
+            var log = "Viewed+Edit+Payment";
+            var actionName = "VIEW";
+
+            var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+            string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+
             return new ResponseModel(paymentData);
 
         }
@@ -1241,14 +1278,7 @@ namespace Business_Services
             try
             {
 
-                var eventId = 2;
-                var resourceName = "Payment";
-                var toEmail = "";
-                var log = "Viewed+Payment+Schedule";
-                var actionName = "VIEW";
-
-                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+                
 
                 var responseduedate = await API_Connection.GetAsync(lcToken, "/api/OnetimePayment/GetPaymentInfo/?loanNo=" + loanNumber + "&schDate=" + "");
                 string returnedduedateData = await responseduedate.Content.ReadAsStringAsync();
@@ -1278,6 +1308,15 @@ namespace Business_Services
                     paymentFeesheduledate = feeList
                 };
 
+                var eventId = 2;
+                var resourceName = "Payment";
+                var toEmail = "";
+                var log = "Viewed+Payment+Schedule";
+                var actionName = "VIEW";
+
+                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+
                 return new ResponseModel(paymentData);
             }
             catch (Exception Ex)
@@ -1296,14 +1335,7 @@ namespace Business_Services
             try
             {
 
-                var eventId = 2;
-                var resourceName = "Payment";
-                var toEmail = "";
-                var log = "Viewed+Payment+History";
-                var actionName = "VIEW";
-
-                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+                
 
                 var response = await API_Connection.GetAsync(lcToken, "/api/Loan/GetLoanActivity/" + loanNumber);
                 string returnedData = await response.Content.ReadAsStringAsync();
@@ -1316,6 +1348,15 @@ namespace Business_Services
 
                 }
                 descriptionlist = descriptionlist.Distinct().ToList();
+
+                var eventId = 2;
+                var resourceName = "Payment";
+                var toEmail = "";
+                var log = "Viewed+Payment+History";
+                var actionName = "VIEW";
+
+                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
                 return new ResponseModel(descriptionlist);
             }
@@ -1335,14 +1376,7 @@ namespace Business_Services
             try
             {
 
-                var eventId = 2;
-                var resourceName = "Payment";
-                var toEmail = "";
-                var log = "Viewed+Payment+Description";
-                var actionName = "VIEW";
-
-                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+                
 
                 var response = await API_Connection.GetAsync(lcToken, "/api/Loan/GetLoanActivity/" + loanNumber);
                 string returnedData = await response.Content.ReadAsStringAsync();
@@ -1387,6 +1421,16 @@ namespace Business_Services
                     activityDetails.ActivityType.Add(new Activity() { payment_date = strpayment_date, total_amount = strtotal_amount, payment_description = strpayment_description, due_date = strdue_date, principal_amount = strprincipal_amount, interest_amount = strinterest_amount, escrow_amount = strescrow_amount, escrow_balance = strescrow_balance, principal_balance = strprincipal_balance, feeAmount = strfeeAmount, lateChargeAmount = strlateChargeAmount, miscPaidAmount = strmiscPaidAmount, suspenseAmount = strsuspenseAmount });
 
                 }
+
+                var eventId = 2;
+                var resourceName = "Payment";
+                var toEmail = "";
+                var log = "Viewed+Payment+Description";
+                var actionName = "VIEW";
+
+                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+
                 return new ResponseModel(activityDetails);
             }
             catch (Exception ex)
@@ -1415,6 +1459,14 @@ namespace Business_Services
                 pendingInfoPayment = JsonConvert.DeserializeObject<List<OneTimePayment_GetMockedPendingTransactions>>(returnedData);
                 pendingInfoPayment = pendingInfoPayment.OrderBy(x => x.schDT).ToList();
 
+                var eventId = 2;
+                var resourceName = "Payment";
+                var toEmail = "";
+                var log = "Viewed+Pending+Payment";
+                var actionName = "VIEW";
+
+                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
                 try
                 {
@@ -1454,14 +1506,7 @@ namespace Business_Services
                         pendingPayments.Add(tempPayment);
                     }
 
-                    //var eventId = 2;
-                    //var resourceName = "Payment";
-                    //var toEmail = "";
-                    //var log = "Viewed+Pending+Payment";
-                    //var actionName = "VIEW";
-
-                    //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                    //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+                    
 
                     return new ResponseModel(pendingPayments);
                 }
@@ -2600,14 +2645,7 @@ namespace Business_Services
             try
             {
 
-                var eventId = 2;
-                var resourceName = "Payment";
-                var toEmail = "";
-                var log = "Viewed+Payment+Details";
-                var actionName = "VIEW";
-
-                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+               
 
 
                 var response = await API_Connection.GetAsync(lcToken, "/api/Loan/GetCurrentLoanInfo/" + loanNumber);
@@ -2617,6 +2655,15 @@ namespace Business_Services
                 var responseEscrow = await API_Connection.GetAsync(lcToken, "/api/Escrow/CallEscrow/?LoanNo=" + loanNumber);
                 string returnedDataEscrow = await responseEscrow.Content.ReadAsStringAsync();
                 Escrow_CallEscrow escrowInfo = JsonConvert.DeserializeObject<Escrow_CallEscrow>(returnedDataEscrow);
+
+                var eventId = 2;
+                var resourceName = "Payment";
+                var toEmail = "";
+                var log = "Viewed+Payment+Details";
+                var actionName = "VIEW";
+
+                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
                 return new ResponseModel(NewMethod(loanInfo, escrowInfo));
             }
@@ -2646,17 +2693,18 @@ namespace Business_Services
                     transactionAppliedDate = objpaymentdetail.transactionAppliedDate,
                     interestPaidAmount = objpaymentdetail.interestPaidAmount,
                     suspenseAmount = objpaymentdetail.suspenseAmount,
-                    tranCodeDesc = objpaymentdetail.tranCodeDesc
+                    tranCodeDesc = objpaymentdetail.tranCodeDesc,
+                    dueDate = objpaymentdetail.dueDate
                 };
 
                 pendingpaymentList.Add(paymentdetails);
 
             }
-            var transactiondate = pendingpaymentList.Max(x => x.transactionAppliedDate);
+            var transactiondate = pendingpaymentList.Max(x => x.dueDate);
 
             var Paymentdata = (from paymentdetails in pendingpaymentList
-                              where paymentdetails.transactionAppliedDate == transactiondate
-                              select paymentdetails).LastOrDefault();
+                              where paymentdetails.dueDate == transactiondate
+                              select paymentdetails).FirstOrDefault();
             //var q = from n in pendingpaymentList
             //        //group n by n.transactionAppliedDate into g
             //        select new { totalPaymentReceivedAmount = , Date = g.Max(t => t.transactionAppliedDate) };

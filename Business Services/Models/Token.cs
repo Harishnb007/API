@@ -12,6 +12,7 @@ namespace Business_Services.Models
         public string UserId { get; set; }
         public DateTime ExpiresOn { get; set; }
         public string Lcauth { get; set; }
+        public bool eStatement { get;set: }
         public string Password { get; set; }
         public string UserName { get; set; }
         public int ClientId { get; set; }
