@@ -337,26 +337,17 @@ namespace Business_Services
                     string decodeduserEmail = System.Convert.ToBase64String(userEmail);
 
                     Dictionary<string, string> someDict = new Dictionary<string, string>();
-                    someDict.Add("emailData[0][key]", "clientname");
-                    someDict.Add("emailData[0][value]", clientName);
-                    someDict.Add("emailData[0][update]", "undefined");
-                    someDict.Add("emailData[1][key]", "username");
-                    someDict.Add("emailData[1][value]", decodeduserName);
-                    someDict.Add("emailData[1][update]", "undefined");
-                    someDict.Add("emailData[2][key]", "loanNo");
-                    someDict.Add("emailData[2][value]", loanNo);
-                    someDict.Add("emailData[2][update]", "undefined");
-                    someDict.Add("emailData[3][key]", "clientPhone");
-                    someDict.Add("emailData[3][value]", clientPhone);
-                    someDict.Add("emailData[3][update]", "undefined");
-                    someDict.Add("emailData[4][key]", "url");
-                    someDict.Add("emailData[4][value]", clientUrl);
-                    someDict.Add("emailData[4][update]", "undefined");
-                    someDict.Add("update", "undefined");
-
+                    someDict.Add("LoanNo", loanNo);
+                    someDict.Add("userName", strUserName);
+                    someDict.Add("email", strUserEmail);
+                    someDict.Add("clientName", clientName);
+                    someDict.Add("clientPhone", clientPhone);
+                    someDict.Add("url", clientUrl);
+                    someDict.Add("PROPERTY_STATE_CODE", "");
                     var content = new FormUrlEncodedContent(someDict);
-                    strUserEmail = "vignesh.hari1-external@tcs.com";
-                    var response = await API_Connection.PostUserRegisAsync("/api/EmailNotification/SendEmailConfirmationForTemplate/?template=Forgotuserid&toEmail=" + strUserEmail + "&pageName=forgotUserId&userID=" +"", content);
+                    var response = await API_Connection.PostUserAsync("/api/Register/SendEmailforUserId/", content);
+                    string returnedDataemail = await response.Content.ReadAsStringAsync();
+                    dynamic objForgotemail = JsonConvert.DeserializeObject(returnedDataemail);
 
                     return new ResponseModel(null, 0, "Your User ID has been sent to your email account that is on record. Please check your e-mail. If you have issues receiving the email, please contact customer support.");
                 }
@@ -1006,7 +997,7 @@ namespace Business_Services
                 strUserEmail = "vignesh.hari1-external@tcs.com";
                 var content = new FormUrlEncodedContent(someDict);
 
-                var response = await API_Connection.PostUserRegisAsync("/api/EmailNotification/SendEmailConfirmationForTemplate/?template=Forgotuserid&toEmail=" + strUserEmail + "&pageName=forgotUserId&userID=" + objForgotUser.user.id, content);
+                var response = await API_Connection.PostUserRegisAsync("/api/Register/SendEmailforUserId/", content);
 
                 return new ResponseModel(response);
             }
