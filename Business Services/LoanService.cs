@@ -2628,61 +2628,94 @@ namespace Business_Services
 
         private static PaymentDetails NewMethod(Loan_GetCurrentLoanInfo loanInfo, Escrow_CallEscrow escrowInfo)
         {
-            PaymentDetails loan_duedatedate = new PaymentDetails();
+
+
+            List<Pendingloandetails> pendingpaymentList = new List<Pendingloandetails>();
+            for (int i = 0; i < loanInfo.paymentOnlyHistory.Count(); i++)
+            {
+                var payment = loanInfo.paymentOnlyHistory[i];
+                dynamic paymentdetail = Newtonsoft.Json.JsonConvert.SerializeObject(payment);
+                Pendingloandetails objpaymentdetail = JsonConvert.DeserializeObject<Pendingloandetails>(paymentdetail);
+
+                Pendingloandetails paymentdetails = new Pendingloandetails {
+
+
+                    totalPaymentReceivedAmount = objpaymentdetail.totalPaymentReceivedAmount,
+                    escrowPaidAmount = objpaymentdetail.escrowPaidAmount,
+                    principalPmtAmount = objpaymentdetail.principalPmtAmount,
+                    transactionAppliedDate = objpaymentdetail.transactionAppliedDate,
+                    interestPaidAmount = objpaymentdetail.interestPaidAmount,
+                    suspenseAmount = objpaymentdetail.suspenseAmount,
+                    tranCodeDesc = objpaymentdetail.tranCodeDesc
+                };
+
+                pendingpaymentList.Add(paymentdetails);
+
+            }
+            var transactiondate = pendingpaymentList.Max(x => x.transactionAppliedDate);
+
+            var Paymentdata = (from paymentdetails in pendingpaymentList
+                              where paymentdetails.transactionAppliedDate == transactiondate
+                              select paymentdetails).LastOrDefault();
+            //var q = from n in pendingpaymentList
+            //        //group n by n.transactionAppliedDate into g
+            //        select new { totalPaymentReceivedAmount = , Date = g.Max(t => t.transactionAppliedDate) };
+
+            PaymentDetails loan_duedatedate = new PaymentDetails();         
 
             loan_duedatedate.loan_duedate = Convert.ToDateTime(loanInfo.dueDate).ToString("MM/dd/yy");
 
             LastRegularPayment last_regular_payment = new LastRegularPayment();
 
-            last_regular_payment.principal_amount = loanInfo.lastPrinPD;
+            last_regular_payment.principal_amount = Convert.ToString(Paymentdata.principalPmtAmount);
 
-            if (loanInfo.lastPrinPD == "")
+            if (Convert.ToString(Paymentdata.principalPmtAmount) == "")
             {
 
                 last_regular_payment.principal_amount = "0.00";
             }
 
-            last_regular_payment.interest_amount = loanInfo.lastIntPD;
-            if (loanInfo.lastIntPD == "")
+            last_regular_payment.interest_amount = Convert.ToString(Paymentdata.interestPaidAmount);
+            if (Convert.ToString(Paymentdata.interestPaidAmount) == "")
             {
                 last_regular_payment.interest_amount = "0.00";
             }
-            if (loanInfo.lastTransactionAppliedDate == "")
+            if (Convert.ToString(Paymentdata.transactionAppliedDate) == "")
             {
 
                 last_regular_payment.last_payment_date = "";
             }
-            else if (loanInfo.lastTransactionAppliedDate != "")
+            else if (Convert.ToString(Paymentdata.transactionAppliedDate) != "")
             {
-                last_regular_payment.last_payment_date = Convert.ToDateTime(loanInfo.lastTransactionAppliedDate).ToString("MM/dd/yy");
+                last_regular_payment.last_payment_date = Convert.ToDateTime(Paymentdata.transactionAppliedDate).ToString("MM/dd/yy");
             }
 
-            last_regular_payment.escrow_amount = loanInfo.lastEscrowPD;
-            if (loanInfo.lastEscrowPD == "")
+            last_regular_payment.escrow_amount = Convert.ToString(Paymentdata.escrowPaidAmount);
+            if (Convert.ToString(Paymentdata.escrowPaidAmount) == "")
             {
 
                 last_regular_payment.escrow_amount = "0.00";
             }
 
-            if (loanInfo.lastEscrowPD == "")
-            {
+            //if (loanInfo.lastEscrowPD == "")
+            //{
 
-                loanInfo.lastEscrowPD = "0.00";
-            }
-            if (loanInfo.lastPrinPD == "")
-            {
-                loanInfo.lastPrinPD = "0.00";
-            }
-            if (loanInfo.lastIntPD == "")
-            {
-                loanInfo.lastIntPD = "0.00";
-            }
+            //    loanInfo.lastEscrowPD = "0.00";
+            //}
+            //if (loanInfo.lastPrinPD == "")
+            //{
+            //    loanInfo.lastPrinPD = "0.00";
+            //}
+            //if (loanInfo.lastIntPD == "")
+            //{
+            //    loanInfo.lastIntPD = "0.00";
+            //}
 
-            var lastescrowlenth = Convert.ToDecimal(loanInfo.lastEscrowPD);
-            var lastPrinPDlenth = Convert.ToDecimal(loanInfo.lastPrinPD);
-            var lastintPDlenth = Convert.ToDecimal(loanInfo.lastIntPD);
+            //var lastescrowlenth = Convert.ToDecimal(loanInfo.lastEscrowPD);
+            //var lastPrinPDlenth = Convert.ToDecimal(loanInfo.lastPrinPD);
+            //var lastintPDlenth = Convert.ToDecimal(loanInfo.lastIntPD);
 
-            var Total_Amount = lastescrowlenth + lastPrinPDlenth + lastintPDlenth;
+            var Total_Amount = loanInfo.netPresent;
             last_regular_payment.total_amount = Convert.ToString(Total_Amount);
             loan_duedatedate.last_regular_payment = last_regular_payment;
 
