@@ -829,5 +829,30 @@ namespace LoanCare_Mobile_API.Controllers
 
             return Ok(paymentCounter);
         }
+
+        [Route("validatePassword")]
+        [HttpPost]
+        public async Task<IHttpActionResult> ValidatePasswordAsync(UserAuth userData)
+        {
+
+            // To do - Move the following code to a single method & use it across the project
+            IEnumerable<string> tokenValues;
+            string tokenValue = "";
+            if (Request.Headers.TryGetValues("AuthorizationToken", out tokenValues))
+            {
+                tokenValue = tokenValues.FirstOrDefault();
+            }
+
+            var PendingList = await loanService.ValidatePasswordAsync(tokenValue, userData);
+
+
+            if (PendingList == null)
+            {
+                return BadRequest("Error!");
+            }
+
+            return Ok(PendingList);
+        }
     }
 }
+

@@ -2802,5 +2802,32 @@ namespace Business_Services
                 return new ResponseModel(null, 1, Ex.Message);
             }
         }
+
+        public async Task<ResponseModel> ValidatePasswordAsync(string mobileToken, UserAuth userData)
+        {
+            try
+            {
+                TokenServices tokenServices = new TokenServices();
+                string lcToken = tokenServices.GetLctoken(mobileToken);
+                string returnedData = null;
+                var response = await API_Connection.GetAsync(lcToken, "/api/BankAccountInformation/ValidatePassword?userID="
+                                                                            + userData.user_id + "&password=" + userData.user_pwd);
+                returnedData = await response.Content.ReadAsStringAsync();                
+
+                if (returnedData.Contains("true"))
+                {
+                    return new ResponseModel(null, 0, "success");
+                }
+                else
+                {
+                    return new ResponseModel(returnedData, 0, "failure");
+                }
+            }
+            catch (Exception Ex)
+            {
+                return new ResponseModel(null, 1, "Problem validating credentials. Please try  again.");
+            }
+        }
+
     }
 }

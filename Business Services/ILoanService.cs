@@ -72,5 +72,7 @@ namespace Business_Services
         Task<ResponseModel> PostManageNotificationForAsync(string MobileToken, Business_Services.Models.ManageNotification ModifyPayment);
       
         Task<ResponseModel> GetpdfstreamAsync(string lcAuthToken, string statement_url);
+
+        Task<ResponseModel> ValidatePasswordAsync(string mobileToken, UserAuth userData);
     }
 }
