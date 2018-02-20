@@ -30,12 +30,12 @@ namespace LoanCare_Mobile_API.Models
         public string discVer { get; set; }
         public bool is_successful { get; set; }
        public string mae_steps_completed { get; set; }
-
-        public int ClientId { get; set; }
-
+        public string resourcename { get; set; }
+    public int ClientId { get; set; }
         public string ClientName { get; set; }
         public string BorrowerName { get; set; }
         public Addresss address { get; set; }
+        public bool SecurityQuestionFlag { get; set; }
         public List<LoanSummarys> loans { get; set; }
     }
 

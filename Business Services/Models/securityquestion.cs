@@ -9,6 +9,7 @@ namespace Business_Services.Models
     //Added by BBSR_Team on 23rd Dec 2017
     public class SecurityQuestion
     {
+        public string pin { get; set; }
         public List<SecurityQuestionSummary> questions { get; set; }
     }
 

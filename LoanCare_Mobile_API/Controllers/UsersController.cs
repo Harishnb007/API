@@ -49,6 +49,10 @@ namespace LoanCare_Mobile_API.Controllers
                 tokenValue = tokenValues.FirstOrDefault();
             }
 
+           
+
+            // var payment = await userService.UpdatePasswordAsync(tokenValue, loanDetails, objPasswordUpd);
+
             var payment = await userService.getUserDetailsAsyn(tokenValue, userId);
             if (payment == null)
             {
@@ -75,20 +79,17 @@ namespace LoanCare_Mobile_API.Controllers
             return Ok(payment);
         }
 
-
-
-        [Route("MyLoanSetpin/{LoanNumber}/{pin}")]
+        [Route("MyLoanSetPin/{Pin}")]
         [HttpGet]
-        public IHttpActionResult Getpin(string LoanNumber, string pin)
+        public async Task<IHttpActionResult> myloanGetPin(string Pin)
         {
-            // To do - Move the following code to a single method & use it across the project
             IEnumerable<string> tokenValues;
             string tokenValue = "";
             if (Request.Headers.TryGetValues("AuthorizationToken", out tokenValues))
             {
                 tokenValue = tokenValues.FirstOrDefault();
             }
-            var payment = userService.getpinAsync(LoanNumber, pin);
+            var payment = await userService.myloanGetPinAsyn(tokenValue,Pin);
             if (payment == null)
             {
                 return NotFound();
@@ -97,9 +98,30 @@ namespace LoanCare_Mobile_API.Controllers
         }
 
 
-        [Route("bankaccountsDelete/{id}/{bankname}/{routingnum}/{accountnum}/{accounttype}")]
+
+        //[Route("MyLoanSetpin/{LoanNumber}/{pin}")]
+        //[HttpGet]
+        //public IHttpActionResult Getpin(string LoanNumber, string pin)
+        //{
+        //    // To do - Move the following code to a single method & use it across the project
+        //    IEnumerable<string> tokenValues;
+        //    string tokenValue = "";
+        //    if (Request.Headers.TryGetValues("AuthorizationToken", out tokenValues))
+        //    {
+        //        tokenValue = tokenValues.FirstOrDefault();
+        //    }
+        //    var payment = userService.myloanGetPinAsyn(tokenValue, pin);
+        //    if (payment == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return Ok(payment);
+        //}
+
+
+        [Route("bankaccountsDelete")]
         [HttpDelete]
-        public async Task<IHttpActionResult> DeleteBankAccounts(int id, string bankname, string routingnum, string accountnum, string accounttype)
+        public async Task<IHttpActionResult> DeleteBankAccounts(BankAccount objBank)
         {
             IEnumerable<string> tokenValues;
             string tokenValue = "";
@@ -107,7 +129,7 @@ namespace LoanCare_Mobile_API.Controllers
             {
                 tokenValue = tokenValues.FirstOrDefault();
             }
-            var payment = await userService.DeleteBankAccountsForUser(tokenValue, id, bankname, routingnum, accountnum, accounttype);
+            var payment = await userService.DeleteBankAccountsForUser(tokenValue, objBank);
             if (payment == null)
             {
                 return NotFound();
@@ -118,7 +140,7 @@ namespace LoanCare_Mobile_API.Controllers
        
         [Route("contactus")]
         [HttpGet]
-        public IHttpActionResult Contactus()
+        public async Task<IHttpActionResult> Contactus()
         {
             // To do - Move the following code to a single method & use it across the project
             IEnumerable<string> tokenValues;
@@ -127,7 +149,7 @@ namespace LoanCare_Mobile_API.Controllers
             {
                 tokenValue = tokenValues.FirstOrDefault();
             }
-            var payment = userService.ContactUsAsync(tokenValue);
+            var payment = await userService.ContactUsAsync(tokenValue);
             if (payment == null)
             {
                 return NotFound();
@@ -171,10 +193,49 @@ namespace LoanCare_Mobile_API.Controllers
             return Ok(payment);
         }    
 
-        [Route("Setpin")]
-        [HttpPost]
-        public  IHttpActionResult Postsetpin(UsersMDb userDetail)
+        //[Route("Setpin")]
+        //[HttpPut]
+        //public  IHttpActionResult Postsetpin(UpdatePassword PinDetail)
+        //{
+        //    // To do - Move the following code to a single method & use it across the project
+        //    IEnumerable<string> tokenValues;
+        //    string tokenValue = "";
+        //    if (Request.Headers.TryGetValues("AuthorizationToken", out tokenValues))
+        //    {
+        //        tokenValue = tokenValues.FirstOrDefault();
+        //    }
+        //    var payment =  userService.PostsetpinAsync(PinDetail,tokenValue);
+        //    if (payment == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return Ok(payment);
+        //}
+
+        //[Route("Resetpin")]
+        //[HttpPost]
+        //public IHttpActionResult PostResetpin(UsersMDb userDetail)
+        //{
+        //    // To do - Move the following code to a single method & use it across the project
+        //    IEnumerable<string> tokenValues;
+        //    string tokenValue = "";
+        //    if (Request.Headers.TryGetValues("AuthorizationToken", out tokenValues))
+        //    {
+        //        tokenValue = tokenValues.FirstOrDefault();
+        //    }
+        //    var payment = userService.ResetpinAsync(userDetail);
+        //    if (payment == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return Ok(payment);
+        //}
+
+        [Route("SetPin")]
+        [HttpPut]
+        public async Task<IHttpActionResult> SetpinPost(UpdatePassword PinDetails)
         {
+
             // To do - Move the following code to a single method & use it across the project
             IEnumerable<string> tokenValues;
             string tokenValue = "";
@@ -182,7 +243,8 @@ namespace LoanCare_Mobile_API.Controllers
             {
                 tokenValue = tokenValues.FirstOrDefault();
             }
-            var payment =  userService.PostsetpinAsync(userDetail);
+           
+            var payment = await userService.SetPinAsync(tokenValue, PinDetails);
             if (payment == null)
             {
                 return NotFound();
@@ -190,10 +252,11 @@ namespace LoanCare_Mobile_API.Controllers
             return Ok(payment);
         }
 
-        [Route("Resetpin")]
-        [HttpPost]
-        public IHttpActionResult PostResetpin(UsersMDb userDetail)
+        [Route("ReSetPin")]
+        [HttpPut]
+        public async Task<IHttpActionResult> ReSetpinPost(UpdatePassword PinDetails)
         {
+
             // To do - Move the following code to a single method & use it across the project
             IEnumerable<string> tokenValues;
             string tokenValue = "";
@@ -201,19 +264,23 @@ namespace LoanCare_Mobile_API.Controllers
             {
                 tokenValue = tokenValues.FirstOrDefault();
             }
-            var payment = userService.PostsetpinAsync(userDetail);
+
+            var payment = await userService.ReSetPinAsync(tokenValue, PinDetails);
             if (payment == null)
             {
                 return NotFound();
             }
             return Ok(payment);
         }
+
+
+
 
         [Route("updatepwd")]
         [HttpPut]
         public async Task<IHttpActionResult> updatepassword(UpdatePassword loanDetails)
         {
-
+            
             // To do - Move the following code to a single method & use it across the project
             IEnumerable<string> tokenValues;
             string tokenValue = "";
@@ -371,10 +438,13 @@ namespace LoanCare_Mobile_API.Controllers
             }
         }
 
+       
+
+
         //Added by BBSR_Team on 9th Jan 2018
 
 
-       
+
 
         //Modified by BBSR Team on 16th Jan 2018 : User Registration
 

@@ -23,10 +23,12 @@ namespace Business_Services
             
         }
 
-        public string GenerateToken(string userId,string password,int ClientId, string lcAuthToken)
+        public  string GenerateToken(string userId,string password,int ClientId, string lcAuthToken,string UserName,string resourcename,string log, bool eStatementenroll)
         {
             DateTime issuedOn = DateTime.Now;
             DateTime expiresOn = DateTime.Now.AddSeconds(Convert.ToDouble(ConfigurationManager.AppSettings["AuthTokenExpiry"]));
+
+          var Tracking =  trackinglog(lcAuthToken,log,resourcename);
 
             var tokendomain = new Token
             {
@@ -35,12 +37,28 @@ namespace Business_Services
                 Lcauth = lcAuthToken,
                 ExpiresOn = expiresOn,
                 Password = password,
-                ClientId = ClientId
+                ClientId = ClientId,
+                UserName = UserName,
+                resourcename =resourcename,
+                log = log,
+                eStatement=eStatementenroll
             };
            
             return Encryptor.Encrypt(JsonConvert.SerializeObject(tokendomain));
         }
 
+
+        public async Task<string> trackinglog(string lcAuthToken, string log, string resourcename)
+        {
+
+            var eventId = 1;
+            var toEmail = "";
+            var actionName = "VIEW";
+
+            var trackresponse = await API_Connection.GetAsync(lcAuthToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourcename + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+            string returnedData = await trackresponse.Content.ReadAsStringAsync();
+            return returnedData;
+        }
         public async Task<string> AuthenticateAsync(string userName, string password)
         {
            

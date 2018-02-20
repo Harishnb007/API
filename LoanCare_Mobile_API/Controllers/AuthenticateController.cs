@@ -15,6 +15,10 @@ using System.Threading.Tasks;
 using System.Web.Http.Cors;
 using System.Data.Entity;
 using Business_Services.Models;
+using Newtonsoft.Json;
+using System.Security.Cryptography;
+using System.IO;
+
 
 namespace LoanCare_Mobile_API.Controllers
 {
@@ -63,7 +67,7 @@ namespace LoanCare_Mobile_API.Controllers
             var lcAuthTokenValueTask = _tokenServices.AuthenticateAsync(userCred.username, userCred.password);
             await Task.WhenAll(lcAuthTokenValueTask);
 
-            var GetTokenTask = GetAuthTokenAsync(userCred.username, userCred.password, lcAuthTokenValueTask.Result, userCred.Is_New_MobileUser);
+            var GetTokenTask = GetAuthTokenAsync(userCred.username, userCred.password, lcAuthTokenValueTask.Result, userCred.Is_New_MobileUser,userCred.username,userCred.resourcename,userCred.log);
             await Task.WhenAll(GetTokenTask);
 
             return GetTokenTask.Result;
@@ -104,66 +108,71 @@ namespace LoanCare_Mobile_API.Controllers
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        private async Task<HttpResponseMessage> GetAuthTokenAsync(string userId, string Password, string lcAuthToken, bool Is_New_MobileUser)
+        private async Task<HttpResponseMessage> GetAuthTokenAsync(string userId, string Password, string lcAuthToken, bool Is_New_MobileUser, string UserName,string resourcename,string log)
         {
             AuthTokenAndUserDetails Auth_data = new AuthTokenAndUserDetails();
             IUserServices userService = new UserServices();
             try
             {
-                var details = userService.getUserDetailsAsync(lcAuthToken, userId);
+                var details = userService.getUserDetailsAsync(lcAuthToken, userId,Is_New_MobileUser);
                 await Task.WhenAll(details);
                 Business_Services.Models.User userDetails = (Business_Services.Models.User)details.Result.data;
                 //Debug.WriteLine(userDetails.first_name);
 
-                var token = _tokenServices.GenerateToken(userId, Password, userDetails.ClientId, lcAuthToken);
+                var token = _tokenServices.GenerateToken(userDetails.username, Password, userDetails.ClientId, lcAuthToken, userDetails.username,resourcename,log, userDetails.is_enrolled);
+
+                var Decryptdata = Decrypt(token);
+
+                dynamic objPassword = JsonConvert.DeserializeObject(Decryptdata);
+
                 List<LoanSummarys> loanS = new List<LoanSummarys>();
                 //AuthTokenAndUserDetails Auth_data = new AuthTokenAndUserDetails
                 //{
-                using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
-                {
-                    var setpin = ctx.MobileUsers.Where(s => s.User_Id == userId).FirstOrDefault();
+                //using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
+                //{
+                //    var setpin = ctx.MobileUsers.Where(s => s.User_Id == userDetails.username).FirstOrDefault();
 
-                    if (setpin == null)
-                    {
-                        if (Is_New_MobileUser == false)
-                        {
+                //    if (setpin == null)
+                //    {
+                //        if (Is_New_MobileUser == false)
+                //        {
 
-                            Is_New_MobileUser = false;
-                        }
-                        else if (Is_New_MobileUser == true)
-                        {
+                //            Is_New_MobileUser = false;
+                //        }
+                //        else if (Is_New_MobileUser == true)
+                //        {
 
-                            Is_New_MobileUser = true;
-                        }
-                        using (var context = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
-                        {
-                            Business_Services.Models.DAL.LoancareDBContext.MobileUser obj_Login = new Business_Services.Models.DAL.LoancareDBContext.MobileUser()
-                            {
-                                pin = "",
-                                User_Id = userId,
-                                mae_steps_completed = "0",
-                                Mobile_Token_Id = "",
-                                created_on = DateTime.Now,
-                                Is_New_MobileUser = Is_New_MobileUser,
-                                Legal_version = 0,
-                                Privacy_version = 0,
-                                Terms_version =0
-                            };
-                            context.MobileUsers.Add(obj_Login);
-                            context.Entry(obj_Login).State = EntityState.Added;
-                            context.SaveChanges();
-                            Auth_data.mae_steps_completed = "0";
-                        }
-                    }
-                    else if (setpin != null)
-                    {
-                        Auth_data.mae_steps_completed = setpin.mae_steps_completed;
-                    }
-                    else if (setpin.mae_steps_completed == "")
-                    {
-                        setpin.mae_steps_completed = "0";
-                    }
-                }
+                //            Is_New_MobileUser = true;
+                //        }
+                //        using (var context = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
+                //        {
+                //            Business_Services.Models.DAL.LoancareDBContext.MobileUser obj_Login = new Business_Services.Models.DAL.LoancareDBContext.MobileUser()
+                //            {
+                //                pin = "",
+                //                User_Id = userDetails.username,
+                //                mae_steps_completed = "0",
+                //                Mobile_Token_Id = "",
+                //                created_on = DateTime.Now,
+                //                Is_New_MobileUser = Is_New_MobileUser,
+                //                Legal_version = 0,
+                //                Privacy_version = 0,
+                //                Terms_version = 0
+                //            };
+                //            context.MobileUsers.Add(obj_Login);
+                //            context.Entry(obj_Login).State = EntityState.Added;
+                //            context.SaveChanges();
+                //            Auth_data.mae_steps_completed = "0";
+                //        }
+                //    }
+                //    else if (setpin != null)
+                //    {
+                //        Auth_data.mae_steps_completed = setpin.mae_steps_completed;
+                //    }
+                //    else if (setpin.mae_steps_completed == "")
+                //    {
+                //        setpin.mae_steps_completed = "0";
+                //    }
+                //}
 
                 Auth_data.AuthorizationToken = token;
                 Auth_data.Expires = DateTime.Now.AddSeconds(Convert.ToDouble(ConfigurationManager.AppSettings["AuthTokenExpiry"]));
@@ -191,7 +200,9 @@ namespace LoanCare_Mobile_API.Controllers
                 Auth_data.id = userDetails.id;
                 Auth_data.ClientId = userDetails.ClientId;
                 Auth_data.ClientName = userDetails.ClientName;
-                Auth_data.LoginId = userDetails.LoginId;
+                Auth_data.LoginId = userDetails.username;
+                Auth_data.mae_steps_completed = userDetails.mae_steps_completed;
+                Auth_data.SecurityQuestionFlag = userDetails.SecurityQuestionFlag;
                 foreach (var Add in userDetails.loanss)
                 {
                     loanS.Add(new LoanSummarys
@@ -312,6 +323,41 @@ namespace LoanCare_Mobile_API.Controllers
             return response;
         }
 
+        static string _Pwd = "This_is_just_a_token_text_for_dev";
+        // To do - move this to config file
+
+        static byte[] _Salt = new byte[] { 0x45, 0xF1, 0x61, 0x6e, 0x20, 0x00, 0x65, 0x64, 0x76, 0x65, 0x64, 0x03, 0x76 };
+        internal static string Decrypt(string cipherText)
+        {
+            byte[] cipherBytes = Convert.FromBase64String(cipherText);
+            Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(_Pwd, _Salt);
+            byte[] decryptedData = Decrypt(cipherBytes, pdb.GetBytes(32), pdb.GetBytes(16));
+            return System.Text.Encoding.Unicode.GetString(decryptedData);
+        }
+
+        private static byte[] Decrypt(byte[] cipherData, byte[] Key, byte[] IV)
+        {
+            MemoryStream ms = new MemoryStream();
+            CryptoStream cs = null;
+            try
+            {
+                Rijndael alg = Rijndael.Create();
+                alg.Key = Key;
+                alg.IV = IV;
+                cs = new CryptoStream(ms, alg.CreateDecryptor(), CryptoStreamMode.Write);
+                cs.Write(cipherData, 0, cipherData.Length);
+                cs.FlushFinalBlock();
+                return ms.ToArray();
+            }
+            catch
+            {
+                return null;
+            }
+            finally
+            {
+                cs.Close();
+            }
+        }
         /// <summary>
         /// Extend the session
         /// </summary>
@@ -330,7 +376,7 @@ namespace LoanCare_Mobile_API.Controllers
 
                 //To do - Write a call to TokenService to pull the username from the token
                 // To do - Pass username into the method below
-                return GetAuthTokenAsync("23423", "", "", false).Result;
+                return GetAuthTokenAsync("23423", "", "", false,"","","").Result;
             }
             return null;
         }

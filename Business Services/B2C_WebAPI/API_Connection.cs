@@ -166,7 +166,7 @@ namespace Business_Services.B2C_WebAPI
         public static async Task<ResponseWithToken> PostAsync(string tokenValue, string url, HttpContent content)
         {
 
-            ResponseWithToken returnData = new ResponseWithToken();
+          
             Auth_GetToken tokens = await GetFormTokenAsync(tokenValue);
             
             var message = new HttpRequestMessage(HttpMethod.Post, url);
@@ -176,7 +176,7 @@ namespace Business_Services.B2C_WebAPI
             message.Content = content;
             var result = await client.SendAsync(message);
             result.EnsureSuccessStatusCode();
-            
+            ResponseWithToken returnData = new ResponseWithToken();
             if (result.Headers.TryGetValues("Set-Cookie", out IEnumerable<string> cookieValues))
             {
                 string setCookieValue = HttpUtility.UrlDecode(cookieValues.FirstOrDefault());

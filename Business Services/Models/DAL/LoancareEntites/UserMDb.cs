@@ -25,5 +25,6 @@ namespace Business_Services.Models.DAL.LoancareEntites
         public string New_Pin { get; set; }
         public DateTime created_on { get; set; }
         public DateTime updated_on { get; set; }
+
     }
 }

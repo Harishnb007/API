@@ -16,7 +16,12 @@ namespace Business_Services
 {
     public class AppService : IAppService
     {
-   
+        private readonly ITokenServices tokenServices;
+
+        public AppService(ITokenServices _tokenServices)
+        {
+            tokenServices = _tokenServices;
+        }
         public ResponseModel GetDraftDateDelay()
         {
             return new ResponseModel(new List<string>() {
@@ -99,9 +104,12 @@ namespace Business_Services
         public ResponseModel GetLegalTermsPrivacy(string type)
         {
             // Note - Privacy text is specific to the client to which the user belongs
+            
             LegalPrivacyTerms lpttext = new LegalPrivacyTerms();
             try
             {
+               
+
                 using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
                 {
                     var getlpttext = ctx.LegalPrivacyTerms.Where(s => s.Type == type).FirstOrDefault();

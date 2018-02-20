@@ -22,6 +22,7 @@ namespace Business_Services.Models
         public int id { get; set; }
         public string ssn { get; set; }
         public string password { get; set; }
+        public bool is_enrolled { get; set; }
         public string LoginId { get; set; }
         public string loanNumber { get; set; }
         public string NotifyEmail { get; set; }
@@ -36,7 +37,8 @@ namespace Business_Services.Models
         public Address addresss { get; set; }
         public string status { get; set; }
         public string noOfAttempts { get; set; }
-
+        public string mae_steps_completed { get; set; }
+        public bool SecurityQuestionFlag { get; set; }
         public List<LoanSummary> loanss { get; set; }
     }
 

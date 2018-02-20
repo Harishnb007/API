@@ -86,6 +86,9 @@ namespace Business_Services.Models.LC_WebApi_Models
         [JsonProperty]
         internal string paymentType { get; set; }
 
+        [JsonProperty]
+        internal List<Fees> fees { get; set; }
+
     }
 
 
@@ -98,9 +101,17 @@ namespace Business_Services.Models.LC_WebApi_Models
         [JsonProperty]
         internal string routingNumber { get; set; }
         [JsonProperty]
-        internal string bankName { get; set; }
+        internal string bankName { get; set; } 
         [JsonProperty]
         internal string accountType { get; set; }
+    }
+
+    class Fees
+    {
+        [JsonProperty]
+        internal string feeCode { get; set; }
+        [JsonProperty]
+        internal decimal feeAmt { get; set; }
     }
 
 }

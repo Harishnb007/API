@@ -204,7 +204,10 @@
     <None Include="Properties\PublishProfiles\FolderProfile76.pubxml" />
     <None Include="Properties\PublishProfiles\FolderProfile77.pubxml" />
     <None Include="Properties\PublishProfiles\FolderProfile78.pubxml" />
+    <None Include="Properties\PublishProfiles\FolderProfile79.pubxml" />
     <None Include="Properties\PublishProfiles\FolderProfile8.pubxml" />
+    <None Include="Properties\PublishProfiles\FolderProfile80.pubxml" />
+    <None Include="Properties\PublishProfiles\FolderProfile81.pubxml" />
     <None Include="Properties\PublishProfiles\FolderProfile9.pubxml" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
