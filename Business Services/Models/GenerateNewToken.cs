@@ -51,7 +51,7 @@ namespace Business_Services.Models
             }
         }
 
-        public string GenerateToken(string userId, string password, int ClientId, string lcAuthToken)
+        public string GenerateToken(string userId, string password, int ClientId, string lcAuthToken,string Username,string resorucename,string logview,bool estatementenroll)
         {
             DateTime issuedOn = DateTime.Now;
             DateTime expiresOn = DateTime.Now.AddSeconds(Convert.ToDouble(ConfigurationManager.AppSettings["AuthTokenExpiry"]));
@@ -63,7 +63,11 @@ namespace Business_Services.Models
                 Lcauth = lcAuthToken,
                 ExpiresOn = expiresOn,
                 Password = password,
-                ClientId = ClientId
+                ClientId = ClientId,
+                UserName = Username,
+                resourcename = resorucename,
+                log = logview,
+                eStatement = estatementenroll
             };
 
             return Encryptor.Encrypt(JsonConvert.SerializeObject(tokendomain));

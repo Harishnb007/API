@@ -388,6 +388,76 @@ namespace Business_Services
             }
         }
 
+        public async Task<ResponseModel> GetgetstatementspdfAsync(string lcAuthToken, string URL)
+        {
+            // To do - Use DI
+
+            string lcToken = tokenServices.GetLctoken(lcAuthToken);
+            try
+            {
+
+
+                MemoryStream mem = new MemoryStream();
+                var responsestream = await API_Connection.GetAsync(lcToken,URL);
+                string returnedDatastream = await responsestream.Content.ReadAsStringAsync();
+                byte[] datastream = Encoding.ASCII.GetBytes(returnedDatastream);
+
+                //byte[] bytes;
+                //BinaryFormatter bf = new BinaryFormatter();
+                //MemoryStream ms = new MemoryStream();
+                //bf.Serialize(ms, returnedDatastream);
+                //bytes = ms.ToArray();
+                //System.IO.File.WriteAllBytes("C:\\Users\\harivigneshm.FNFSECURE.003\\Desktop\\pdfhello.pdf", bytes);
+
+
+
+
+                //    //using (FileStream stream = new FileStream("C:\\Users\\harivigneshm.FNFSECURE.003\\Desktop\\pdfhello.pdf" + "\\" + datastream, FileMode.CreateNew))
+
+                //    //{
+
+                //    //    using (StreamWriter writer = new StreamWriter(stream, Encoding.UTF8))
+
+                //    //    {
+
+                //    //        byte[] buffer = datastream;
+
+                //    //        stream.Write(buffer, 0, buffer.Length);
+
+                //    //        writer.Close();
+
+                //    //    }
+
+                //    //}
+                //    //using (FileStream stream = new FileStream("C:\\Users\\harivigneshm.FNFSECURE.003\\Desktop\\pdf" + "\\" + datastream, FileMode.CreateNew))
+
+                //    //{
+
+                //    //    using (StreamWriter writer = new StreamWriter(stream, Encoding.UTF8))
+
+                //    //    {
+
+                //    //        byte[] buffer = datastream;
+
+                //    //        stream.Write(buffer, 0, buffer.Length);
+
+                //    //        writer.Close();
+
+                //    //    }
+
+                //    //}
+                //}
+
+                return new ResponseModel(returnedDatastream);
+            }
+            catch (Exception Ex)
+            {
+
+                return new ResponseModel(null, 1, Ex.Message);
+            }
+        }
+
+
         public async Task<ResponseModel> GetgetstatementsAsync(string lcAuthToken, string loan_number)
         {
             // To do - Use DI
@@ -431,7 +501,7 @@ namespace Business_Services
                 };
                 //foreach (var estatemen in estatement) {
                 //    MemoryStream mem = new MemoryStream();
-                //    var responsestream = await API_Connection.GetAsync(lcToken, estatemen.statement_url);
+                //    var responsestream = await API_Connection.GetAsync(lcToken, "/Statements/EStatementHandler.Pdf?loanNo=" + loan_number + "&statementDate=" + Estatementdata.statementDate + "&statementKey=" + Estatementdata.key);
                 //    string returnedDatastream = await responsestream.Content.ReadAsStringAsync();
                 //    byte[] datastream = Encoding.ASCII.GetBytes(returnedDatastream);
 
@@ -1774,6 +1844,19 @@ namespace Business_Services
                 string objPWd = ObjUserId.Password;
                 int objCId = ObjUserId.ClientId;
                 string objusername = ObjUserId.UserName;
+
+              
+                if (ObjUserId.log == null) {
+
+                    ObjUserId.log = "";
+                }
+                if (ObjUserId.resourcename == null) {
+                    ObjUserId.resourcename = "";
+                }
+                string resourcename = ObjUserId.resourcename;
+                string logview = ObjUserId.log;
+                bool eStatemente = ObjUserId.eStatement;
+
                 string lcToken = tokenServices.GetLctoken(MobileToken);
 
                 byte[] email = System.Text.ASCIIEncoding.ASCII.GetBytes(loanDetails.email);
@@ -1793,6 +1876,19 @@ namespace Business_Services
                 var content = new FormUrlEncodedContent(someDict);
 
                 var response = await API_Connection.PostAsync(lcToken, "/api/MyAccount/SetUpdateEmail/", content);
+
+                var responsePropertystateCD = await API_Connection.GetAsync(lcToken, "/api/Helper/GetStatePropertyCode/?loanNo="+loanDetails.loanNo);
+
+                dynamic Message = await responsePropertystateCD.Content.ReadAsStringAsync();
+                var PropcodeMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Message);
+                string PropertyStatecode = PropcodeMessage;
+
+                var responseClientURL = await API_Connection.GetAsync(lcToken, "/api/Helper/GetClientData/");
+                dynamic URL = await responseClientURL.Content.ReadAsStringAsync();
+                var ClientURLmessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(URL);
+                string ClientPhone = ClientURLmessage.clientPhone;
+                string ClientURL = ClientURLmessage.privateLabelURL;
+
                 Dictionary<string, string> someDictsendmail = new Dictionary<string, string>();
                 someDictsendmail.Add("emailData[0][key]", "loginName");
                 someDictsendmail.Add("emailData[0][value]", objusername);
@@ -1801,13 +1897,13 @@ namespace Business_Services
                 someDictsendmail.Add("emailData[1][value]", loanDetails.loanNo);
                 someDictsendmail.Add("emailData[1][update]", "undefined");
                 someDictsendmail.Add("emailData[2][key]", "clientPhone");
-                someDictsendmail.Add("emailData[2][value]", "855-876-9219");
+                someDictsendmail.Add("emailData[2][value]", ClientPhone);
                 someDictsendmail.Add("emailData[2][update]", "undefined");
                 someDictsendmail.Add("emailData[3][key]", "Url");
-                someDictsendmail.Add("emailData[3][value]", "freedommortgage.myloancare.com");
+                someDictsendmail.Add("emailData[3][value]", ClientURL);
                 someDictsendmail.Add("emailData[3][update]", "undefined");
                 someDictsendmail.Add("emailData[4][key]", "PROPERTY_STATE_CODE");
-                someDictsendmail.Add("emailData[4][value]", "AZ");
+                someDictsendmail.Add("emailData[4][value]", PropertyStatecode);
                 someDictsendmail.Add("emailData[4][update]", "undefined");
                 someDictsendmail.Add("update", "undefined");
                 var contentmail = new FormUrlEncodedContent(someDictsendmail);
@@ -1830,7 +1926,7 @@ namespace Business_Services
                 var Token = responseregeneratedToken.tokenValue;
 
 
-                var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token);
+                var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token, objusername, resourcename,logview, eStatemente);
                 loanDetails.Token = MobileTokenNew;
 
                 return new ResponseModel(loanDetails);
@@ -1853,7 +1949,12 @@ namespace Business_Services
             string objUId = ObjUserId.UserId;
             string objPWd = ObjUserId.Password;
             int objCId = ObjUserId.ClientId;
-            string lcToken = tokenServices.GetLctoken(MobileToken);
+                string objusername = ObjUserId.UserName;
+                string resourcename = ObjUserId.resourcename;
+                string logview = ObjUserId.log;
+                bool eStatemente = ObjUserId.eStatement;
+
+                string lcToken = tokenServices.GetLctoken(MobileToken);
 
           
                 Dictionary<string, string> someDict = new Dictionary<string, string>();
@@ -1873,7 +1974,7 @@ namespace Business_Services
                 var Token = responseregeneratedToken.tokenValue;
 
 
-                var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token);
+                var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token,objusername,resourcename,logview, eStatemente);
                 loanDetails.Token = MobileTokenNew;
 
                 return new ResponseModel(loanDetails);
@@ -1899,7 +2000,14 @@ namespace Business_Services
             string objUId = ObjUserId.UserId;
             string objPWd = ObjUserId.Password;
             int objCId = ObjUserId.ClientId;
-            string lcToken = tokenServices.GetLctoken(MobileToken);
+
+                string resourcename = ObjUserId.resourcename;
+                string logview = ObjUserId.log;
+                bool eStatementenroll = ObjUserId.eStatement;
+
+                string objusername = ObjUserId.UserName;
+               
+                string lcToken = tokenServices.GetLctoken(MobileToken);
 
            
                 var response = await API_Connection.GetAsync(lcToken, "/api/MyAccount/GetAccountInfo/" + estatementdetails.loanNumber);
@@ -1920,8 +2028,8 @@ namespace Business_Services
                 var Token = responseregeneratedToken.tokenValue;
 
 
-                var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token);
-
+                //var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token,resourcename,logview, eStatementenroll);
+                var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token,objusername, resourcename, logview,eStatementenroll);
                 estatementdetails.Token = MobileTokenNew;
                 return new ResponseModel(estatementdetails);
             }
@@ -1947,11 +2055,14 @@ namespace Business_Services
                 var Decryptdata = objgenerateToken.Decrypt(MobileToken);
 
             dynamic ObjUserId = JsonConvert.DeserializeObject(Decryptdata);
-            string objUId = ObjUserId.UserId;
-            string objPWd = ObjUserId.Password;
-            int objCId = ObjUserId.ClientId;
-
-            string lcToken = tokenServices.GetLctoken(MobileToken);
+                string objUId = ObjUserId.UserId;
+                string objPWd = ObjUserId.Password;
+                int objCId = ObjUserId.ClientId;
+                string objusername = ObjUserId.UserName;
+                string resourcename = ObjUserId.resourcename;
+                string logview = ObjUserId.log;
+                bool eStatemente = ObjUserId.eStatement;
+                string lcToken = tokenServices.GetLctoken(MobileToken);
 
            
                 var response = await API_Connection.GetAsync(lcToken, "/api/MyAccount/GetAccountInfo/" + Cstatementdetails.loanNumber);
@@ -1972,7 +2083,7 @@ namespace Business_Services
                 var Token = responseregeneratedToken.tokenValue;
 
 
-                var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token);
+                var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token,objusername,resourcename,logview, eStatemente);
                 Cstatementdetails.Token = MobileTokenNew;
                 return new ResponseModel(Cstatementdetails);
             }
@@ -2174,13 +2285,17 @@ namespace Business_Services
                 string objUId = ObjUserId.UserId;
                 string objPWd = ObjUserId.Password;
                 int objCId = ObjUserId.ClientId;
+                string objusername = ObjUserId.UserName;
+                string resourcename = ObjUserId.resourcename;
+                string logview = ObjUserId.log;
+                bool eStatemente = ObjUserId.eStatement;
                 var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", objPWd } });
                 var responseregeneratedToken = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
 
                 var Token = responseregeneratedToken.tokenValue;
 
 
-                var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token);
+                var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token,objusername,resourcename,logview,eStatemente);
                 LoanContactDetail.Token = MobileTokenNew;
                 return new ResponseModel(LoanContactDetail);
 
@@ -2204,7 +2319,11 @@ namespace Business_Services
             string objUId = ObjUserId.UserId;
             string objPWd = ObjUserId.Password;
             int objCId = ObjUserId.ClientId;
-            string lcToken = tokenServices.GetLctoken(MobileToken);
+                string objusername = ObjUserId.UserName;
+                string resourcename = ObjUserId.resourcename;
+                string logview = ObjUserId.log;
+                bool eStatementenr = ObjUserId.eStatement;
+                string lcToken = tokenServices.GetLctoken(MobileToken);
            
                 var responseuser = await API_Connection.GetAsync(lcToken, "api/Personal/GetBorrowerContactInfo/" + LoanContactDetail.LoanNumber);
                 string returnedDatausername = await responseuser.Content.ReadAsStringAsync();
@@ -2384,7 +2503,7 @@ namespace Business_Services
                 var Token = responseregeneratedToken.tokenValue;
 
 
-                var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token);
+                var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token,objusername,resourcename,logview,eStatementenr);
                 LoanContactDetail.Token = MobileTokenNew;
 
                 return new ResponseModel(LoanContactDetail);

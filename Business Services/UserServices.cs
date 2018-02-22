@@ -572,151 +572,151 @@ namespace Business_Services
 
                  Business_Services.Models.User userDetails = new Business_Services.Models.User();
 
-                using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
-                {
-                    var setpin = ctx.MobileUsers.Where(s => s.User_Id == userName).FirstOrDefault();
+                //using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
+                //{
+                //    var setpin = ctx.MobileUsers.Where(s => s.User_Id == userName).FirstOrDefault();
 
-                    if (setpin == null)
-                    {
-                        if (Is_New_MobileUser == false)
-                        {
+                //    if (setpin == null)
+                //    {
+                //        if (Is_New_MobileUser == false)
+                //        {
 
-                            Is_New_MobileUser = false;
-                        }
-                        else if (Is_New_MobileUser == true)
-                        {
+                //            Is_New_MobileUser = false;
+                //        }
+                //        else if (Is_New_MobileUser == true)
+                //        {
 
-                            Is_New_MobileUser = true;
-                        }
-                        using (var context = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
-                        {
-                            Business_Services.Models.DAL.LoancareDBContext.MobileUser obj_Login = new Business_Services.Models.DAL.LoancareDBContext.MobileUser()
-                            {
-                                pin = "",
-                                User_Id = userName,
-                                mae_steps_completed = "0",
-                                Mobile_Token_Id = "",
-                                created_on = DateTime.Now,
-                                Is_New_MobileUser = Is_New_MobileUser,
-                                Legal_version = 0,
-                                Privacy_version = 0,
-                                Terms_version = 0
-                            };
-                            context.MobileUsers.Add(obj_Login);
-                            context.Entry(obj_Login).State = EntityState.Added;
-                            context.SaveChanges();
-                            userDetails.mae_steps_completed = "0";
-                        }
+                //            Is_New_MobileUser = true;
+                //        }
+                //        using (var context = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
+                //        {
+                //            Business_Services.Models.DAL.LoancareDBContext.MobileUser obj_Login = new Business_Services.Models.DAL.LoancareDBContext.MobileUser()
+                //            {
+                //                pin = "",
+                //                User_Id = userName,
+                //                mae_steps_completed = "0",
+                //                Mobile_Token_Id = "",
+                //                created_on = DateTime.Now,
+                //                Is_New_MobileUser = Is_New_MobileUser,
+                //                Legal_version = 0,
+                //                Privacy_version = 0,
+                //                Terms_version = 0
+                //            };
+                //            context.MobileUsers.Add(obj_Login);
+                //            context.Entry(obj_Login).State = EntityState.Added;
+                //            context.SaveChanges();
+                //            userDetails.mae_steps_completed = "0";
+                //        }
 
-                        var responseQuestionInfo = await API_Connection.GetAsync(lcAuthToken, "/api/User/GetSecurtiyQuestions/");
-                        string returnedDatasecurity = await responseQuestionInfo.Content.ReadAsStringAsync();
+                //        var responseQuestionInfo = await API_Connection.GetAsync(lcAuthToken, "/api/User/GetSecurtiyQuestions/");
+                //        string returnedDatasecurity = await responseQuestionInfo.Content.ReadAsStringAsync();
 
-                        dynamic objQuestion = JsonConvert.DeserializeObject(returnedDatasecurity);
+                //        dynamic objQuestion = JsonConvert.DeserializeObject(returnedDatasecurity);
 
-                        Business_Services.Models.SecurityQuestion questionDetails = new Business_Services.Models.SecurityQuestion();
+                //        Business_Services.Models.SecurityQuestion questionDetails = new Business_Services.Models.SecurityQuestion();
 
-                        questionDetails.questions = new List<SecurityQuestionSummary>();
-
-
-                        questionDetails.pin = objQuestion.pin;
-                        string strQuestion;
-                        string strAnswer;
-
-                        string strQuestionID;
-                        string strUserID;
+                //        questionDetails.questions = new List<SecurityQuestionSummary>();
 
 
-                        foreach (var questionNumber in objQuestion.secQuestions)
-                        {
-                            // Send request to pull all question
+                //        questionDetails.pin = objQuestion.pin;
+                //        string strQuestion;
+                //        string strAnswer;
 
-                            //Modified by BBSR Team on 12th Jan 2018
-                            strQuestionID = questionNumber.questionID;
-                            strUserID = questionNumber.userID;
-                            //Modified by BBSR Team on 12th Jan 2018
-
-                            strQuestion = questionNumber.secretQuestion;
+                //        string strQuestionID;
+                //        string strUserID;
 
 
-                            strAnswer = questionNumber.securityAnswer;
-                            if (strUserID != "0" && strAnswer != "")
-                            {
-                                using (var ctxsecurity = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
-                                {
-                                    var setpinSecurity = ctxsecurity.MobileUsers.Where(s => s.User_Id == userName).FirstOrDefault();
+                //        foreach (var questionNumber in objQuestion.secQuestions)
+                //        {
+                //            // Send request to pull all question
 
-                                    using (var context = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
-                                    {
-                                        setpinSecurity.mae_steps_completed = "1";
-                                        context.Entry(setpinSecurity).State = EntityState.Modified;
-                                        context.SaveChanges();
-                                    }
+                //            //Modified by BBSR Team on 12th Jan 2018
+                //            strQuestionID = questionNumber.questionID;
+                //            strUserID = questionNumber.userID;
+                //            //Modified by BBSR Team on 12th Jan 2018
 
-                                }
-                            }
-                        }
-                    }
-                    else if (setpin != null)
-                    {
-                        userDetails.mae_steps_completed = setpin.mae_steps_completed;
-                    }
-                    else if (setpin.mae_steps_completed == "")
-                    {
-                        userDetails.mae_steps_completed = "0";
-                    }
-                }
+                //            strQuestion = questionNumber.secretQuestion;
 
 
-                using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
-                {
-                    var setpin = ctx.MobileUsers.Where(s => s.User_Id == userName).FirstOrDefault();
+                //            strAnswer = questionNumber.securityAnswer;
+                //            if (strUserID != "0" && strAnswer != "")
+                //            {
+                //                using (var ctxsecurity = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
+                //                {
+                //                    var setpinSecurity = ctxsecurity.MobileUsers.Where(s => s.User_Id == userName).FirstOrDefault();
 
-                    if (setpin != null)
-                    {
+                //                    using (var context = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
+                //                    {
+                //                        setpinSecurity.mae_steps_completed = "1";
+                //                        context.Entry(setpinSecurity).State = EntityState.Modified;
+                //                        context.SaveChanges();
+                //                    }
 
-                        if (setpin.mae_steps_completed == "1" || setpin.mae_steps_completed == "2")
-                        {
-
-                            var responseQuestionInfo = await API_Connection.GetAsync(lcAuthToken, "/api/User/GetSecurtiyQuestions/");
-                            string returnedDatasecurity = await responseQuestionInfo.Content.ReadAsStringAsync();
-
-                            dynamic objQuestion = JsonConvert.DeserializeObject(returnedDatasecurity);
-
-                            Business_Services.Models.SecurityQuestion questionDetails = new Business_Services.Models.SecurityQuestion();
-
-                            questionDetails.questions = new List<SecurityQuestionSummary>();
-
-
-                            questionDetails.pin = objQuestion.pin;
-                            string strQuestion;
-                            string strAnswer;
-
-                            string strQuestionID;
-                            string strUserID;
-
-
-                            foreach (var questionNumber in objQuestion.secQuestions)
-                            {
-                                // Send request to pull all question
-
-                                //Modified by BBSR Team on 12th Jan 2018
-                                strQuestionID = questionNumber.questionID;
-                                strUserID = questionNumber.userID;
-                                //Modified by BBSR Team on 12th Jan 2018
-
-                                strQuestion = questionNumber.secretQuestion;
+                //                }
+                //            }
+                //        }
+                //    }
+                //    else if (setpin != null)
+                //    {
+                //        userDetails.mae_steps_completed = setpin.mae_steps_completed;
+                //    }
+                //    else if (setpin.mae_steps_completed == "")
+                //    {
+                //        userDetails.mae_steps_completed = "0";
+                //    }
+                //}
 
 
-                                strAnswer = questionNumber.securityAnswer;
-                                if (strUserID != "0" && strAnswer != "")
-                                {
-                                    userDetails.SecurityQuestionFlag = true;
-                                }
-                            }
-                        }
-                    }
-                    userDetails.mae_steps_completed = setpin.mae_steps_completed;
-                }
+                //using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
+                //{
+                //    var setpin = ctx.MobileUsers.Where(s => s.User_Id == userName).FirstOrDefault();
+
+                //    if (setpin != null)
+                //    {
+
+                //        if (setpin.mae_steps_completed == "1" || setpin.mae_steps_completed == "2")
+                //        {
+
+                //            var responseQuestionInfo = await API_Connection.GetAsync(lcAuthToken, "/api/User/GetSecurtiyQuestions/");
+                //            string returnedDatasecurity = await responseQuestionInfo.Content.ReadAsStringAsync();
+
+                //            dynamic objQuestion = JsonConvert.DeserializeObject(returnedDatasecurity);
+
+                //            Business_Services.Models.SecurityQuestion questionDetails = new Business_Services.Models.SecurityQuestion();
+
+                //            questionDetails.questions = new List<SecurityQuestionSummary>();
+
+
+                //            questionDetails.pin = objQuestion.pin;
+                //            string strQuestion;
+                //            string strAnswer;
+
+                //            string strQuestionID;
+                //            string strUserID;
+
+
+                //            foreach (var questionNumber in objQuestion.secQuestions)
+                //            {
+                //                // Send request to pull all question
+
+                //                //Modified by BBSR Team on 12th Jan 2018
+                //                strQuestionID = questionNumber.questionID;
+                //                strUserID = questionNumber.userID;
+                //                //Modified by BBSR Team on 12th Jan 2018
+
+                //                strQuestion = questionNumber.secretQuestion;
+
+
+                //                strAnswer = questionNumber.securityAnswer;
+                //                if (strUserID != "0" && strAnswer != "")
+                //                {
+                //                    userDetails.SecurityQuestionFlag = true;
+                //                }
+                //            }
+                //        }
+                //    }
+                //    userDetails.mae_steps_completed = setpin.mae_steps_completed;
+                //}
 
 
                 if (objUserName.currentUserLoan.roleId == 5)
@@ -1244,7 +1244,10 @@ namespace Business_Services
                 string objUId = ObjUserId.UserId;
                 string objPWd = ObjUserId.Password;
                 int objCId = ObjUserId.ClientId;
-
+                string objusername = ObjUserId.UserName;
+                string resourcename = ObjUserId.resourcename;
+                string logview = ObjUserId.log;
+                bool eStatementenr = ObjUserId.eStatement;
                 LogWriter("current_password:", loanDetails.current_password);
                 LogWriter("Password:", loanDetails.password);
 
@@ -1336,7 +1339,7 @@ namespace Business_Services
 
                         var Token = responseregeneratedToken.tokenValue;
 
-                        var MobileTokenNew = objgenerateToken.GenerateToken(objUId, loanDetails.password, objCId, Token);
+                        var MobileTokenNew = objgenerateToken.GenerateToken(objUId, loanDetails.password, objCId, Token,objusername,resourcename,logview,eStatementenr);
 
                         loanDetails.Token = MobileTokenNew;
 
@@ -1399,7 +1402,10 @@ namespace Business_Services
                 string objUId = ObjUserId.UserId;
                 string objPWd = ObjUserId.Password;
                 int objCId = ObjUserId.ClientId;
-
+                string objusername = ObjUserId.UserName;
+                string resourcename = ObjUserId.resourcename;
+                string logview = ObjUserId.log;
+                bool eStatementenr = ObjUserId.eStatement;
                 string lcToken = tokenServices.GetLctoken(MobileToken);
 
                 var responseIn = await API_Connection.GetAsync(lcToken, "/api/User/GetUserInformation");
@@ -1486,7 +1492,7 @@ namespace Business_Services
 
                 var Token = responseregeneratedToken.tokenValue;
 
-                var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token);
+                var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token,objusername,resourcename,logview,eStatementenr);
 
                 PinDetail.Token = MobileTokenNew;
 
@@ -1527,6 +1533,9 @@ namespace Business_Services
                 string objPWd = ObjUserId.Password;
                 int objCId = ObjUserId.ClientId;
                 string userName = ObjUserId.UserName;
+                string resourcename = ObjUserId.resourcename;
+                string logview = ObjUserId.log;
+                bool eStatementenr = ObjUserId.eStatement;
                 string lcToken = tokenServices.GetLctoken(MobileToken);
 
                 //var responseIn = await API_Connection.GetAsync(lcToken, "/api/User/GetUserInformation");
@@ -1608,7 +1617,7 @@ namespace Business_Services
 
                 var Token = responseregeneratedToken.tokenValue;
 
-                var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token);
+                var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token,UserName,resourcename,logview,eStatementenr);
 
                 PinDetail.Token = MobileTokenNew;
 
