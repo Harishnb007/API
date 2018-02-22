@@ -443,6 +443,25 @@ namespace Business_Services
 
                         return new ResponseModel(listsecquestion, 1, "Error");
                     }
+                    string clientUrl = "www.myloancare.com";
+                    string loanNo = objForgotUser.userLoan.loanNo;
+                    string userName = objForgotUser.user.userName;
+                    string emailAddress = objForgotUser.userLoan.emailAddress;
+                    string clientName= objForgotUser.client.clientName;
+                    string clientPhone = objForgotUser.client.clientPhone;
+                    Dictionary<string, string> someDict = new Dictionary<string, string>();
+                    someDict.Add("LoanNo", loanNo);
+                    someDict.Add("userName", userName);
+                    someDict.Add("email", emailAddress);
+                    someDict.Add("clientName", clientName);
+                    someDict.Add("clientPhone", clientPhone);
+                    someDict.Add("url", clientUrl);
+                    someDict.Add("PROPERTY_STATE_CODE", "");
+                    var content = new FormUrlEncodedContent(someDict);
+                    var response = await API_Connection.PostUserAsync("/api/Register/SendEmailforPassword/", content);
+                    string returnedDataemail = await response.Content.ReadAsStringAsync();
+                    dynamic objForgotemail = JsonConvert.DeserializeObject(returnedDataemail);
+
                     return new ResponseModel(listsecquestion);
                 }
                 return new ResponseModel(null, 1, returnedData);
@@ -792,7 +811,7 @@ namespace Business_Services
                 userDetails.BorrowerName = getuserinfoPhoneNo.contactinfo.contactInfo.borrower;
                 userDetails.id = objUserName.user.id;
                 userDetails.LoginId = loan_number;
-
+                userDetails.is_enrolled = (objUserName.currentUserLoan.eStatement == null) ? false : true;
                 return new ResponseModel(userDetails);
             }
             catch (Exception Ex)
@@ -805,13 +824,19 @@ namespace Business_Services
         public async Task<ResponseModel> getUserDetailsAsyn(string lcAuthToken, string loan_number)
         {
             Token tokenObject = JsonConvert.DeserializeObject<Token>(Encryptor.Decrypt(lcAuthToken));
+            Business_Services.Models.GenerateNewToken objgenerateToken = new GenerateNewToken();
+
+            var Decryptdata = objgenerateToken.Decrypt(lcAuthToken);
+            dynamic ObjUserId = JsonConvert.DeserializeObject(Decryptdata);
+            bool objisenrolled = ObjUserId.eStatement;
+            //string UserName = ObjUserId.UserName;
             try
             {
                 string lcToken = tokenObject.Lcauth;
-                var responseUserInfo = await API_Connection.GetAsync(lcToken, "/api/User/GetUserInformation");
-                string returnedData = await responseUserInfo.Content.ReadAsStringAsync();
-                dynamic obj = JsonConvert.DeserializeObject(returnedData);
-                string userName = obj.user.userName;
+                //var responseUserInfo = await API_Connection.GetAsync(lcToken, "/api/User/GetUserInformation");
+                //string returnedData = await responseUserInfo.Content.ReadAsStringAsync();
+                //dynamic obj = JsonConvert.DeserializeObject(returnedData);
+                //string userName = obj.user.userName;
 
                 var response_princilAmout = await API_Connection.GetAsync(lcToken, "/api/Loan/GetCurrentLoanInfo/" + loan_number);
                 string returnedDataAmount = await response_princilAmout.Content.ReadAsStringAsync();
@@ -820,11 +845,10 @@ namespace Business_Services
 
                 var responseGetUserInfo = await API_Connection.GetAsync(lcToken, "/api/User/GetUserInformation");
                 string returnedDataUser = await responseGetUserInfo.Content.ReadAsStringAsync();
-
-
                 dynamic getuserinfo = JsonConvert.DeserializeObject(returnedDataUser);
+                string userName = getuserinfo.user.userName;
 
-                var responseLP = await API_Connection.GetAsync(lcToken, "/api/User/LanguagePref/?userId=" + getuserinfo.user.userName);
+                var responseLP = await API_Connection.GetAsync(lcToken, "/api/User/LanguagePref/?userId=" + userName);
                 string returnedDataLP = await responseLP.Content.ReadAsStringAsync();
 
 
@@ -898,7 +922,7 @@ namespace Business_Services
                 userLoanAmount.last_pending_payments = Convert.ToString(no_of_payments);
                 userLoanAmount.last_payment_date = loan_duedate;
                 userDetails.username = getuserinfo.user.userName;
-                userLoanAmount.is_enrolled = (obj.currentUserLoan.eStatement == null) ? false : true;
+                userLoanAmount.is_enrolled = (getuserinfo.currentUserLoan.eStatement == null) ? false : true;
 
                 DateTime date = new DateTime();
                 date = Convert.ToDateTime(userLoanAmount.loan_duedate);
@@ -1260,10 +1284,10 @@ namespace Business_Services
 
                     if (loanDetails.password != Password)
                     {
-                        var responseIn = await API_Connection.GetAsync(lcToken, "/api/User/GetUserInformation");
-                        string returnedDataUser = await responseIn.Content.ReadAsStringAsync();
-                        dynamic getuserinfo = JsonConvert.DeserializeObject(returnedDataUser);
-                        string UserName = getuserinfo.user.userName;
+                        //var responseIn = await API_Connection.GetAsync(lcToken, "/api/User/GetUserInformation");
+                        //string returnedDataUser = await responseIn.Content.ReadAsStringAsync();
+                        //dynamic getuserinfo = JsonConvert.DeserializeObject(returnedDataUser);
+                        string UserName = objusername;
                         string User_Name = UserName.Trim();
                         byte[] password = System.Text.ASCIIEncoding.ASCII.GetBytes(loanDetails.password);
                         string decodedStringpassword = System.Convert.ToBase64String(password);
@@ -1408,10 +1432,10 @@ namespace Business_Services
                 bool eStatementenr = ObjUserId.eStatement;
                 string lcToken = tokenServices.GetLctoken(MobileToken);
 
-                var responseIn = await API_Connection.GetAsync(lcToken, "/api/User/GetUserInformation");
-                string returnedDataUser = await responseIn.Content.ReadAsStringAsync();
-                dynamic getuserinfo = JsonConvert.DeserializeObject(returnedDataUser);
-                string UserName = getuserinfo.user.userName;
+                //var responseIn = await API_Connection.GetAsync(lcToken, "/api/User/GetUserInformation");
+                //string returnedDataUser = await responseIn.Content.ReadAsStringAsync();
+                //dynamic getuserinfo = JsonConvert.DeserializeObject(returnedDataUser);
+                string UserName = objusername;
                 string User_Name = UserName.Trim();
 
 

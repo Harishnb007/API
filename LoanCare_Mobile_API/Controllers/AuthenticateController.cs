@@ -310,7 +310,7 @@ namespace LoanCare_Mobile_API.Controllers
                 //}
                 var responseMobileUser = Request.CreateResponse(HttpStatusCode.OK, new ResponseModel
                 {
-                    status = new Status { CustomErrorCode = 1, Message = "Problem occurred trying to validate the user credentials.Please try again." },
+                    status = new Status { CustomErrorCode = 1, Message = "Problem occurred trying to validate the user credentials. Please try again." },
                     data = Auth_data
                 });
                 return responseMobileUser;

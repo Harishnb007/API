@@ -59,8 +59,10 @@ namespace Business_Services.Models
         [JsonProperty]
         internal string monthly_mortgage_insurance_amount { get; set; }
 
-        [JsonProperty]
-        internal string overage_shortage { get; set; }
+
+    
+        [JsonProperty("overage-shortage")]
+        internal string overageshortage { get; set; }
 
         [JsonProperty]
         internal string total_amount { get; set; }

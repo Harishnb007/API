@@ -1520,7 +1520,6 @@ namespace Business_Services
                 // To do - Use DI
                 TokenServices tokenServices = new TokenServices();
                 string lcToken = tokenServices.GetLctoken(mobileToken);
-
                 
 
                 string returnedData = null;
@@ -2822,8 +2821,12 @@ namespace Business_Services
             var transactiondate = pendingpaymentList.Max(x => x.dueDate);
 
             var Paymentdata = (from paymentdetails in pendingpaymentList
-                              where paymentdetails.dueDate == transactiondate
-                              select paymentdetails).FirstOrDefault();
+                              where paymentdetails.dueDate == transactiondate 
+                               select paymentdetails).FirstOrDefault();
+
+            //var Paymentdata = (from paymentde in Paymentdatapending
+            //                   where paymentdetails.dueDate == transactiondate
+            //                   select paymentdetails).First();
             //var q = from n in pendingpaymentList
             //        //group n by n.transactionAppliedDate into g
             //        select new { totalPaymentReceivedAmount = , Date = g.Max(t => t.transactionAppliedDate) };
@@ -2896,7 +2899,7 @@ namespace Business_Services
             next_monthly_payment.other_tax_amount = loanInfo.otherTax;
             next_monthly_payment.total_amount = loanInfo.netPresent;
             next_monthly_payment.monthly_mortgage_insurance_amount = loanInfo.miAmount;
-            next_monthly_payment.overage_shortage = loanInfo.overShortAmount;
+            next_monthly_payment.overageshortage = loanInfo.overShortAmount;
             loan_duedatedate.next_monthly_payment = next_monthly_payment;
             return (loan_duedatedate);
         }
