@@ -9,11 +9,11 @@ namespace Business_Services.Models
     public class PendingPayment
     {
         public string payment_id { get; set; }
-        public DateTime payment_date { get; set; }
+        public string payment_date { get; set; }
         public decimal? total_amount { get; set; }
         public string payment_description { get; set; }
         public string account_number { get; set; }
         public int paymentCount { get; set; }
-        public DateTime date_created { get; set; }
+        public string date_created { get; set; }
     }
 }
