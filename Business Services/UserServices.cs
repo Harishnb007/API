@@ -312,7 +312,7 @@ namespace Business_Services
                 Dictionary<string, string> forgotDict = new Dictionary<string, string>();
                 forgotDict.Add("userID", Loan_Number);
                 forgotDict.Add("ssn", decodeduserSSN);
-
+                string clientUrl = "www.myloancare.com";
                 var forgotcontent = new FormUrlEncodedContent(forgotDict);
                 var UserDetails = await API_Connection.PostUserAsync("/api/Register/SendUserId/", forgotcontent);
                 //Modified by BBSR_Team on 11th Jan 2018
@@ -330,7 +330,7 @@ namespace Business_Services
 
                     string loanNo = objForgotUser.userLoan.loanNo;
                     string clientPhone = objForgotUser.client.clientPhone;
-                    string clientUrl = "www.myloancare.com";
+                   
 
                     string strUserEmail = objForgotUser.userLoan.emailAddress;
                     byte[] userEmail = System.Text.ASCIIEncoding.ASCII.GetBytes(strUserEmail);

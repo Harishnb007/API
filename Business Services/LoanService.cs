@@ -2020,6 +2020,14 @@ namespace Business_Services
                 var content = new FormUrlEncodedContent(someDict);
 
                 var responseEstatement = await API_Connection.PostAsync(lcToken, "/api/EStatement/EnrollStatement/", content);
+                dynamic Message = await responseEstatement.message.Content.ReadAsStringAsync();
+                var ResponseMsg = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Message);
+                string resmsg = ResponseMsg;
+                if (resmsg == "")
+                {
+
+                    eStatementenroll = true;
+                }
 
                 var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", objPWd } });
                 var responseregeneratedToken = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
@@ -2075,7 +2083,14 @@ namespace Business_Services
                 var content = new FormUrlEncodedContent(someDict);
 
                 var responseCstatement = await API_Connection.PostAsync(lcToken, "/api/EStatement/CancelStatement/", content);
+                dynamic Message = await responseCstatement.message.Content.ReadAsStringAsync();
+                var ResponseMsg = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Message);
+                string resmsg = ResponseMsg;
+                if (resmsg == "")
+                {
 
+                    eStatemente = false;
+                }
                 var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", objPWd } });
                 var responseregeneratedToken = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
 
@@ -2763,12 +2778,13 @@ namespace Business_Services
             try
             {
 
-               
-
-
                 var response = await API_Connection.GetAsync(lcToken, "/api/Loan/GetCurrentLoanInfo/" + loanNumber);
                 string returnedData = await response.Content.ReadAsStringAsync();
                 Loan_GetCurrentLoanInfo loanInfo = JsonConvert.DeserializeObject<Loan_GetCurrentLoanInfo>(returnedData);
+
+                var responseloanactivity = await API_Connection.GetAsync(lcToken, "/api/Loan/GetLoanActivity/" + loanNumber);
+                string returnedloanactivityData = await responseloanactivity.Content.ReadAsStringAsync();
+                LoanHistory_Activity loanactivityInfo = JsonConvert.DeserializeObject<LoanHistory_Activity>(returnedloanactivityData);
 
                 var responseEscrow = await API_Connection.GetAsync(lcToken, "/api/Escrow/CallEscrow/?LoanNo=" + loanNumber);
                 string returnedDataEscrow = await responseEscrow.Content.ReadAsStringAsync();
@@ -2783,7 +2799,7 @@ namespace Business_Services
                 var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
                 string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
-                return new ResponseModel(NewMethod(loanInfo, escrowInfo));
+                return new ResponseModel(NewMethod(loanInfo, loanactivityInfo ,escrowInfo));
             }
             catch (Exception Ex) {
 
@@ -2791,14 +2807,14 @@ namespace Business_Services
             }
         }
 
-        private static PaymentDetails NewMethod(Loan_GetCurrentLoanInfo loanInfo, Escrow_CallEscrow escrowInfo)
+        private static PaymentDetails NewMethod(Loan_GetCurrentLoanInfo loanInfo, LoanHistory_Activity loanactivityInfo, Escrow_CallEscrow escrowInfo)
         {
 
 
             List<Pendingloandetails> pendingpaymentList = new List<Pendingloandetails>();
-            for (int i = 0; i < loanInfo.paymentOnlyHistory.Count(); i++)
+            for (int i = 0; i < loanactivityInfo.fullMortageHistory.Count(); i++)
             {
-                var payment = loanInfo.paymentOnlyHistory[i];
+                var payment = loanactivityInfo.fullMortageHistory[i];
                 dynamic paymentdetail = Newtonsoft.Json.JsonConvert.SerializeObject(payment);
                 Pendingloandetails objpaymentdetail = JsonConvert.DeserializeObject<Pendingloandetails>(paymentdetail);
 
@@ -2818,11 +2834,34 @@ namespace Business_Services
                 pendingpaymentList.Add(paymentdetails);
 
             }
-            var transactiondate = pendingpaymentList.Max(x => x.dueDate);
 
-            var Paymentdata = (from paymentdetails in pendingpaymentList
-                              where paymentdetails.dueDate == transactiondate 
+            List<Pendingloandetails> paymentList = new List<Pendingloandetails>();
+
+            foreach (var paymentdesc in pendingpaymentList)
+            {
+
+                if (paymentdesc.tranCodeDesc == "Payment")
+                {
+                    Pendingloandetails paymentdetails = new Pendingloandetails
+                    {
+                        totalPaymentReceivedAmount = paymentdesc.totalPaymentReceivedAmount,
+                        escrowPaidAmount = paymentdesc.escrowPaidAmount,
+                        principalPmtAmount = paymentdesc.principalPmtAmount,
+                        transactionAppliedDate = paymentdesc.transactionAppliedDate,
+                        interestPaidAmount = paymentdesc.interestPaidAmount,
+                        suspenseAmount = paymentdesc.suspenseAmount,
+                        tranCodeDesc = paymentdesc.tranCodeDesc,
+                        dueDate = paymentdesc.dueDate
+                    };
+                    paymentList.Add(paymentdetails);
+                }
+            }
+            var transactiondate = paymentList.Max(x => x.dueDate);
+
+            var Paymentdata = (from paymentdetails in paymentList
+                               where paymentdetails.dueDate == transactiondate
                                select paymentdetails).FirstOrDefault();
+
 
             //var Paymentdata = (from paymentde in Paymentdatapending
             //                   where paymentdetails.dueDate == transactiondate
