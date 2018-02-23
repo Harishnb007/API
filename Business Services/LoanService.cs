@@ -40,7 +40,7 @@ namespace Business_Services
             try
             { 
                 var response = await API_Connection.GetAsync(lcToken, "/api/OneTimePayment/CancelOnetimePayment/?loanNo="
-                    + paymentData.loan_number + "&schDate=" + paymentData.payment_date.ToString("MM/dd/yyyy") + "&isRegularDelete=true&dateCreated="
+                    + paymentData.loan_number + "&schDate=" + paymentData.payment_date.Replace('-','/') + "&isRegularDelete=true&dateCreated="
                     + paymentData.date_created);
                 string returnedData = await response.Content.ReadAsStringAsync();
 
@@ -1128,7 +1128,7 @@ namespace Business_Services
             Payment paymentData = new Payment
             {
                 isAutoDraftAvailable = autodraft,
-                due_date = Convert.ToDateTime(loanInfo.payment.dueDate).ToString("MM/dd/yy"),
+                due_date = loanInfo.payment.dueDate,
                 loan_number = loanNumber,
                 account_status = account_status,
                 payment_amount = paymentAmt,
@@ -1213,7 +1213,7 @@ namespace Business_Services
 
                 PendingPayment tempPayment = new PendingPayment()
                 {
-                    payment_date = Convert.ToDateTime(a.schDT),
+                    payment_date = a.schDT,
                     paymentCount = Convert.ToInt32(a.pmts),
                     date_created = a.dateCreated
                     
@@ -1548,7 +1548,7 @@ namespace Business_Services
                     {
                         tempPayment = new PendingPayment()
                         {
-                            payment_date = Convert.ToDateTime(pendingInfoAutoDraft.nextDraftDate),
+                            payment_date = pendingInfoAutoDraft.nextDraftDate,
                             total_amount = pendingInfoAutoDraft.autoDraftInfo.totalDftAmount,
                             payment_description = "Auto Draft",
                             account_number = pendingInfoAutoDraft.autoDraftInfo.accountNumber
@@ -1564,7 +1564,7 @@ namespace Business_Services
                     {
                         tempPayment = new PendingPayment()
                         {
-                            payment_date = Convert.ToDateTime(a.schDT),
+                            payment_date = a.schDT,
                             total_amount = a.amtRecvd,
                             payment_description = a.getPaymentType(a.paymentType),
                             account_number = a.accountNumber,
@@ -1584,7 +1584,7 @@ namespace Business_Services
                 {
                     tempPayment = new PendingPayment()
                     {
-                        payment_date = Convert.ToDateTime(a.schDT),
+                        payment_date = a.schDT,
                         total_amount = a.amtRecvd,
                         payment_description = a.getPaymentType(a.paymentType),
                         account_number = a.accountNumber,
@@ -2545,7 +2545,7 @@ namespace Business_Services
                 if (paymentdata.override_payment == true)
                 {
                     var responseCancelPayment = await API_Connection.GetAsync(lcToken, "/api/OneTimePayment/CancelOnetimePayment/?loanNo=" +
-                                 paymentdata.loan_number + "&schDate=" + paymentdata.initial_schDate.ToString("MM/dd/yyyy") +
+                                 paymentdata.loan_number + "&schDate=" + paymentdata.initial_schDate.Replace('-','/') +
                                  "&isRegularDelete=false&dateCreated=" + paymentdata.date_created + "&=");
                     string returnedData = await responseCancelPayment.Content.ReadAsStringAsync();
 
@@ -2557,8 +2557,8 @@ namespace Business_Services
                 someDict.Add("IsAutoDraftSetup", paymentdata.isAutoDraftSetup.ToString());
                 someDict.Add("isStateException", "false");
                 someDict.Add("loanNo", paymentdata.loan_number);
-                someDict.Add("schDT", paymentdata.payment_date.ToString("MM/dd/yyyy"));
-                someDict.Add("intialSchDt", paymentdata.initial_schDate.ToString("MM/dd/yyyy"));
+                someDict.Add("schDT", paymentdata.payment_date);
+                someDict.Add("intialSchDt", paymentdata.initial_schDate);
                 someDict.Add("PaymentEffectiveDate", "0001-01-01T00: 00:00");
                 //paymentdata.payment_date.ToString("yyyy -MM-ddTHH:mm:ss"));
                 someDict.Add("pmtAmt", paymentdata.payment_amount.ToString());
@@ -2575,8 +2575,8 @@ namespace Business_Services
                 someDict.Add("saveBankInfoDtls", "false"); // Added By Avinash
                 someDict.Add("isBankNameSelected", "true");  // Added By Avinash
                 someDict.Add("bankInfoDetailsRowId", "0");
-                someDict.Add("PaymentEffectiveDateFormatted", paymentdata.payment_date.ToString("MM/dd/yyyy"));
-                someDict.Add("PaymentEffectiveDateFormatted1", paymentdata.payment_date.ToString("MM/dd/yy"));
+                someDict.Add("PaymentEffectiveDateFormatted", paymentdata.payment_date);
+                someDict.Add("PaymentEffectiveDateFormatted1", paymentdata.payment_date);
 
 
                 someDict.Add("dueDate", paymentdata.due_date);

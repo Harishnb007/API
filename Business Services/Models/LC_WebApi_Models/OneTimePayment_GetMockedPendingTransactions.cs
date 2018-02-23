@@ -87,7 +87,7 @@ namespace Business_Services.Models.LC_WebApi_Models
         public float outstandingFeeDue { get; set; }
         public DateTime paymentEffectiveDate { get; set; }
 
-        public DateTime dateCreated { get; set; }
+        public string dateCreated { get; set; }
         public object servicerLastProcessingDate { get; set; }
         public bool isStateException { get; set; }
     }
