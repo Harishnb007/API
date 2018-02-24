@@ -2545,7 +2545,7 @@ namespace Business_Services
                 if (paymentdata.override_payment == true)
                 {
                     var responseCancelPayment = await API_Connection.GetAsync(lcToken, "/api/OneTimePayment/CancelOnetimePayment/?loanNo=" +
-                                 paymentdata.loan_number + "&schDate=" + paymentdata.initial_schDate.Replace('-','/') +
+                                 paymentdata.loan_number + "&schDate=" + paymentdata.initial_schDate +
                                  "&isRegularDelete=false&dateCreated=" + paymentdata.date_created + "&=");
                     string returnedData = await responseCancelPayment.Content.ReadAsStringAsync();
 
@@ -2575,8 +2575,8 @@ namespace Business_Services
                 someDict.Add("saveBankInfoDtls", "false"); // Added By Avinash
                 someDict.Add("isBankNameSelected", "true");  // Added By Avinash
                 someDict.Add("bankInfoDetailsRowId", "0");
-                someDict.Add("PaymentEffectiveDateFormatted", paymentdata.payment_date);
-                someDict.Add("PaymentEffectiveDateFormatted1", paymentdata.payment_date);
+                someDict.Add("PaymentEffectiveDateFormatted", "01/01/1901");
+                someDict.Add("PaymentEffectiveDateFormatted1", "01/01/1");
 
 
                 someDict.Add("dueDate", paymentdata.due_date);
