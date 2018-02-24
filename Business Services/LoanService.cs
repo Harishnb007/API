@@ -1944,10 +1944,10 @@ namespace Business_Services
             {
                 var Decryptdata = objgenerateToken.Decrypt(MobileToken);
 
-            dynamic ObjUserId = JsonConvert.DeserializeObject(Decryptdata);
-            string objUId = ObjUserId.UserId;
-            string objPWd = ObjUserId.Password;
-            int objCId = ObjUserId.ClientId;
+                dynamic ObjUserId = JsonConvert.DeserializeObject(Decryptdata);
+                string objUId = ObjUserId.UserId;
+                string objPWd = ObjUserId.Password;
+                int objCId = ObjUserId.ClientId;
                 string objusername = ObjUserId.UserName;
                 string resourcename = ObjUserId.resourcename;
                 string logview = ObjUserId.log;
@@ -1966,7 +1966,10 @@ namespace Business_Services
                 var content = new FormUrlEncodedContent(someDict);
 
                 var response = await API_Connection.PostAsync(lcToken, "/api/Investor/SaveLinkLoan/", content);
+                dynamic Message = await response.message.Content.ReadAsStringAsync();
 
+                var ErrorMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Message);
+                string ErrMsg = ErrorMessage;
                 var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", objPWd } });
                 var responseregeneratedToken = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
 
@@ -1976,7 +1979,7 @@ namespace Business_Services
                 var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token,objusername,resourcename,logview, eStatemente);
                 loanDetails.Token = MobileTokenNew;
 
-                return new ResponseModel(loanDetails);
+                return new ResponseModel(loanDetails,0, ErrMsg);
             }
             catch (Exception ex)
             {
@@ -2104,7 +2107,7 @@ namespace Business_Services
             catch (Exception ex)
             {
 
-                return new ResponseModel(null, 1, ex.Message);
+                return new ResponseModel(null, 1, "Error cancelling e-Statement. Please contact Customer Service at 1-800-274-6600");
             }
         }
 
