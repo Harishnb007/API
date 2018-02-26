@@ -1012,7 +1012,7 @@ namespace Business_Services
                 original_loan_amount = Convert.ToDecimal(loanInfo.balOrigLoan),
                 maturity_date = loanInfo.maturityDate,
                 co_borrower_name = acctInfo.msg.coBorrower,
-                is_autodraft = autoDrftInfo.autoDraftInfo.isAutoDraftSetup,
+                is_autodraft = autoDrftInfo.nextDraftDate != "" ? true : false,
                 auto_draftdate = Convert.ToString((autoDrftInfo.nextDraftDate != "") ? DateTime.ParseExact(autoDrftInfo.nextDraftDate, "MM/dd/yyyy", CultureInfo.InvariantCulture) : new DateTime())
             });
         }
@@ -1542,7 +1542,7 @@ namespace Business_Services
                         tempPayment = new PendingPayment()
                         {
                             payment_date = pendingInfoAutoDraft.nextDraftDate,
-                            total_amount = pendingInfoAutoDraft.autoDraftInfo.totalDftAmount,
+                            total_amount = pendingInfoAutoDraft.autoDraftInfo.totalDraftAmntPrint,
                             payment_description = "Auto Draft",
                             account_number = pendingInfoAutoDraft.autoDraftInfo.accountNumber
                         };
