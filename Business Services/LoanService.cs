@@ -1962,7 +1962,11 @@ namespace Business_Services
                 dynamic Message = await response.message.Content.ReadAsStringAsync();
 
                 var ErrorMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Message);
-                string ErrMsg = ErrorMessage.message;
+                string ErrMsg = ErrorMessage.msg;
+                if (ErrMsg != "Success") {
+                    loanDetails.issuccess = false;
+                    loanDetails.Message= ErrMsg;
+                }
                 var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", objPWd } });
                 var responseregeneratedToken = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
 

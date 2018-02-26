@@ -36,6 +36,11 @@ namespace LoanCare_Mobile_API.Models
         public string BorrowerName { get; set; }
         public Addresss address { get; set; }
         public bool SecurityQuestionFlag { get; set; }
+        public string phone_primary_number { get; set; }
+        public string phone_secondary_number { get; set; }
+        public string phone_other_1_number { get; set; }
+        public string phone_other_2_number { get; set; }
+        public string phone_other_3_number { get; set; }
         public List<LoanSummarys> loans { get; set; }
     }
 

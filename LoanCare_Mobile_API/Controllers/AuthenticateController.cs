@@ -203,6 +203,12 @@ namespace LoanCare_Mobile_API.Controllers
                 Auth_data.LoginId = userDetails.username;
                 Auth_data.mae_steps_completed = userDetails.mae_steps_completed;
                 Auth_data.SecurityQuestionFlag = userDetails.SecurityQuestionFlag;
+                Auth_data.phone_primary_number = userDetails.phone_primary_number_concern;
+                Auth_data.phone_secondary_number = userDetails.phone_secondary_number_concern;
+                Auth_data.phone_other_1_number = userDetails.phone_other_1_number_concern;
+                Auth_data.phone_other_2_number = userDetails.phone_other_2_number_concern;
+                Auth_data.phone_other_3_number = userDetails.phone_other_3_number_concern;
+
                 foreach (var Add in userDetails.loanss)
                 {
                     loanS.Add(new LoanSummarys
