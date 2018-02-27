@@ -17,7 +17,7 @@ namespace Business_Services.Models.LC_WebApi_Models
             public float? escrowPaidAmount { get; set; }
             public float? feeAmount { get; set; }
             public string historyTransactionCode { get; set; }
-            public float? interestPaidAmount { get; set; }
+            public string interestPaidAmount { get; set; }
             public object lateChargeAmount { get; set; }
             public float? lifeInsurancePmtAmount { get; set; }
             public float? miscPaidAmount { get; set; }

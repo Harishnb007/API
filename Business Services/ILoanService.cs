@@ -66,13 +66,10 @@ namespace Business_Services
         Task<ResponseModel> GetRountingForLoan(string lcAuthToken, string RoutingNumber);
         Task<ResponseModel> GetMakePaymentPendingList(string MobileToken, string loanNumber);
         Task<ResponseModel> GetNotificationforLoanAsync(string mobileToken, string loanNumber);
-
         Task<ResponseModel> ConfirmationforLoanAsync(string MobileToken, ConfirmRegistration details);
-
         Task<ResponseModel> PostManageNotificationForAsync(string MobileToken, Business_Services.Models.ManageNotification ModifyPayment);
-      
-        Task<ResponseModel> GetpdfstreamAsync(string lcAuthToken, string statement_url);
-
         Task<ResponseModel> ValidatePasswordAsync(string mobileToken, UserAuth userData);
+        Task<ResponseModel> GetgetstatementspdfAsync(string lcAuthToken, string URL);
+        Task<ResponseModel> GetpdfstreamAsync(string lcAuthToken, string statement_url);
     }
 }
