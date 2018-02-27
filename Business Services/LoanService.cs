@@ -1012,8 +1012,7 @@ namespace Business_Services
                 original_loan_amount = Convert.ToDecimal(loanInfo.balOrigLoan),
                 maturity_date = loanInfo.maturityDate,
                 co_borrower_name = acctInfo.msg.coBorrower,
-                
-                is_autodraft = autoDrftInfo.nextDraftDate != "" ? true : false,
+                is_autodraft = autoDrftInfo.autoDraftInfo.isAutoDraftSetup,
                 auto_draftdate = Convert.ToString((autoDrftInfo.nextDraftDate != "") ? DateTime.ParseExact(autoDrftInfo.nextDraftDate, "MM/dd/yyyy", CultureInfo.InvariantCulture) : new DateTime())
             });
         }
