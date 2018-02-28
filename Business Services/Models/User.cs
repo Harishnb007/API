@@ -22,6 +22,7 @@ namespace Business_Services.Models
         public int id { get; set; }
         public string ssn { get; set; }
         public string password { get; set; }
+        public bool is_enrolled { get; set; }
         public string LoginId { get; set; }
         public string loanNumber { get; set; }
         public string NotifyEmail { get; set; }
@@ -38,6 +39,17 @@ namespace Business_Services.Models
         public string noOfAttempts { get; set; }
         public string mae_steps_completed { get; set; }
         public bool SecurityQuestionFlag { get; set; }
+
+        public string phone_primary_number_concern { get; set; }
+        public string phone_primary_type_concern { get; set; }
+        public string phone_secondary_number_concern { get; set; }
+        public string phone_secondary_type_concern { get; set; }
+        public string phone_other_1_number_concern { get; set; }
+        public string phone_other_1_type_concern { get; set; }
+        public string phone_other_2_number_concern { get; set; }
+        public string phone_other_2_type_concern { get; set; }
+        public string phone_other_3_number_concern { get; set; }
+        public string phone_other_3_type_concern { get; set; }
         public List<LoanSummary> loanss { get; set; }
     }
 

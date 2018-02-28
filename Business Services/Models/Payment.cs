@@ -12,7 +12,7 @@ namespace Business_Services.Models
         public bool account_status { get; set; }
         public decimal payment_amount { get; set; }
         public BankAccount bank_account { get; set; }
-        public DateTime payment_date { get; set; }
+        public string payment_date { get; set; }
         public string due_date { get; set; }
         public decimal total_amount { get; set; }
         public string number_of_payments { get; set; }
@@ -31,7 +31,7 @@ namespace Business_Services.Models
 
         public bool override_payment { get; set; }
 
-        public DateTime initial_schDate { get; set; }
+        public string initial_schDate { get; set; }
 
         public decimal original_mortgageAmt { get; set; }
 

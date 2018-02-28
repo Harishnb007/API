@@ -49,7 +49,7 @@ namespace LoanCare_Mobile_API.Controllers
                 tokenValue = tokenValues.FirstOrDefault();
             }
 
-           
+
 
             // var payment = await userService.UpdatePasswordAsync(tokenValue, loanDetails, objPasswordUpd);
 
@@ -149,7 +149,7 @@ namespace LoanCare_Mobile_API.Controllers
             {
                 tokenValue = tokenValues.FirstOrDefault();
             }
-            var payment = userService.ContactUsAsync(tokenValue);
+            var payment = await userService.ContactUsAsync(tokenValue);
             if (payment == null)
             {
                 return NotFound();

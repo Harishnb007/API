@@ -23,7 +23,7 @@ namespace Business_Services.Models.LC_WebApi_Models
         internal decimal amtRecvd { get; set; }
 
         [JsonProperty]
-        internal DateTime schDT { get; set; }
+        internal string schDT { get; set; }
 
         [JsonProperty]
         internal string pmts { get; set; }
