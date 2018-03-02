@@ -18,6 +18,5 @@ namespace Business_Services.Models
         public int ClientId { get; set; }
         public string resourcename { get; set; }
         public string log { get; set; }
-        public string Loan_Number { get; set; }
     }
 }

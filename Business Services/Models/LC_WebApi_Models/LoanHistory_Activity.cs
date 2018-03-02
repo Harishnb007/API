@@ -8,7 +8,7 @@ namespace Business_Services.Models.LC_WebApi_Models
 {
     public class LoanHistory_Activity
     {
-    
+
         public string balEscrow { get; set; }
         public string balLCDue { get; set; }
         public string firstPB { get; set; }
@@ -55,6 +55,6 @@ namespace Business_Services.Models.LC_WebApi_Models
         public bool skipChildrenRead { get; set; }
     }
 
-   
+
 
 }
