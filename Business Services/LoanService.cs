@@ -1999,7 +1999,7 @@ namespace Business_Services
             }
             catch (Exception ex)
             {
-                return new ResponseModel(null, 1, ex.Message);
+                return new ResponseModel(null, 1, "Specified Loan Number does not exists in the system");
 
             }
 
@@ -2062,7 +2062,7 @@ namespace Business_Services
             catch (Exception ex)
             {
 
-                return new ResponseModel(null, 1, ex.Message);
+                return new ResponseModel(null, 1, "Error completing e-Statement Registration. Please contact Customer Service at1-800-274-6600");
             }
 
 

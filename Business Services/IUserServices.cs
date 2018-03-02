@@ -42,7 +42,7 @@ namespace Business_Services
        Task<ResponseModel> PostUserRegistrationAsync(Business_Services.Models.User userDetail);
         Task<ResponseModel> GetConfirmationAsync(Business_Services.Models.User userDetail);
         Task<ResponseModel> PostsetRegistrationAsync(Business_Services.Models.User userDetail);
-
+        Task<ResponseModel> GetRefereshToken(string MobileToken, string loannumber, string password);
         //Modified by BBSR Team on 16th Jan 2018 : User Registration
 
         //Modified by BBSR Team on 18th Jan 2018 : Forgot User / Password
