@@ -409,7 +409,7 @@ namespace LoanCare_Mobile_API.Controllers
 
         [Route("InsertSecurityAnswer")]
         [HttpPost]
-        public async Task<IHttpActionResult> InsertSecurityAnswer([FromBody]Question questionSummary)
+        public async Task<IHttpActionResult> InsertSecurityAnswer([FromBody]List<QuestionSummary> questionSummary)
         {
             //Debug.WriteLine("Authenticate method has been invoked..");    
 
