@@ -119,7 +119,7 @@ namespace LoanCare_Mobile_API.Controllers
                 Business_Services.Models.User userDetails = (Business_Services.Models.User)details.Result.data;
                 //Debug.WriteLine(userDetails.first_name);
 
-                var token = _tokenServices.GenerateToken(userDetails.username, Password, userDetails.ClientId, lcAuthToken, userDetails.username,resourcename,log, userDetails.is_enrolled, userId);
+                var token = _tokenServices.GenerateToken(userDetails.username, Password, userDetails.ClientId, lcAuthToken, userDetails.username,resourcename,log, userDetails.is_enrolled);
 
                 var Decryptdata = Decrypt(token);
 

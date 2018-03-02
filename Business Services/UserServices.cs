@@ -293,7 +293,7 @@ namespace Business_Services
             string returnedDatausername = await responseuser.Content.ReadAsStringAsync();
             personal_getborrowercontactInfo getusernameinfo = JsonConvert.DeserializeObject<personal_getborrowercontactInfo>(returnedDatausername);
             Users.user_first_name = getusernameinfo.contactinfo.contactInfo.firstName;
-            Users.count_of_user_alerts = 0;
+            Users.count_of_user_alerts = 10;
             return new ResponseModel(Users);
         }
         //Modified by BBSR_Team on 11th Jan 2018
@@ -443,7 +443,6 @@ namespace Business_Services
 
                         return new ResponseModel(listsecquestion, 1, "Error");
                     }
-
                     string clientUrl = "www.myloancare.com";
                     string loanNo = objForgotUser.userLoan.loanNo;
                     string userName = objForgotUser.user.userName;
@@ -501,36 +500,6 @@ namespace Business_Services
                 return new ResponseModel(null, 1, Ex.Message);
             }
         }
-
-        public async Task<ResponseModel> GetRefereshToken(string MobileToken, string loannumber,string password)
-        {
-            Business_Services.Models.GenerateNewToken objgenerateToken = new GenerateNewToken();
-            try
-            {
-             var content = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", loannumber }, { "password", password } });
-             var response = await API_Connection.PostAsync("/api/Auth/Authenticate", content);
-             var Token =    response.tokenValue;
-              var Decryptdata = objgenerateToken.Decrypt(MobileToken);
-
-                dynamic ObjUserId = JsonConvert.DeserializeObject(Decryptdata);
-                string objUId = ObjUserId.UserId;
-                string objPWd = ObjUserId.Password;
-                int objCId = ObjUserId.ClientId;
-                bool eStatemente = false;
-                string objusername = ObjUserId.UserName;
-                string resourcename = ObjUserId.resourcename;
-                string logview = ObjUserId.log;
-                bool eStatementenr = ObjUserId.eStatement;
-                var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token, objusername, resourcename, logview, eStatemente);
-               // loanDetails.Token = MobileTokenNew;
-                return new ResponseModel(MobileTokenNew);
-            }
-            catch (Exception Ex)
-            {
-                return new ResponseModel(null, 1, Ex.Message);
-            }
-        }
-
 
         //Modified by BBSR_Team on 24th Jan 2018
         public async Task<ResponseModel> ResetSendPassword(Business_Services.Models.User userDetail)
@@ -1912,14 +1881,7 @@ namespace Business_Services
             //HttpContent content = null;
             TokenServices tokenServices = new TokenServices();
             string lcToken = tokenServices.GetLctoken(lcAuthToken);
-            
 
-            Business_Services.Models.GenerateNewToken objgenerateToken = new GenerateNewToken();
-
-            var Decryptdata = objgenerateToken.Decrypt(lcAuthToken);
-
-            dynamic ObjUser = JsonConvert.DeserializeObject(Decryptdata);
-            string str_Loan = ObjUser.Loan_Number;
 
             try
             {
@@ -1946,47 +1908,6 @@ namespace Business_Services
                 dynamic Updated_SecurityQuesion = JsonConvert.DeserializeObject(Updated_value);
 
                 string InsertResponse = Updated_SecurityQuesion.updated;
-
-              
-                var responsePropertystateCD = await API_Connection.GetAsync(lcToken, "/api/Helper/GetStatePropertyCode/?loanNo=" + str_Loan);
-                dynamic Message = await responsePropertystateCD.Content.ReadAsStringAsync();
-                var PropcodeMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Message);
-                string PropertyStatecode = PropcodeMessage;
-
-                var responseUserInfo = await API_Connection.GetAsync(lcToken, "/api/User/GetUserInformation");
-                string returnedData = await responseUserInfo.Content.ReadAsStringAsync();
-                dynamic objUseremail = JsonConvert.DeserializeObject(returnedData);
-                string Useremail = objUseremail.currentUserLoan.emailAddress;
-             
-                byte[] secr_email = System.Text.ASCIIEncoding.ASCII.GetBytes(Useremail);
-                string decoded_email = System.Convert.ToBase64String(secr_email);
-
-                if (InsertResponse == "True") {
-
-                    string freedommortageURL = Updated_SecurityQuesion.client.privateLabelURL;
-                    string FreedomMortage = Updated_SecurityQuesion.client.clientName;
-             
-                    Dictionary<string, string> someDictMail = new Dictionary<string, string>();
-                    someDictMail.Add("emailData[0][key]", "timeVal");
-                    someDictMail.Add("emailData[0][value]", Convert.ToString(DateTime.Now));
-                    someDictMail.Add("emailData[0][update]", "undefined");
-                    someDictMail.Add("emailData[1][key]", "Url");
-                    someDictMail.Add("emailData[1][value]", freedommortageURL);
-                    someDictMail.Add("emailData[1][update]", "undefined");
-                    someDictMail.Add("emailData[2][key]", "client");
-                    someDictMail.Add("emailData[2][value]", FreedomMortage);
-                    someDictMail.Add("emailData[2][update]", "undefined");
-                    someDictMail.Add("emailData[3][key]", "PROPERTY_STATE_CODE");
-                    someDictMail.Add("emailData[3][value]", PropertyStatecode);
-                    someDictMail.Add("emailData[3][update]", "undefined");
-                    someDictMail.Add("update", "undefined");
-                    string Page_Name = "manageSecurityPref-UpdateUserPassword";
-                    string Update_Password = "UpdateUserPassword";
-                    var contentmail = new FormUrlEncodedContent(someDictMail);
-                    var responsemail = await API_Connection.PostAsync(lcToken, "/api/EmailNotification/SendEmailConfirmationForTemplate/?template="+ Update_Password + "&toEmail="+ decoded_email + "&pageName="+ Page_Name + "&userID="+""+"&securityEnabled="+false, contentmail);
-                    string returnedSendemail = await responsemail.message.Content.ReadAsStringAsync();
-                    dynamic objSendUseremail = JsonConvert.DeserializeObject(returnedSendemail);
-                }
                 if (secQuestions.Delete_Flag == false)
                 {
                     if (InsertResponse == "True")
