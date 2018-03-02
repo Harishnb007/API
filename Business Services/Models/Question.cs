@@ -9,7 +9,8 @@ namespace Business_Services.Models
     //Added by BBSR_Team on 25th Dec 2017
     public class Question
     {
-        public List<SecurityQuestionSummary> secquestions { get; set; }               
+        public List<QuestionSummary> secquestions { get; set; }    
+        public bool Delete_Flag { get; set; }
     }
 
     public class QuestionSummary
