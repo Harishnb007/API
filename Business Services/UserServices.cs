@@ -876,6 +876,9 @@ namespace Business_Services
                 //string returnedData = await responseUserInfo.Content.ReadAsStringAsync();
                 //dynamic obj = JsonConvert.DeserializeObject(returnedData);
                 //string userName = obj.user.userName;
+                var responseEscrow = await API_Connection.GetAsync(lcToken, "/api/Escrow/CallEscrow/?LoanNo=" + loan_number);
+                string returnedData = await responseEscrow.Content.ReadAsStringAsync();
+                Escrow_CallEscrow escrowInfo = JsonConvert.DeserializeObject<Escrow_CallEscrow>(returnedData);
 
                 var response_princilAmout = await API_Connection.GetAsync(lcToken, "/api/Loan/GetCurrentLoanInfo/" + loan_number);
                 string returnedDataAmount = await response_princilAmout.Content.ReadAsStringAsync();
@@ -1007,7 +1010,9 @@ namespace Business_Services
                     loan_total_amount = userLoanAmount.loan_total_amount,
                     loan_principal_balance = userLoanAmount.loan_principal_balance,
                     last_payment_date = userLoanAmount.last_payment_date,
-                    is_enrolled = userLoanAmount.is_enrolled
+                    is_enrolled = userLoanAmount.is_enrolled,
+                    is_escrow_loan = escrowInfo.lastAna.Contains('*') ? false : true
+
                 };
                 return new ResponseModel(UserLoanIfo);
             }
