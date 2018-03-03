@@ -19,7 +19,6 @@ using System.IO;
 using System.Configuration;
 using System.Net;
 using System.Runtime.Serialization.Formatters.Binary;
-using RasterEdge.XDoc.Converter;
 
 namespace Business_Services
 {

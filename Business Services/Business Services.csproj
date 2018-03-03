@@ -109,6 +109,7 @@
     <Compile Include="Models\LC_WebApi_Models\ForgotUser_UserId.cs" />
     <Compile Include="Models\LC_WebApi_Models\Getdetails_estatement.cs" />
     <Compile Include="Models\LC_WebApi_Models\getuserInfo.cs" />
+    <Compile Include="Models\LC_WebApi_Models\LoanHistory_Activity.cs" />
     <Compile Include="Models\LC_WebApi_Models\Loan_GetCurrentLoanInfo.cs" />
     <Compile Include="Models\LC_WebApi_Models\MyAccount_GetAccountInfo.cs" />
     <Compile Include="Models\LC_WebApi_Models\OnetimePayment_GetHolidayList.cs" />
