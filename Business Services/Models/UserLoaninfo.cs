@@ -30,6 +30,8 @@ namespace Business_Services.Models
         public bool property_value { get; set; }
         public string origination_date { get; set; }
         public bool original_loan_amount { get; set; }
-       
+        public bool is_escrow_loan { get; set; }
+
+
     }
 }
