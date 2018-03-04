@@ -919,9 +919,9 @@ namespace Business_Services
             string returnedData = await response.Content.ReadAsStringAsync();
             Loan_GetCurrentLoanInfo loanInfo = JsonConvert.DeserializeObject<Loan_GetCurrentLoanInfo>(returnedData);
 
-            //var responseUserInfo = await API_Connection.GetAsync(lcToken, "/api/User/GetUserInformation");
-            //string returnedDataUserInfo = await responseUserInfo.Content.ReadAsStringAsync();
-            //dynamic userInfo = JsonConvert.DeserializeObject(returnedDataUserInfo);
+            var responseUserInfo = await API_Connection.GetAsync(lcToken, "/api/User/GetUserInformation");
+            string returnedDataUserInfo = await responseUserInfo.Content.ReadAsStringAsync();
+            dynamic userInfo = JsonConvert.DeserializeObject(returnedDataUserInfo);
 
             var acctInforesponse = await API_Connection.GetAsync(lcToken, "/api/MyAccount/GetAccountInfo/" + loanNumber);
             string acctInfoData = await acctInforesponse.Content.ReadAsStringAsync();
@@ -1019,7 +1019,7 @@ namespace Business_Services
                 loan_total_amount = Convert.ToDecimal(loanInfo.netPresent),
                 loan_duedate = loanInfo.dueDate.Substring(5, 2) + "/" + loanInfo.dueDate.Substring(8, 2) + "/" + loanInfo.dueDate.Substring(2, 2),
                 loan_type = loanInfo.loanType,
-                is_enrolled = objisenrolled,
+                is_enrolled = (userInfo.currentUserLoan.eStatement == null) ? false : true,
                 loan_interest_rate = loanInfo.intRate,
                 escrow_balance = Convert.ToDecimal(loanInfo.escrowBalance),
                 property_value = Convert.ToDecimal(loanInfo.propertyValue),
@@ -1840,33 +1840,35 @@ namespace Business_Services
         {
             // To do - Use DI
             Business_Services.Models.GenerateNewToken objgenerateToken = new GenerateNewToken();
+            var Decryptdata = objgenerateToken.Decrypt(MobileToken);
+            string lcToken = tokenServices.GetLctoken(MobileToken);
+            dynamic ObjUserId = JsonConvert.DeserializeObject(Decryptdata);
+            string objUId = ObjUserId.UserId;
+            string objPWd = ObjUserId.Password;
+            int objCId = ObjUserId.ClientId;
+            string objusername = ObjUserId.UserName;
+
+
+
+            if (ObjUserId.log == null)
+            {
+
+                ObjUserId.log = "";
+            }
+            if (ObjUserId.resourcename == null)
+            {
+                ObjUserId.resourcename = "";
+            }
+            string resourcename = ObjUserId.resourcename;
+            string logview = ObjUserId.log;
+            bool eStatemente = ObjUserId.eStatement;
             try
             {
                 LogWriter("Email:", loanDetails.email);
                 LogWriter("LoanNumber:", loanDetails.loanNo);
-                var Decryptdata = objgenerateToken.Decrypt(MobileToken);
+  
 
-                dynamic ObjUserId = JsonConvert.DeserializeObject(Decryptdata);
-                string objUId = ObjUserId.UserId;
-                string objPWd = ObjUserId.Password;
-                int objCId = ObjUserId.ClientId;
-                string objusername = ObjUserId.UserName;
-
-
-                if (ObjUserId.log == null)
-                {
-
-                    ObjUserId.log = "";
-                }
-                if (ObjUserId.resourcename == null)
-                {
-                    ObjUserId.resourcename = "";
-                }
-                string resourcename = ObjUserId.resourcename;
-                string logview = ObjUserId.log;
-                bool eStatemente = ObjUserId.eStatement;
-
-                string lcToken = tokenServices.GetLctoken(MobileToken);
+             
 
                 byte[] email = System.Text.ASCIIEncoding.ASCII.GetBytes(loanDetails.email);
                 string decodedStringemail = System.Convert.ToBase64String(email);
@@ -1920,6 +1922,12 @@ namespace Business_Services
                 var UserID = "";
                 var responseSendconfirmation = await API_Connection.PostAsync(lcToken, "/api/EmailNotification/SendEmailConfirmationForTemplate/?template=UpdateUserEmail&toEmail=" + decodedStringemail + "&pageName=" + UpdateEmailsend + "&userID=" + UserID, contentmail);
 
+                dynamic ErrMessage = await responseSendconfirmation.message.Content.ReadAsStringAsync();
+
+                var ErrorMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(ErrMessage);
+                string Errmsg = ErrorMessage;
+                if (Errmsg == "Response status code does not indicate success: 401 (Unauthorized).") { }
+                
                 var eventId = 5;
                 var resourceName = "Update+Email";
                 var toEmail = "";
@@ -1942,8 +1950,24 @@ namespace Business_Services
             }
             catch (Exception Ex)
             {
+                var eventId = 5;
+                var resourceName = "Update+Email";
+                var toEmail = "";
+                var log = "Viewed+Update+Email+page";
+                var actionName = "VIEW";
 
-                return new ResponseModel(null, 1, Ex.Message);
+                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+
+                var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", objPWd } });
+                var responseregeneratedToken = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
+
+                var Token = responseregeneratedToken.tokenValue;
+
+
+                var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token, objusername, resourcename, logview, eStatemente);
+                loanDetails.Token = MobileTokenNew;
+                return new ResponseModel(loanDetails);
             }
         }
 
