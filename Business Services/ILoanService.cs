@@ -69,7 +69,7 @@ namespace Business_Services
         Task<ResponseModel> ConfirmationforLoanAsync(string MobileToken, ConfirmRegistration details);
         Task<ResponseModel> PostManageNotificationForAsync(string MobileToken, Business_Services.Models.ManageNotification ModifyPayment);
         Task<ResponseModel> ValidatePasswordAsync(string mobileToken, UserAuth userData);
-        Task<ResponseModel> GetgetstatementspdfAsync(string lcAuthToken, string URL);
+        Task<ResponseModel> GetgetstatementspdfAsync(string lcAuthToken, string loan_number, string Date, string Key);
         Task<ResponseModel> GetpdfstreamAsync(string lcAuthToken, string statement_url);
     }
 }

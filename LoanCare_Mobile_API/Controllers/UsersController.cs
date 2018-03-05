@@ -77,6 +77,28 @@ namespace LoanCare_Mobile_API.Controllers
             return Ok(payment);
         }
 
+
+        [Route("GetPin")]
+        [HttpGet]
+        public async Task<IHttpActionResult> GetPin()
+        {
+
+            // To do - Move the following code to a single method & use it across the project
+            IEnumerable<string> tokenValues;
+            string tokenValue = "";
+            if (Request.Headers.TryGetValues("AuthorizationToken", out tokenValues))
+            {
+                tokenValue = tokenValues.FirstOrDefault();
+            }
+
+            var payment = await userService.GetPinforMobileAsync(tokenValue);
+            if (payment == null)
+            {
+                return NotFound();
+            }
+            return Ok(payment);
+        }
+
         [Route("MyLoanSetPin/{Pin}")]
         [HttpGet]
         public async Task<IHttpActionResult> myloanGetPin(string Pin)

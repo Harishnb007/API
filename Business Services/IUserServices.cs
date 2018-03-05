@@ -52,5 +52,7 @@ namespace Business_Services
         Task<ResponseModel> ResetSendPassword(Business_Services.Models.User userDetail);
         Task<ResponseModel> SetPinAsync(string MobileToken, UpdatePassword loanDetails);
         //Modified by BBSR Team on 18th Jan 2018 : Forgot User / Password
+
+        Task<ResponseModel> GetPinforMobileAsync(string MobileToken);
     }
 }

@@ -389,67 +389,25 @@ namespace Business_Services
             }
         }
 
-        public async Task<ResponseModel> GetgetstatementspdfAsync(string lcAuthToken, string URL)
+        public async Task<ResponseModel> GetgetstatementspdfAsync(string lcAuthToken, string loan_number, string Date,string Key)
         {
             // To do - Use DI
 
             string lcToken = tokenServices.GetLctoken(lcAuthToken);
+            byte[] retArr;
             try
             {
-
-
-                MemoryStream mem = new MemoryStream();
-                var responsestream = await API_Connection.GetAsync(lcToken, URL);
+                var statement_url = "/Statements/EStatementHandler.Pdf?loanNo=" + loan_number + "&statementDate=" + Date + "&statementKey=" + Key;
+               // MemoryStream mem = new MemoryStream();
+                var responsestream = await API_Connection.GetAsync(lcToken, statement_url);
                 string returnedDatastream = await responsestream.Content.ReadAsStringAsync();
-                byte[] datastream = Encoding.ASCII.GetBytes(returnedDatastream);
 
-                //byte[] bytes;
-                //BinaryFormatter bf = new BinaryFormatter();
-                //MemoryStream ms = new MemoryStream();
-                //bf.Serialize(ms, returnedDatastream);
-                //bytes = ms.ToArray();
-                //System.IO.File.WriteAllBytes("C:\\Users\\harivigneshm.FNFSECURE.003\\Desktop\\pdfhello.pdf", bytes);
+                retArr = await responsestream.Content.ReadAsByteArrayAsync();
+                //   return     responsestream.setContentType("application/pdf");
+                 return new ResponseModel(returnedDatastream);
+               // var x = retArr.Skip(1).Take(y.Length - 2).ToArray();
 
-
-
-
-                //    //using (FileStream stream = new FileStream("C:\\Users\\harivigneshm.FNFSECURE.003\\Desktop\\pdfhello.pdf" + "\\" + datastream, FileMode.CreateNew))
-
-                //    //{
-
-                //    //    using (StreamWriter writer = new StreamWriter(stream, Encoding.UTF8))
-
-                //    //    {
-
-                //    //        byte[] buffer = datastream;
-
-                //    //        stream.Write(buffer, 0, buffer.Length);
-
-                //    //        writer.Close();
-
-                //    //    }
-
-                //    //}
-                //    //using (FileStream stream = new FileStream("C:\\Users\\harivigneshm.FNFSECURE.003\\Desktop\\pdf" + "\\" + datastream, FileMode.CreateNew))
-
-                //    //{
-
-                //    //    using (StreamWriter writer = new StreamWriter(stream, Encoding.UTF8))
-
-                //    //    {
-
-                //    //        byte[] buffer = datastream;
-
-                //    //        stream.Write(buffer, 0, buffer.Length);
-
-                //    //        writer.Close();
-
-                //    //    }
-
-                //    //}
-                //}
-
-                return new ResponseModel(returnedDatastream);
+               // return new File(retArr, "application/pdf","Pd")
             }
             catch (Exception Ex)
             {
@@ -500,49 +458,51 @@ namespace Business_Services
                 {
                     estatement = estatement
                 };
-                //             foreach (var estatemen in estatement)
-                //             {
+                foreach (var estatemen in estatement)
+                {
 
-                //                 MemoryStream mem = new MemoryStream();
-                //                 var responsestream = await API_Connection.GetAsync(lcToken, estatemen.statement_url);
-                //                 string returnedDatastream = await responsestream.Content.ReadAsStringAsync();
-                //                 //byte[] datastream = Encoding.ASCII.GetBytes(returnedDatastream);
-                //                 var byteArray = Encoding.UTF8.GetBytes(returnedDatastream);
-                //                 //byte[] byteArray = Encoding.ASCII.GetBytes(contents);
-                //                  MemoryStream stream = new MemoryStream(byteArray);
-                //                 // MemoryStream stream =  byteArray;
-                //                 String outputFilePath = "C:\\Users\\harivigneshm\\Desktop\\pdfurl.pdf";
-                //               //  MemoryStream outputStream = new MemoryStream();
-                //                 DocumentConverter.ToDocument(returnedDatastream, outputFilePath, FileType.DOC_PDF);
+                    MemoryStream mem = new MemoryStream();
+                    var responsestream = await API_Connection.GetAsync(lcToken, estatemen.statement_url);
+                    string returnedDatastream = await responsestream.Content.ReadAsStringAsync();
+                    //byte[] datastream = Encoding.ASCII.GetBytes(returnedDatastream);
+                    var byteArray = Encoding.UTF8.GetBytes(returnedDatastream);
+                    //byte[] byteArray = Encoding.ASCII.GetBytes(contents);
+                    MemoryStream stream = new MemoryStream(byteArray);
 
 
-                //                 byte[] bytes;
-                //                 BinaryFormatter bf = new BinaryFormatter();
-                //                 MemoryStream ms = new MemoryStream();
-                //                 bf.Serialize(ms, returnedDatastream);
-                //                 bytes = ms.ToArray();
-                //                 System.IO.File.WriteAllBytes("C:\\Users\\harivigneshm\\Desktop\\pdfhello.pdf", bytes);
-                //                 string sampleHtml = "<html><body><p>Simple HTML string</p></body></html> ";
-                //// Converter.ConvertHtmlString(sampleHtml, @"C:\\Document.pdf");
+                    // MemoryStream stream =  byteArray;
+                    // String outputFilePath = "C:\\Users\\harivigneshm\\Desktop\\pdfurl.pdf";
+                    //  MemoryStream outputStream = new MemoryStream();
+                    // DocumentConverter.ToDocument(returnedDatastream, outputFilePath, FileType.DOC_PDF);
 
-                //                 //using (FileStream stream = new FileStream("C:\\Users\\harivigneshm.FNFSECURE.003\\Desktop\\pdf" + "\\" + datastream, FileMode.CreateNew))
 
-                //                 //{
+                    //byte[] bytes;
+                    //BinaryFormatter bf = new BinaryFormatter();
+                    //MemoryStream ms = new MemoryStream();
+                    //bf.Serialize(ms, returnedDatastream);
+                    //bytes = ms.ToArray();
+                    //System.IO.File.WriteAllBytes("C:\\Users\\harivigneshm\\Desktop\\pdfhello.pdf", bytes);
+                    //string sampleHtml = "<html><body><p>Simple HTML string</p></body></html> ";
+                    // Converter.ConvertHtmlString(sampleHtml, @"C:\\Document.pdf");
 
-                //                 //    using (StreamWriter writer = new StreamWriter(stream, Encoding.UTF8))
+                    //using (FileStream stream = new FileStream("C:\\Users\\harivigneshm.FNFSECURE.003\\Desktop\\pdf" + "\\" + datastream, FileMode.CreateNew))
 
-                //                 //    {
+                    //{
 
-                //                 //        byte[] buffer = datastream;
+                    //    using (StreamWriter writer = new StreamWriter(stream, Encoding.UTF8))
 
-                //                 //        stream.Write(buffer, 0, buffer.Length);
+                    //    {
 
-                //                 //        writer.Close();
+                    //        byte[] buffer = datastream;
 
-                //                 //    }
+                    //        stream.Write(buffer, 0, buffer.Length);
 
-                //                 //}
-                //             }
+                    //        writer.Close();
+
+                    //    }
+
+                    //}
+                }
 
                 return new ResponseModel(estatementresult);
             }

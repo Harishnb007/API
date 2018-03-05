@@ -653,8 +653,6 @@ namespace Business_Services
                     }
                 }
 
-
-
                 using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
                 {
                     var setpin = ctx.MobileUsers.Where(s => s.User_Id == userName).FirstOrDefault();
@@ -748,7 +746,6 @@ namespace Business_Services
                         userDetails.mae_steps_completed = "0";
                     }
                 }
-
 
                 using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
                 {
@@ -1493,6 +1490,163 @@ namespace Business_Services
         }
 
 
+        //public async Task<ResponseModel> SetPinAsync(string MobileToken, UpdatePassword PinDetail)
+        //{
+        //    try
+        //    {
+        //        // To do - Use DI
+
+        //        TokenServices tokenServices = new TokenServices();
+
+        //        Business_Services.Models.GenerateNewToken objgenerateToken = new GenerateNewToken();
+
+        //        var Decryptdata = objgenerateToken.Decrypt(MobileToken);
+
+        //        dynamic ObjUserId = JsonConvert.DeserializeObject(Decryptdata);
+        //        string objUId = ObjUserId.UserId;
+        //        string objPWd = ObjUserId.Password;
+        //        int objCId = ObjUserId.ClientId;
+        //        string objusername = ObjUserId.UserName;
+        //        string resourcename = ObjUserId.resourcename;
+        //        string logview = ObjUserId.log;
+        //        bool eStatementenr = ObjUserId.eStatement;
+        //        string lcToken = tokenServices.GetLctoken(MobileToken);
+
+        //        //var responseIn = await API_Connection.GetAsync(lcToken, "/api/User/GetUserInformation");
+        //        //string returnedDataUser = await responseIn.Content.ReadAsStringAsync();
+        //        //dynamic getuserinfo = JsonConvert.DeserializeObject(returnedDataUser);
+        //        string UserName = objusername;
+        //        string User_Name = UserName.Trim();
+
+
+        //        byte[] Pin = System.Text.ASCIIEncoding.ASCII.GetBytes(PinDetail.Pin);
+        //        string decodedStringPin = System.Convert.ToBase64String(Pin);
+
+        //        byte[] userId = System.Text.ASCIIEncoding.ASCII.GetBytes(User_Name);
+        //        string decodedStringuserId = System.Convert.ToBase64String(userId);
+        //        string decodedStringexistinguserId = System.Convert.ToBase64String(userId);
+
+        //        Dictionary<string, string> someDict = new Dictionary<string, string>();
+
+        //        someDict.Add("password", "");
+        //        someDict.Add("userId", "");
+        //        someDict.Add("existinguserId", decodedStringexistinguserId);
+        //        someDict.Add("ssn", "");
+        //        someDict.Add("Pin", decodedStringPin);
+        //        someDict.Add("OldPin", "");
+        //        someDict.Add("ContactType", "");
+
+        //        var content = new FormUrlEncodedContent(someDict);
+        //        var response = await API_Connection.PostAsync(lcToken, "/api/User/UpdateUseridPassword/", content);
+
+        //        dynamic Message = await response.message.Content.ReadAsStringAsync();
+
+        //        var ErrorMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Message);
+
+        //        if (ErrorMessage.msg == "Incorrect Old Pin")
+        //        {
+        //            PinDetail.Message = "Pin has been previously set";
+
+        //        }
+        //        if (ErrorMessage.updated == true)
+        //        {
+
+        //            Business_Services.Models.DAL.LoancareDBContext.MobileUser MUser = new Business_Services.Models.DAL.LoancareDBContext.MobileUser();
+        //            using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
+        //            {
+        //                var setpin = ctx.MobileUsers.Where(s => s.User_Id == UserName).FirstOrDefault();
+        //                if (setpin != null)
+        //                {
+        //                    using (var context = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
+        //                    {
+        //                        setpin.mae_steps_completed = "2";
+        //                        context.Entry(setpin).State = EntityState.Modified;
+        //                        context.SaveChanges();
+
+        //                    }
+        //                }
+        //            }
+        //            if (ErrorMessage.updated == true)
+        //            {
+        //                string freedommortageURL = ErrorMessage.client.privateLabelURL;
+        //                string FreedomMortage = ErrorMessage.client.clientName;
+        //                PinDetail.Message = ErrorMessage.msg;
+        //                Dictionary<string, string> someDictMail = new Dictionary<string, string>();
+        //                someDictMail.Add("emailData[0][key]", "timeVal");
+        //                someDictMail.Add("emailData[0][value]", Convert.ToString(DateTime.Now));
+        //                someDictMail.Add("emailData[0][update]", "undefined");
+        //                someDictMail.Add("emailData[1][key]", "Url");
+        //                someDictMail.Add("emailData[1][value]", freedommortageURL);
+        //                someDictMail.Add("emailData[1][update]", "undefined");
+        //                someDictMail.Add("emailData[2][key]", "client");
+        //                someDictMail.Add("emailData[2][value]", FreedomMortage);
+        //                someDictMail.Add("emailData[2][update]", "undefined");
+        //                someDictMail.Add("emailData[3][key]", "PROPERTY_STATE_CODE");
+        //                someDictMail.Add("emailData[3][value]", "MA");
+        //                someDictMail.Add("emailData[3][update]", "undefined");
+        //                someDictMail.Add("update", "undefined");
+
+
+        //                var contentmail = new FormUrlEncodedContent(someDictMail);
+        //                var responsemail = await API_Connection.PostAsync(lcToken, "/api/EmailNotification/SendEmailConfirmationForTemplate/?template=UpdateUserPassword&toEmail=bGFtZXJlLm5pY2hvbGFzQGdtYWlsLmNvbQ==&pageName=manageSecurityPref-UpdateUserPassword&userID=&securityEnabled=true", contentmail);
+        //            }
+        //        }
+        //        var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", objPWd } });
+        //        var responseregeneratedToken = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
+
+        //        var Token = responseregeneratedToken.tokenValue;
+
+        //        var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token,objusername,resourcename,logview,eStatementenr);
+
+        //        PinDetail.Token = MobileTokenNew;
+
+        //        if (ErrorMessage.updated == false && ErrorMessage.msg != "Incorrect Old Pin")
+        //        {
+        //            PinDetail.Message = ErrorMessage.msg;
+        //            PinDetail.Token = MobileToken;
+        //            return new ResponseModel(PinDetail, 1, "Failed");
+        //        }
+        //        else
+        //        {
+        //            return new ResponseModel(PinDetail);
+        //        }
+
+
+        //    }
+        //    catch (Exception Ex)
+        //    {
+        //        return new ResponseModel(PinDetail, 1, Ex.Message);
+        //    }
+        //}
+
+        public async Task<ResponseModel> GetPinforMobileAsync(string lcAuthToken)
+        {
+
+            try
+            {
+
+                TokenServices tokenServices = new TokenServices();
+                string lcToken = tokenServices.GetLctoken(lcAuthToken);
+                var responseQuestionInfo = await API_Connection.GetAsync(lcToken, "/api/User/GetSecurtiyQuestions");
+                string returnedData = await responseQuestionInfo.Content.ReadAsStringAsync();
+
+                dynamic objQuestion = JsonConvert.DeserializeObject(returnedData);
+
+                Business_Services.Models.UpdatePassword PinDetails = new Business_Services.Models.UpdatePassword();
+
+
+
+                PinDetails.Pin = objQuestion.pin;
+                string Pin = objQuestion.pin;
+
+                return new ResponseModel(Pin);
+            }
+            catch (Exception Ex)
+            {
+
+                return new ResponseModel(null, 1, Ex.Message);
+            }
+        }
         public async Task<ResponseModel> SetPinAsync(string MobileToken, UpdatePassword PinDetail)
         {
             try
@@ -1521,38 +1675,149 @@ namespace Business_Services
                 string UserName = objusername;
                 string User_Name = UserName.Trim();
 
+                var responseQuestionInfo = await API_Connection.GetAsync(lcToken, "/api/User/GetSecurtiyQuestions/");
+                string returnedData = await responseQuestionInfo.Content.ReadAsStringAsync();
 
-                byte[] Pin = System.Text.ASCIIEncoding.ASCII.GetBytes(PinDetail.Pin);
-                string decodedStringPin = System.Convert.ToBase64String(Pin);
+                dynamic objQuestion = JsonConvert.DeserializeObject(returnedData);
 
-                byte[] userId = System.Text.ASCIIEncoding.ASCII.GetBytes(User_Name);
-                string decodedStringuserId = System.Convert.ToBase64String(userId);
-                string decodedStringexistinguserId = System.Convert.ToBase64String(userId);
+                // Business_Services.Models.SecurityQuestion questionDetails = new Business_Services.Models.SecurityQuestion();
 
-                Dictionary<string, string> someDict = new Dictionary<string, string>();
+                // questionDetails.questions = new List<SecurityQuestionSummary>();
 
-                someDict.Add("password", "");
-                someDict.Add("userId", "");
-                someDict.Add("existinguserId", decodedStringexistinguserId);
-                someDict.Add("ssn", "");
-                someDict.Add("Pin", decodedStringPin);
-                someDict.Add("OldPin", "");
-                someDict.Add("ContactType", "");
 
-                var content = new FormUrlEncodedContent(someDict);
-                var response = await API_Connection.PostAsync(lcToken, "/api/User/UpdateUseridPassword/", content);
-
-                dynamic Message = await response.message.Content.ReadAsStringAsync();
-
-                var ErrorMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Message);
-
-                if (ErrorMessage.msg == "Incorrect Old Pin")
+                string OldPinuser = objQuestion.pin;
+                if (OldPinuser == "")
                 {
-                    PinDetail.Message = "Pin has been previously set";
+                    byte[] Pin = System.Text.ASCIIEncoding.ASCII.GetBytes(PinDetail.Pin);
+                    string decodedStringPin = System.Convert.ToBase64String(Pin);
+
+                    byte[] userId = System.Text.ASCIIEncoding.ASCII.GetBytes(User_Name);
+                    string decodedStringuserId = System.Convert.ToBase64String(userId);
+                    string decodedStringexistinguserId = System.Convert.ToBase64String(userId);
+
+                    Dictionary<string, string> someDict = new Dictionary<string, string>();
+
+                    someDict.Add("password", "");
+                    someDict.Add("userId", "");
+                    someDict.Add("existinguserId", decodedStringexistinguserId);
+                    someDict.Add("ssn", "");
+                    someDict.Add("Pin", decodedStringPin);
+                    someDict.Add("OldPin", "");
+                    someDict.Add("ContactType", "");
+
+                    var content = new FormUrlEncodedContent(someDict);
+                    var response = await API_Connection.PostAsync(lcToken, "/api/User/UpdateUseridPassword/", content);
+
+                    dynamic Message = await response.message.Content.ReadAsStringAsync();
+
+                    var ErrorMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Message);
+
+                    if (ErrorMessage.updated == true)
+                    {
+
+                        Business_Services.Models.DAL.LoancareDBContext.MobileUser MUser = new Business_Services.Models.DAL.LoancareDBContext.MobileUser();
+                        using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
+                        {
+                            var setpin = ctx.MobileUsers.Where(s => s.User_Id == UserName).FirstOrDefault();
+                            if (setpin != null)
+                            {
+                                using (var context = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
+                                {
+                                    setpin.mae_steps_completed = "2";
+                                    context.Entry(setpin).State = EntityState.Modified;
+                                    context.SaveChanges();
+
+                                }
+                            }
+                        }
+                    }
+                    if (ErrorMessage.updated == true)
+                    {
+
+                        var responsepropertyCode = await API_Connection.GetAsync(lcToken, "/api/Helper/GetStatePropertyCode/?loanNo=" + PinDetail.User_Id);
+                        string returnedpropertyCode = await responsepropertyCode.Content.ReadAsStringAsync();
+                        dynamic propertycode = JsonConvert.DeserializeObject(returnedpropertyCode);
+
+                        string freedommortageURL = ErrorMessage.client.privateLabelURL;
+                        string FreedomMortage = ErrorMessage.client.clientName;
+                        PinDetail.Message = ErrorMessage.msg;
+                        Dictionary<string, string> someDictMail = new Dictionary<string, string>();
+                        someDictMail.Add("emailData[0][key]", "timeVal");
+                        someDictMail.Add("emailData[0][value]", Convert.ToString(DateTime.Now));
+                        someDictMail.Add("emailData[0][update]", "undefined");
+                        someDictMail.Add("emailData[1][key]", "Url");
+                        someDictMail.Add("emailData[1][value]", freedommortageURL);
+                        someDictMail.Add("emailData[1][update]", "undefined");
+                        someDictMail.Add("emailData[2][key]", "client");
+                        someDictMail.Add("emailData[2][value]", FreedomMortage);
+                        someDictMail.Add("emailData[2][update]", "undefined");
+                        someDictMail.Add("emailData[3][key]", "PROPERTY_STATE_CODE");
+                        someDictMail.Add("emailData[3][value]", propertycode);
+                        someDictMail.Add("emailData[3][update]", "undefined");
+                        someDictMail.Add("update", "undefined");
+
+
+                        var contentmail = new FormUrlEncodedContent(someDictMail);
+                        var responsemail = await API_Connection.PostAsync(lcToken, "/api/EmailNotification/SendEmailConfirmationForTemplate/?template=UpdateUserPassword&toEmail=bGFtZXJlLm5pY2hvbGFzQGdtYWlsLmNvbQ==&pageName=manageSecurityPref-UpdateUserPassword&userID=&securityEnabled=true", contentmail);
+                        var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", objPWd } });
+                        var responseregeneratedToken = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
+
+                        var Token = responseregeneratedToken.tokenValue;
+
+                        var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token, objusername, resourcename, logview, eStatementenr);
+
+                        PinDetail.Token = MobileTokenNew;
+
+                        if (ErrorMessage.updated == false && ErrorMessage.msg != "Incorrect Old Pin")
+                        {
+                            PinDetail.Message = ErrorMessage.msg;
+                            PinDetail.Token = MobileToken;
+                            return new ResponseModel(PinDetail, 1, "Failed");
+                        }
+                        else
+                        {
+                            return new ResponseModel(PinDetail);
+                        }
+
+
+                    }
 
                 }
-                if (ErrorMessage.updated == true)
+                if (OldPinuser != "")
                 {
+
+                    var responsepropertyCode = await API_Connection.GetAsync(lcToken, "/api/Helper/GetStatePropertyCode/?loanNo=" + PinDetail.User_Id);
+                    string returnedpropertyCode = await responsepropertyCode.Content.ReadAsStringAsync();
+                    dynamic propertycode = JsonConvert.DeserializeObject(returnedpropertyCode);
+
+                    byte[] Pin = System.Text.ASCIIEncoding.ASCII.GetBytes(PinDetail.Pin);
+                    string decodedStringPin = System.Convert.ToBase64String(Pin);
+
+                    byte[] userId = System.Text.ASCIIEncoding.ASCII.GetBytes(User_Name);
+                    string decodedStringuserId = System.Convert.ToBase64String(userId);
+                    string decodedStringexistinguserId = System.Convert.ToBase64String(userId);
+
+                    byte[] OldPin = System.Text.ASCIIEncoding.ASCII.GetBytes(OldPinuser);
+                    string decodedStringOldPin = System.Convert.ToBase64String(OldPin);
+
+
+                    Dictionary<string, string> someDictResetpin = new Dictionary<string, string>();
+
+                    someDictResetpin.Add("password", "");
+                    someDictResetpin.Add("userId", "");
+                    someDictResetpin.Add("existinguserId", decodedStringexistinguserId);
+                    someDictResetpin.Add("ssn", "");
+                    someDictResetpin.Add("Pin", decodedStringPin);
+                    someDictResetpin.Add("OldPin", decodedStringOldPin);
+                    someDictResetpin.Add("ContactType", "");
+
+                    var contentreset = new FormUrlEncodedContent(someDictResetpin);
+                    var responsereset = await API_Connection.PostAsync(lcToken, "/api/User/UpdateUseridPassword/", contentreset);
+
+                    dynamic Messagereset = await responsereset.message.Content.ReadAsStringAsync();
+
+                    var ErrorMessagereset = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Messagereset);
+
 
                     Business_Services.Models.DAL.LoancareDBContext.MobileUser MUser = new Business_Services.Models.DAL.LoancareDBContext.MobileUser();
                     using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
@@ -1569,59 +1834,33 @@ namespace Business_Services
                             }
                         }
                     }
-                    if (ErrorMessage.updated == true)
+                    var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", objPWd } });
+                    var responseregeneratedToken = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
+
+                    var Token = responseregeneratedToken.tokenValue;
+
+                    var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token, objusername, resourcename, logview, eStatementenr);
+
+                    PinDetail.Token = MobileTokenNew;
+
+                    if (ErrorMessagereset.updated == false && ErrorMessagereset.msg != "Incorrect Old Pin")
                     {
-                        string freedommortageURL = ErrorMessage.client.privateLabelURL;
-                        string FreedomMortage = ErrorMessage.client.clientName;
-                        PinDetail.Message = ErrorMessage.msg;
-                        Dictionary<string, string> someDictMail = new Dictionary<string, string>();
-                        someDictMail.Add("emailData[0][key]", "timeVal");
-                        someDictMail.Add("emailData[0][value]", Convert.ToString(DateTime.Now));
-                        someDictMail.Add("emailData[0][update]", "undefined");
-                        someDictMail.Add("emailData[1][key]", "Url");
-                        someDictMail.Add("emailData[1][value]", freedommortageURL);
-                        someDictMail.Add("emailData[1][update]", "undefined");
-                        someDictMail.Add("emailData[2][key]", "client");
-                        someDictMail.Add("emailData[2][value]", FreedomMortage);
-                        someDictMail.Add("emailData[2][update]", "undefined");
-                        someDictMail.Add("emailData[3][key]", "PROPERTY_STATE_CODE");
-                        someDictMail.Add("emailData[3][value]", "MA");
-                        someDictMail.Add("emailData[3][update]", "undefined");
-                        someDictMail.Add("update", "undefined");
-
-
-                        var contentmail = new FormUrlEncodedContent(someDictMail);
-                        var responsemail = await API_Connection.PostAsync(lcToken, "/api/EmailNotification/SendEmailConfirmationForTemplate/?template=UpdateUserPassword&toEmail=bGFtZXJlLm5pY2hvbGFzQGdtYWlsLmNvbQ==&pageName=manageSecurityPref-UpdateUserPassword&userID=&securityEnabled=true", contentmail);
+                        PinDetail.Message = ErrorMessagereset.msg;
+                        PinDetail.Token = MobileToken;
+                        return new ResponseModel(PinDetail, 1, "Failed");
+                    }
+                    else
+                    {
+                        return new ResponseModel(PinDetail);
                     }
                 }
-                var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", objPWd } });
-                var responseregeneratedToken = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
-
-                var Token = responseregeneratedToken.tokenValue;
-
-                var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token,objusername,resourcename,logview,eStatementenr);
-
-                PinDetail.Token = MobileTokenNew;
-
-                if (ErrorMessage.updated == false && ErrorMessage.msg != "Incorrect Old Pin")
-                {
-                    PinDetail.Message = ErrorMessage.msg;
-                    PinDetail.Token = MobileToken;
-                    return new ResponseModel(PinDetail, 1, "Failed");
-                }
-                else
-                {
-                    return new ResponseModel(PinDetail);
-                }
-
-
+                return new ResponseModel(PinDetail);
             }
             catch (Exception Ex)
             {
                 return new ResponseModel(PinDetail, 1, Ex.Message);
             }
         }
-
 
         public async Task<ResponseModel> ReSetPinAsync(string MobileToken, UpdatePassword PinDetail)
         {
