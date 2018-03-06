@@ -1387,12 +1387,14 @@ namespace Business_Services
                 string returnedaquisitiondate = await responseaquisitiondate.Content.ReadAsStringAsync();
                 dynamic objaquisitiondate = JsonConvert.DeserializeObject(returnedaquisitiondate);
                 string straquisitiondate = objaquisitiondate.acquisitionDate;
+                string acqMsg = "As a courtesy no fee will be assessed for utilizing this service during your initial 60 days as a new customer";
 
                 List<PaymentFeeSheduledate> feeList = new List<PaymentFeeSheduledate>();
                 //Need to add the >= 60 Aquisition date Condition
 
                 if ((DateTime.Now - Convert.ToDateTime(straquisitiondate)).Days > 60)
                 {
+                    acqMsg = "";
                     //As a courtesy no fee will be assessed for utilizing this service during your initial 60 days as a new customer
                     foreach (var duedate in paymentInfo.clientFeeCollection)
                     {
@@ -1400,9 +1402,7 @@ namespace Business_Services
                         {
                             OverdueStartdays = duedate.daysOverdueStart,
                             OverdueEnddays = duedate.daysOverdueEnd,
-                            FeeAmount = duedate.feeAmount,
-                            AquisitionMessage = ""
-
+                            FeeAmount = duedate.feeAmount
                         });
                     }
                 }
@@ -1412,18 +1412,19 @@ namespace Business_Services
                     {
                         OverdueStartdays = 0,
                         OverdueEnddays = 0,
-                        FeeAmount = 0,
-                        AquisitionMessage = "As a courtesy no fee will be assessed for utilizing this service during your initial 60 days as a new customer"
-
+                        FeeAmount = 0
                     });
 
                 }
+                
+
 
                 PaymentFeeShedule paymentData = new PaymentFeeShedule()
                 {
                     dueDate = calenderDuedate.Payment.dueDate,
                     aquisitiondDate = objaquisitiondate.acquisitionDate,
-                    paymentFeesheduledate = feeList
+                    paymentFeesheduledate = feeList,
+                    AquisitionMessage = acqMsg
                 };
 
                 var eventId = 2;
