@@ -1308,6 +1308,65 @@ namespace Business_Services
         }
 
 
+        //public async Task<ResponseModel> GetPaymentFeeSchedule(string loanNumber, string MobileToken)
+        //{
+        //    // To do - Use DI
+
+        //    string lcToken = tokenServices.GetLctoken(MobileToken);
+        //    try
+        //    {
+
+
+
+        //        var responseduedate = await API_Connection.GetAsync(lcToken, "/api/OnetimePayment/GetPaymentInfo/?loanNo=" + loanNumber + "&schDate=" + "");
+        //        string returnedduedateData = await responseduedate.Content.ReadAsStringAsync();
+        //        Calender_GetPaymentInfo calenderDuedate = JsonConvert.DeserializeObject<Calender_GetPaymentInfo>(returnedduedateData);
+
+        //        var response = await API_Connection.GetAsync(lcToken, "api/Helper/GetPaymentFeeSchedule/?paymentFeeTypeId=" + 1 + "&loanNo=" + loanNumber + "&schDate=" + "");
+        //        string returnedData = await response.Content.ReadAsStringAsync();
+        //        Calender_GetPaymentFeeSchedule paymentInfo = JsonConvert.DeserializeObject<Calender_GetPaymentFeeSchedule>(returnedData);
+
+
+        //        List<PaymentFeeSheduledate> feeList = new List<PaymentFeeSheduledate>();
+
+        //        foreach (var duedate in paymentInfo.clientFeeCollection)
+        //        {
+        //            feeList.Add(new PaymentFeeSheduledate
+        //            {
+        //                OverdueStartdays = duedate.daysOverdueStart,
+        //                OverdueEnddays = duedate.daysOverdueEnd,
+        //                FeeAmount = duedate.feeAmount
+
+        //            });
+        //        }
+
+        //        PaymentFeeShedule paymentData = new PaymentFeeShedule()
+        //        {
+        //            dueDate = calenderDuedate.Payment.dueDate,
+        //            paymentFeesheduledate = feeList
+        //        };
+
+        //        var eventId = 2;
+        //        var resourceName = "Payment";
+        //        var toEmail = "";
+        //        var log = "Viewed+Payment+Schedule";
+        //        var actionName = "VIEW";
+
+        //        var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+        //        string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+
+        //        return new ResponseModel(paymentData);
+        //    }
+        //    catch (Exception Ex)
+        //    {
+        //        return new ResponseModel(null, 1, Ex.Message);
+        //    }
+        //}
+
+
+        //Modified by BBSR Team on 10th Jan 2018
+
+        // Modified By BBSR Team on 6th March 2018 : Defect # 955
         public async Task<ResponseModel> GetPaymentFeeSchedule(string loanNumber, string MobileToken)
         {
             // To do - Use DI
@@ -1315,8 +1374,6 @@ namespace Business_Services
             string lcToken = tokenServices.GetLctoken(MobileToken);
             try
             {
-
-
 
                 var responseduedate = await API_Connection.GetAsync(lcToken, "/api/OnetimePayment/GetPaymentInfo/?loanNo=" + loanNumber + "&schDate=" + "");
                 string returnedduedateData = await responseduedate.Content.ReadAsStringAsync();
@@ -1326,23 +1383,46 @@ namespace Business_Services
                 string returnedData = await response.Content.ReadAsStringAsync();
                 Calender_GetPaymentFeeSchedule paymentInfo = JsonConvert.DeserializeObject<Calender_GetPaymentFeeSchedule>(returnedData);
 
+                var responseaquisitiondate = await API_Connection.GetAsync(lcToken, "/api/OnetimePayment/GetAcquisitionDate/" + loanNumber);
+                string returnedaquisitiondate = await responseaquisitiondate.Content.ReadAsStringAsync();
+                dynamic objaquisitiondate = JsonConvert.DeserializeObject(returnedaquisitiondate);
+                string straquisitiondate = objaquisitiondate.acquisitionDate;
 
                 List<PaymentFeeSheduledate> feeList = new List<PaymentFeeSheduledate>();
+                //Need to add the >= 60 Aquisition date Condition
 
-                foreach (var duedate in paymentInfo.clientFeeCollection)
+                if ((DateTime.Now - Convert.ToDateTime(straquisitiondate)).Days > 60)
+                {
+                    //As a courtesy no fee will be assessed for utilizing this service during your initial 60 days as a new customer
+                    foreach (var duedate in paymentInfo.clientFeeCollection)
+                    {
+                        feeList.Add(new PaymentFeeSheduledate
+                        {
+                            OverdueStartdays = duedate.daysOverdueStart,
+                            OverdueEnddays = duedate.daysOverdueEnd,
+                            FeeAmount = duedate.feeAmount,
+                            AquisitionMessage = ""
+
+                        });
+                    }
+                }
+                else
                 {
                     feeList.Add(new PaymentFeeSheduledate
                     {
-                        OverdueStartdays = duedate.daysOverdueStart,
-                        OverdueEnddays = duedate.daysOverdueEnd,
-                        FeeAmount = duedate.feeAmount
+                        OverdueStartdays = 0,
+                        OverdueEnddays = 0,
+                        FeeAmount = 0,
+                        AquisitionMessage = "As a courtesy no fee will be assessed for utilizing this service during your initial 60 days as a new customer"
 
                     });
+
                 }
 
                 PaymentFeeShedule paymentData = new PaymentFeeShedule()
                 {
                     dueDate = calenderDuedate.Payment.dueDate,
+                    aquisitiondDate = objaquisitiondate.acquisitionDate,
                     paymentFeesheduledate = feeList
                 };
 
@@ -1363,8 +1443,7 @@ namespace Business_Services
             }
         }
 
-
-        //Modified by BBSR Team on 10th Jan 2018
+        // Modified By BBSR Team on 6th March 2018 : Defect # 955
         public async Task<ResponseModel> GetPaymentHistoryForLoanAsync(string mobileToken, string loanNumber)
         {
 

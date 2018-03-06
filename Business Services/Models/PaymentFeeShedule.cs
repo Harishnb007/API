@@ -12,11 +12,15 @@ namespace Business_Services.Models
         [JsonProperty]
         internal DateTime dueDate { get; set; }
 
+        //Defect# 955 : Added by BBSR Team on 6th March 2018
+        [JsonProperty]
+        internal DateTime aquisitiondDate { get; set; }
+
         [JsonProperty]
         internal List<PaymentFeeSheduledate> paymentFeesheduledate { get; set; }
     }
 
-      class PaymentFeeSheduledate
+    class PaymentFeeSheduledate
     {
         [JsonProperty]
         internal int OverdueStartdays { get; set; }
@@ -26,6 +30,10 @@ namespace Business_Services.Models
 
         [JsonProperty]
         internal decimal FeeAmount { get; set; }
+
+        //Defect# 955 : Added by BBSR Team on 6th March 2018
+        [JsonProperty]
+        internal string AquisitionMessage { get; set; }
 
     }
 
