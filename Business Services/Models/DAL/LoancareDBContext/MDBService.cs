@@ -133,10 +133,9 @@ namespace Business_Services.Models.DAL.LoancareDBContext
                 .Property(e => e.created_by)
                 .IsUnicode(false);
         }
-<<<<<<< HEAD
+
         //Added by BBSR Team on 5th March 2018 : Defect # 1218
        // public virtual DbSet<TransDescription> TransDescription { get; set; }
-=======
->>>>>>> parent of 8b01ef4... CommitPDF
+
     }
 }
