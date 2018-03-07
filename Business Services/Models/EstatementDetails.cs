@@ -17,7 +17,5 @@ namespace Business_Services.Models
 
         public string statement_url { get; set; }
 
-        public string Token_Estatement { get; set; }
-
     }
 }
