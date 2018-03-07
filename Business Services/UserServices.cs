@@ -843,6 +843,17 @@ namespace Business_Services
                     }
                     catch (Exception ex)
                     {
+                        foreach (var loan_Number in objUserName.user.userLoansList)
+                        {
+                                    var loanDetailsList = new LoanSummary
+                                    {
+
+                                        loan_number = loan_Number,
+                                        property_address =""
+                                    };
+                                    userDetails.loanss.Add(loanDetailsList);
+                    }
+
                         var Message = ex.Message;
                         userDetails.username = objUserName.user.userName;
                         userDetails.is_enrolled = (objUserName.currentUserLoan.eStatement == null) ? false : true;
@@ -2359,7 +2370,9 @@ namespace Business_Services
                 var response = await API_Connection.PostUserAsync("/api/Register/SetRegister/", content);
 
                 string returnedData = await response.Content.ReadAsStringAsync();
-                dynamic objUser = JsonConvert.DeserializeObject(returnedData);
+                var replacedText = returnedData.Replace("'", "");
+                //dynamic objUser = Newtonsoft.Json.Linq.JObject.Parse(replacedText);
+              //  dynamic objUser = JsonConvert.DeserializeObject(replacedText);
 
                 IEnumerable<string> tokenValues;
                 string tokenValue = "";
@@ -2368,7 +2381,7 @@ namespace Business_Services
                     tokenValue = tokenValues.FirstOrDefault();
                 }
               //  dynamic objUser = JsonConvert.DeserializeObject(returnedData);
-                var ErrorMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(objUser);
+                var ErrorMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(replacedText);
 
                 var responsepropertyCode = await API_Connection.GetAsync("/api/Helper/GetStatePropertyCode/?loanNo=" + userDetail.loanNumber);
                 string returnedpropertyCode = await responsepropertyCode.Content.ReadAsStringAsync();
@@ -2376,55 +2389,54 @@ namespace Business_Services
 
                 if (ErrorMessage.updated == true)
                 {
-                    string clientName = ErrorMessage.client.clientName;
+                    //    string clientName = ErrorMessage.client.clientName;
 
-                    string strUserName = ErrorMessage.user.userName;
-                    byte[] userName = System.Text.ASCIIEncoding.ASCII.GetBytes(strUserName);
-                    string decodeduserName = System.Convert.ToBase64String(userName);
-
-
-                    string strUserID = ErrorMessage.user.userID;
+                    //    string strUserName = ErrorMessage.user.userName;
+                    //    byte[] userName = System.Text.ASCIIEncoding.ASCII.GetBytes(strUserName);
+                    //    string decodeduserName = System.Convert.ToBase64String(userName);
 
 
-                    string loanNo = ErrorMessage.userLoan.loanNo;
-                    string clientPhone = ErrorMessage.client.clientPhone;
-                    string clientUrl = "www.myloancare.com";
-
-                    string strUserEmail = ErrorMessage.userLoan.emailAddress;
-                    byte[] userEmail = System.Text.ASCIIEncoding.ASCII.GetBytes(strUserEmail);
-                    string decodeduserEmail = System.Convert.ToBase64String(userEmail);
-
-                    ////string freedommortageURL = ErrorMessage.client.privateLabelURL;
-                    ////string FreedomMortage = ErrorMessage.client.clientName;
-
-                    Dictionary<string, string> someDictMail = new Dictionary<string, string>();
-                    someDictMail.Add("emailData[0][key]", "clientname");
-                    someDictMail.Add("emailData[0][value]", clientName);
-                    someDictMail.Add("emailData[0][update]", "undefined");
-                    someDictMail.Add("emailData[1][key]", "username");
-                    someDictMail.Add("emailData[1][value]", decodeduserName);
-                    someDictMail.Add("emailData[1][update]", "undefined");
-                    someDictMail.Add("emailData[2][key]", "loanNo");
-                    someDictMail.Add("emailData[2][value]", loanNo);
-                    someDictMail.Add("emailData[2][update]", "undefined");
-                    someDictMail.Add("emailData[3][key]", "clientPhone");
-                    someDictMail.Add("emailData[3][value]", clientPhone);
-                    someDictMail.Add("emailData[3][update]", "undefined");
-                    someDictMail.Add("emailData[3][key]", "url");
-                    someDictMail.Add("emailData[3][value]", clientUrl);
-                    someDictMail.Add("emailData[3][update]", "undefined");
-                    someDictMail.Add("emailData[3][key]", "PROPERTY_STATE_CODE");
-                    someDictMail.Add("emailData[3][value]", propertycode);
-                    someDictMail.Add("emailData[3][update]", "undefined");
-                    someDictMail.Add("update", "undefined");
+                    //    string strUserID = ErrorMessage.user.userID;
 
 
-                    var contentmail = new FormUrlEncodedContent(someDictMail);
-                    var responsemail = await API_Connection.PostAsync(tokenValue, "/api/EmailNotification/SendEmailConfirmationForTemplate/?template=LoanCareRegistration&toEmail=" + decodeduserEmail + "&pageName=disclosure&userID=" + strUserID, contentmail);
+                    //    string loanNo = ErrorMessage.userLoan.loanNo;
+                    //    string clientPhone = ErrorMessage.client.clientPhone;
+                    //    string clientUrl = "www.myloancare.com";
+
+                    //    string strUserEmail = ErrorMessage.userLoan.emailAddress;
+                    //    byte[] userEmail = System.Text.ASCIIEncoding.ASCII.GetBytes(strUserEmail);
+                    //    string decodeduserEmail = System.Convert.ToBase64String(userEmail);
+
+                    //    ////string freedommortageURL = ErrorMessage.client.privateLabelURL;
+                    //    ////string FreedomMortage = ErrorMessage.client.clientName;
+
+                    //    Dictionary<string, string> someDictMail = new Dictionary<string, string>();
+                    //    someDictMail.Add("emailData[0][key]", "clientname");
+                    //    someDictMail.Add("emailData[0][value]", clientName);
+                    //    someDictMail.Add("emailData[0][update]", "undefined");
+                    //    someDictMail.Add("emailData[1][key]", "username");
+                    //    someDictMail.Add("emailData[1][value]", decodeduserName);
+                    //    someDictMail.Add("emailData[1][update]", "undefined");
+                    //    someDictMail.Add("emailData[2][key]", "loanNo");
+                    //    someDictMail.Add("emailData[2][value]", loanNo);
+                    //    someDictMail.Add("emailData[2][update]", "undefined");
+                    //    someDictMail.Add("emailData[3][key]", "clientPhone");
+                    //    someDictMail.Add("emailData[3][value]", clientPhone);
+                    //    someDictMail.Add("emailData[3][update]", "undefined");
+                    //    someDictMail.Add("emailData[3][key]", "url");
+                    //    someDictMail.Add("emailData[3][value]", clientUrl);
+                    //    someDictMail.Add("emailData[3][update]", "undefined");
+                    //    someDictMail.Add("emailData[3][key]", "PROPERTY_STATE_CODE");
+                    //    someDictMail.Add("emailData[3][value]", propertycode);
+                    //    someDictMail.Add("emailData[3][update]", "undefined");
+                    //    someDictMail.Add("update", "undefined");
+
+
+                    //    var contentmail = new FormUrlEncodedContent(someDictMail);
+                    //    var responsemail = await API_Connection.PostAsync(tokenValue, "/api/EmailNotification/SendEmailConfirmationForTemplate/?template=LoanCareRegistration&toEmail=" + decodeduserEmail + "&pageName=disclosure&userID=" + strUserID, contentmail);
+
                 }
-
-
-                    return new ResponseModel(objUser);
+                    return new ResponseModel(ErrorMessage);
             }
             catch (Exception Ex)
             {

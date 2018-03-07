@@ -61,6 +61,9 @@ namespace Business_Services.Models.LC_WebApi_Models
 
         [JsonProperty]
         internal string dueDate { get; set; }
+        //Added by BBSR Team on 5th March 2018 : Defect # 1218
+        [JsonProperty]
+        internal string historyTransactionCode { get; set; }
     }
 
     // Modified by BBSR Team on 10th Jan

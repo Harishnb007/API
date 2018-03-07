@@ -14,6 +14,8 @@ using Business_Services.Models.Helpers;
 using System.Threading.Tasks;
 using Business_Services.Models.DAL.LoancareEntites;
 using System.Web.Http.Cors;
+using System.IO;
+using System.Text;
 
 namespace LoanCare_Mobile_API.Controllers
 {
@@ -119,10 +121,6 @@ namespace LoanCare_Mobile_API.Controllers
             return Ok(loan);
         }
 
-
-
-       
-
         [Route("getpaymentdetails/{loan_number}")]
         public async Task<IHttpActionResult> GetPaymentDetails(string loan_number)
         {
@@ -159,22 +157,29 @@ namespace LoanCare_Mobile_API.Controllers
             return Ok(payment);
         }
 
-        [Route("getstatementspdf/{Date}/{loan_number}/{Key}")]
-        public async Task<IHttpActionResult> getstatementspdf(string Date, string loan_number, string Key)
+
+ 
+
+        [Route("getstatementspdf")]
+        [HttpPost]
+        public async Task<HttpResponseMessage> getstatementspdf(GeneratePdf generatePdf)
         {
-            // To do - Move the following code to a single method & use it across the project
-            IEnumerable<string> tokenValues;
-            string tokenValue = "";
-            if (Request.Headers.TryGetValues("AuthorizationToken", out tokenValues))
+           try
             {
-                tokenValue = tokenValues.FirstOrDefault();
+
+                IEnumerable<string> tokenValues;
+                string tokenValue = "";
+                if (Request.Headers.TryGetValues("AuthorizationToken", out tokenValues))
+                {
+                    tokenValue = tokenValues.FirstOrDefault();
+                }
+
+                var pdf_loancare = await loanService.GetgetstatementspdfAsync(tokenValue, generatePdf);
+                return pdf_loancare;
             }
-            var payment = await loanService.GetgetstatementspdfAsync(tokenValue,loan_number,Date, Key);
-            if (payment == null)
-            {
-                return NotFound();
+            catch (Exception ex) {
+               return null;
             }
-            return Ok(payment);
         }
 
         [Route("getpdfStream/{statement_url}")]

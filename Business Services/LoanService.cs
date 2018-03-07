@@ -389,32 +389,27 @@ namespace Business_Services
             }
         }
 
-        public async Task<ResponseModel> GetgetstatementspdfAsync(string lcAuthToken, string loan_number, string Date,string Key)
+        public async Task<HttpResponseMessage> GetgetstatementspdfAsync(string tokenValue, GeneratePdf generatePdf)
         {
-            // To do - Use DI
 
-            string lcToken = tokenServices.GetLctoken(lcAuthToken);
-            byte[] retArr;
+            string lcToken = tokenServices.GetLctoken(tokenValue);
             try
             {
-                var statement_url = "/Statements/EStatementHandler.Pdf?loanNo=" + loan_number + "&statementDate=" + Date + "&statementKey=" + Key;
-               // MemoryStream mem = new MemoryStream();
+                var statement_url = "/Statements/EStatementHandler.Pdf?loanNo=" + generatePdf.LoanNumber + "&statementDate=" + generatePdf.date + "&statementKey=" + generatePdf.Key;
                 var responsestream = await API_Connection.GetAsync(lcToken, statement_url);
                 string returnedDatastream = await responsestream.Content.ReadAsStringAsync();
-
-                retArr = await responsestream.Content.ReadAsByteArrayAsync();
-                //   return     responsestream.setContentType("application/pdf");
-                 return new ResponseModel(returnedDatastream);
-               // var x = retArr.Skip(1).Take(y.Length - 2).ToArray();
-
-               // return new File(retArr, "application/pdf","Pd")
+                return responsestream;
+            
             }
             catch (Exception Ex)
             {
-
-                return new ResponseModel(null, 1, Ex.Message);
+                // return new ResponseModel(null, 1, Ex.Message);
+                return null;
             }
         }
+
+
+
 
 
         public async Task<ResponseModel> GetgetstatementsAsync(string lcAuthToken, string loan_number)
@@ -445,64 +440,20 @@ namespace Business_Services
 
                     {
                         statement_date = Estatementdata.statementDate,
-                        statement_url = "/Statements/EStatementHandler.Pdf?loanNo=" + loan_number + "&statementDate=" + Estatementdata.statementDate + "&statementKey=" + Estatementdata.key
-
+                        statement_url = "/Statements/EStatementHandler.Pdf?loanNo=" + loan_number + "&statementDate=" + Estatementdata.statementDate + "&statementKey=" + Estatementdata.key,
+                        Token_Estatement = lcAuthToken
                     }
 
                       );
 
-                    //  estatement.Add(statement_Date);
+                   //  estatement.Add(statement_Date);
                 }
 
                 EstatementDetails estatementresult = new EstatementDetails()
                 {
                     estatement = estatement
                 };
-                foreach (var estatemen in estatement)
-                {
-
-                    MemoryStream mem = new MemoryStream();
-                    var responsestream = await API_Connection.GetAsync(lcToken, estatemen.statement_url);
-                    string returnedDatastream = await responsestream.Content.ReadAsStringAsync();
-                    //byte[] datastream = Encoding.ASCII.GetBytes(returnedDatastream);
-                    var byteArray = Encoding.UTF8.GetBytes(returnedDatastream);
-                    //byte[] byteArray = Encoding.ASCII.GetBytes(contents);
-                    MemoryStream stream = new MemoryStream(byteArray);
-
-
-                    // MemoryStream stream =  byteArray;
-                    // String outputFilePath = "C:\\Users\\harivigneshm\\Desktop\\pdfurl.pdf";
-                    //  MemoryStream outputStream = new MemoryStream();
-                    // DocumentConverter.ToDocument(returnedDatastream, outputFilePath, FileType.DOC_PDF);
-
-
-                    //byte[] bytes;
-                    //BinaryFormatter bf = new BinaryFormatter();
-                    //MemoryStream ms = new MemoryStream();
-                    //bf.Serialize(ms, returnedDatastream);
-                    //bytes = ms.ToArray();
-                    //System.IO.File.WriteAllBytes("C:\\Users\\harivigneshm\\Desktop\\pdfhello.pdf", bytes);
-                    //string sampleHtml = "<html><body><p>Simple HTML string</p></body></html> ";
-                    // Converter.ConvertHtmlString(sampleHtml, @"C:\\Document.pdf");
-
-                    //using (FileStream stream = new FileStream("C:\\Users\\harivigneshm.FNFSECURE.003\\Desktop\\pdf" + "\\" + datastream, FileMode.CreateNew))
-
-                    //{
-
-                    //    using (StreamWriter writer = new StreamWriter(stream, Encoding.UTF8))
-
-                    //    {
-
-                    //        byte[] buffer = datastream;
-
-                    //        stream.Write(buffer, 0, buffer.Length);
-
-                    //        writer.Close();
-
-                    //    }
-
-                    //}
-                }
+               
 
                 return new ResponseModel(estatementresult);
             }
@@ -1364,25 +1315,88 @@ namespace Business_Services
         }
 
 
+        ////Modified by BBSR Team on 10th Jan 2018
+        //public async Task<ResponseModel> GetPaymentHistoryForLoanAsync(string mobileToken, string loanNumber)
+        //{
+
+
+        //    string lcToken = tokenServices.GetLctoken(mobileToken);
+        //    try
+        //    {
+
+
+
+        //        var response = await API_Connection.GetAsync(lcToken, "/api/Loan/GetLoanActivity/" + loanNumber);
+        //        string returnedData = await response.Content.ReadAsStringAsync();
+        //        Activity_AccountActivity historyInfo = JsonConvert.DeserializeObject<Activity_AccountActivity>(returnedData);
+
+        //        List<String> descriptionlist = new List<String>();
+        //        foreach (FullMortageHistory a in historyInfo.fullMortageHistory)
+        //        {
+        //            descriptionlist.Add(a.tranCodeDesc);
+
+        //        }
+        //        descriptionlist = descriptionlist.Distinct().ToList();
+
+        //        var eventId = 2;
+        //        var resourceName = "Payment";
+        //        var toEmail = "";
+        //        var log = "Viewed+Payment+History";
+        //        var actionName = "VIEW";
+
+        //        var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+        //        string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+
+        //        return new ResponseModel(descriptionlist);
+        //    }
+        //    catch (Exception Ex)
+        //    {
+        //        return new ResponseModel(null, 1, Ex.Message);
+        //    }
+
+        //}
+
+
+        //Modified by BBSR Team on 5th March 2018 : Defect # 1218
         //Modified by BBSR Team on 10th Jan 2018
         public async Task<ResponseModel> GetPaymentHistoryForLoanAsync(string mobileToken, string loanNumber)
         {
-
-
             string lcToken = tokenServices.GetLctoken(mobileToken);
             try
             {
-
-
-
                 var response = await API_Connection.GetAsync(lcToken, "/api/Loan/GetLoanActivity/" + loanNumber);
                 string returnedData = await response.Content.ReadAsStringAsync();
                 Activity_AccountActivity historyInfo = JsonConvert.DeserializeObject<Activity_AccountActivity>(returnedData);
 
                 List<String> descriptionlist = new List<String>();
+
+                string strpayment_description = string.Empty;
+                string strpayment_descriptioncode = string.Empty;
                 foreach (FullMortageHistory a in historyInfo.fullMortageHistory)
                 {
-                    descriptionlist.Add(a.tranCodeDesc);
+                    strpayment_descriptioncode = a.historyTransactionCode;
+
+
+                    //Need to add the code here...
+                    //strpayment_description = a.tranCodeDesc;
+                    using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
+                    {
+                        var transCod = ctx.TransDescription.Where(s => s.TransCode == strpayment_descriptioncode).FirstOrDefault();
+
+                        if (transCod != null)
+                        {
+                            strpayment_description = transCod.TargetDesc;
+                        }
+                        else
+                        {
+                            strpayment_description = a.tranCodeDesc;
+                        }
+                    }
+
+
+                    //Need to add the code here...
+                    //descriptionlist.Add(a.tranCodeDesc);
+                    descriptionlist.Add(strpayment_description);
 
                 }
                 descriptionlist = descriptionlist.Distinct().ToList();
@@ -1405,17 +1419,82 @@ namespace Business_Services
 
         }
 
+        //Modified by BBSR Team on 10th Jan 2018 : The logic to extract the Activity details changed 
+        //public async Task<ResponseModel> GetPaymentDescriptionsForLoanAsync(string mobileToken, string loanNumber)
+        //{
 
+        //    string lcToken = tokenServices.GetLctoken(mobileToken);
+        //    try
+        //    {
+
+
+
+        //        var response = await API_Connection.GetAsync(lcToken, "/api/Loan/GetLoanActivity/" + loanNumber);
+        //        string returnedData = await response.Content.ReadAsStringAsync();
+        //        Activity_AccountActivity historyInfo = JsonConvert.DeserializeObject<Activity_AccountActivity>(returnedData);
+
+
+        //        Business_Services.Models.LC_WebApi_Models.Activity_AccountActivity activityDetails = new Business_Services.Models.LC_WebApi_Models.Activity_AccountActivity();
+
+        //        activityDetails.ActivityType = new List<Activity>();
+
+        //        string strpayment_date;
+        //        string strtotal_amount;
+        //        string strpayment_description;
+        //        string strdue_date;
+        //        string strprincipal_amount;
+        //        string strinterest_amount;
+        //        string strescrow_amount;
+        //        string strescrow_balance;
+        //        string strprincipal_balance;
+        //        string strfeeAmount;
+        //        string strlateChargeAmount;
+        //        string strmiscPaidAmount;
+        //        string strsuspenseAmount;
+
+        //        foreach (FullMortageHistory activity in historyInfo.fullMortageHistory)
+        //        {
+
+        //            strpayment_date = activity.transactionAppliedDate;
+        //            strtotal_amount = Convert.ToString(activity.totalPaymentReceivedAmount);
+        //            strpayment_description = activity.tranCodeDesc;
+        //            strdue_date = activity.dueDate;
+        //            strprincipal_amount = Convert.ToString(activity.principalPmtAmount);
+        //            strinterest_amount = Convert.ToString(activity.interestPaidAmount);
+        //            strescrow_amount = Convert.ToString(activity.escrowPaidAmount);
+        //            strescrow_balance = Convert.ToString(activity.escrowBalance);
+        //            strprincipal_balance = Convert.ToString(activity.unpaidPrincipalBalance);
+        //            strfeeAmount = activity.feeAmount;
+        //            strlateChargeAmount = activity.lateChargeAmount;
+        //            strmiscPaidAmount = activity.miscPaidAmount;
+        //            strsuspenseAmount = activity.suspenseAmount;
+
+        //            activityDetails.ActivityType.Add(new Activity() { payment_date = strpayment_date, total_amount = strtotal_amount, payment_description = strpayment_description, due_date = strdue_date, principal_amount = strprincipal_amount, interest_amount = strinterest_amount, escrow_amount = strescrow_amount, escrow_balance = strescrow_balance, principal_balance = strprincipal_balance, feeAmount = strfeeAmount, lateChargeAmount = strlateChargeAmount, miscPaidAmount = strmiscPaidAmount, suspenseAmount = strsuspenseAmount });
+
+        //        }
+
+        //        var eventId = 2;
+        //        var resourceName = "Payment";
+        //        var toEmail = "";
+        //        var log = "Viewed+Payment+Description";
+        //        var actionName = "VIEW";
+
+        //        var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+        //        string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+
+        //        return new ResponseModel(activityDetails);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new ResponseModel(null, 1, ex.Message);
+        //    }
+        //}
         //Modified by BBSR Team on 10th Jan 2018 : The logic to extract the Activity details changed 
         public async Task<ResponseModel> GetPaymentDescriptionsForLoanAsync(string mobileToken, string loanNumber)
         {
-
             string lcToken = tokenServices.GetLctoken(mobileToken);
             try
             {
-
-
-
                 var response = await API_Connection.GetAsync(lcToken, "/api/Loan/GetLoanActivity/" + loanNumber);
                 string returnedData = await response.Content.ReadAsStringAsync();
                 Activity_AccountActivity historyInfo = JsonConvert.DeserializeObject<Activity_AccountActivity>(returnedData);
@@ -1438,13 +1517,18 @@ namespace Business_Services
                 string strlateChargeAmount;
                 string strmiscPaidAmount;
                 string strsuspenseAmount;
+                string strpayment_descriptioncode;
 
                 foreach (FullMortageHistory activity in historyInfo.fullMortageHistory)
                 {
 
                     strpayment_date = activity.transactionAppliedDate;
                     strtotal_amount = Convert.ToString(activity.totalPaymentReceivedAmount);
+
+                    //Need to add the code here...
                     strpayment_description = activity.tranCodeDesc;
+                    //Need to add the code here...
+
                     strdue_date = activity.dueDate;
                     strprincipal_amount = Convert.ToString(activity.principalPmtAmount);
                     strinterest_amount = Convert.ToString(activity.interestPaidAmount);
@@ -1455,6 +1539,26 @@ namespace Business_Services
                     strlateChargeAmount = activity.lateChargeAmount;
                     strmiscPaidAmount = activity.miscPaidAmount;
                     strsuspenseAmount = activity.suspenseAmount;
+
+                    //Modified by BBSR Team on 5th March 2018 : Defect # 1218
+                    strpayment_descriptioncode = activity.historyTransactionCode;
+
+                    //Need to add the code here...
+                    //strpayment_description = a.tranCodeDesc;
+                    using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
+                    {
+                        var transCod = ctx.TransDescription.Where(s => s.TransCode == strpayment_descriptioncode).FirstOrDefault();
+
+                        if (transCod != null)
+                        {
+                            strpayment_description = transCod.TargetDesc;
+                        }
+                        else
+                        {
+                            strpayment_description = activity.tranCodeDesc;
+                        }
+                    }
+                    //Modified by BBSR Team on 5th March 2018 : Defect # 1218
 
                     activityDetails.ActivityType.Add(new Activity() { payment_date = strpayment_date, total_amount = strtotal_amount, payment_description = strpayment_description, due_date = strdue_date, principal_amount = strprincipal_amount, interest_amount = strinterest_amount, escrow_amount = strescrow_amount, escrow_balance = strescrow_balance, principal_balance = strprincipal_balance, feeAmount = strfeeAmount, lateChargeAmount = strlateChargeAmount, miscPaidAmount = strmiscPaidAmount, suspenseAmount = strsuspenseAmount });
 
@@ -1476,6 +1580,9 @@ namespace Business_Services
                 return new ResponseModel(null, 1, ex.Message);
             }
         }
+
+        //Modified by BBSR Team on 5th March 2018 : Defect # 1218
+
         public async Task<ResponseModel> GetPendingPaymentsAsync(string mobileToken, string loanNumber)
         {
             List<PendingPayment> pendingPayments = new List<PendingPayment>();

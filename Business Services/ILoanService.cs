@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Business_Services.Models.DAL.LoancareEntites;
 using Business_Services.Models.LC_WebApi_Models;
+using System.Net.Http;
 
 namespace Business_Services
 {
@@ -19,17 +20,12 @@ namespace Business_Services
         Task<ResponseModel> GetLoanAsync(string mobileToken, string loanNumber);
         Task<ResponseModel> GetPaymentHistoryForLoanAsync(string mobileToken, string loanNumber);
         Task<ResponseModel> GetPayDetailsAsync(string mobileToken, string loanNumber);
-
         Task<ResponseModel> GetUpcomingPaymentForLoan(string loanNumber, string MobileToken);
-
         Task<ResponseModel> PostModifyPaymentForLoanAsync(string MobileToken, Business_Services.Models.Payment ModifyPayment);
         Task<ResponseModel> EditPaymentForLoanAsync(string mobileToken, string loanNumber, DateTime schdate);
-
         Task<ResponseModel> GetEscrowDetailsForLoanAsync(string mobileToken, string loanNumber);
         Task<ResponseModel> GetPaymentFeeSchedule(string loanNumber, string MobileToken);
-
         Task<ResponseModel> PostPaymentForLoanAsync(string mobileToken, Payment paymentDetails);
-
         Task<ResponseModel> GetPaymentDescriptionsForLoanAsync(string mobileToken, string loanNumber);
 
         ResponseModel EnrollForStatements(string loanNumber);
@@ -69,7 +65,8 @@ namespace Business_Services
         Task<ResponseModel> ConfirmationforLoanAsync(string MobileToken, ConfirmRegistration details);
         Task<ResponseModel> PostManageNotificationForAsync(string MobileToken, Business_Services.Models.ManageNotification ModifyPayment);
         Task<ResponseModel> ValidatePasswordAsync(string mobileToken, UserAuth userData);
-        Task<ResponseModel> GetgetstatementspdfAsync(string lcAuthToken, string loan_number, string Date, string Key);
+        //Task<ResponseModel> GetgetstatementspdfAsync(string lcAuthToken, string loan_number, string Date, string Key);
+        Task<HttpResponseMessage> GetgetstatementspdfAsync(string tokenValue, GeneratePdf generatePdf);
         Task<ResponseModel> GetpdfstreamAsync(string lcAuthToken, string statement_url);
     }
 }
