@@ -629,24 +629,31 @@ namespace Business_Services
                 string returnedDataLP = await responseLP.Content.ReadAsStringAsync();
 
                  Business_Services.Models.User userDetails = new Business_Services.Models.User();
-                userDetails.phone_primary_number_concern = getdisclosure.contactinfo.contactInfo.primaryTelecomNumber.phoneNumber;
-                userDetails.phone_primary_type_concern = getdisclosure.contactinfo.contactInfo.primaryTelecomNumber.type;
-                userDetails.phone_secondary_number_concern = getdisclosure.contactinfo.contactInfo.secondaryTelecomNumber.phoneNumber;
-                userDetails.phone_secondary_type_concern = getdisclosure.contactinfo.contactInfo.secondaryTelecomNumber.type;
-                foreach (var OtherTeleNo in getdisclosure.contactinfo.contactInfo.otherTelecomNumbers)
+
+                if (getdisclosure.contactinfo.contactInfo.primaryTelecomNumber.consentRevokeIndicatorCode == null && getdisclosure.contactinfo.contactInfo.primaryTelecomNumber.type == "C")
+                {
+                    userDetails.phone_primary_number_concern = getdisclosure.contactinfo.contactInfo.primaryTelecomNumber.phoneNumber;
+                    userDetails.phone_primary_type_concern = getdisclosure.contactinfo.contactInfo.primaryTelecomNumber.type;
+                }
+                if (getdisclosure.contactinfo.contactInfo.secondaryTelecomNumber.consentRevokeIndicatorCode == null && getdisclosure.contactinfo.contactInfo.secondaryTelecomNumber.type == "C")
+                {
+                    userDetails.phone_secondary_number_concern = getdisclosure.contactinfo.contactInfo.secondaryTelecomNumber.phoneNumber;
+                    userDetails.phone_secondary_type_concern = getdisclosure.contactinfo.contactInfo.secondaryTelecomNumber.type;
+                }
+                    foreach (var OtherTeleNo in getdisclosure.contactinfo.contactInfo.otherTelecomNumbers)
                 {
 
-                    if (OtherTeleNo.sequenceNumber == 1)
+                    if (OtherTeleNo.sequenceNumber == 1 && OtherTeleNo.consentRevokeIndicatorCode==null&&OtherTeleNo.type == "C")
                     {
                         userDetails.phone_other_1_type_concern = OtherTeleNo.type;
                       userDetails.phone_other_1_number_concern = OtherTeleNo.phoneNumber;
                     }
-                    if (OtherTeleNo.sequenceNumber == 2)
+                    if (OtherTeleNo.sequenceNumber == 2 && OtherTeleNo.consentRevokeIndicatorCode == null && OtherTeleNo.type == "C")
                     {
                         userDetails.phone_other_2_type_concern = OtherTeleNo.type;
                         userDetails.phone_other_2_number_concern = OtherTeleNo.phoneNumber;
                     }
-                    if (OtherTeleNo.sequenceNumber == 3)
+                    if (OtherTeleNo.sequenceNumber == 3 && OtherTeleNo.consentRevokeIndicatorCode == null && OtherTeleNo.type == "C")
                     {
                         userDetails.phone_other_3_type_concern = OtherTeleNo.type;
                         userDetails.phone_other_3_number_concern = OtherTeleNo.phoneNumber;
@@ -2370,7 +2377,7 @@ namespace Business_Services
                 var response = await API_Connection.PostUserAsync("/api/Register/SetRegister/", content);
 
                 string returnedData = await response.Content.ReadAsStringAsync();
-                var replacedText = returnedData.Replace("'", "");
+               // var replacedText = returnedData.Replace("'", "");
                 //dynamic objUser = Newtonsoft.Json.Linq.JObject.Parse(replacedText);
               //  dynamic objUser = JsonConvert.DeserializeObject(replacedText);
 
@@ -2381,7 +2388,7 @@ namespace Business_Services
                     tokenValue = tokenValues.FirstOrDefault();
                 }
               //  dynamic objUser = JsonConvert.DeserializeObject(returnedData);
-                var ErrorMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(replacedText);
+                var ErrorMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(returnedData);
 
                 var responsepropertyCode = await API_Connection.GetAsync("/api/Helper/GetStatePropertyCode/?loanNo=" + userDetail.loanNumber);
                 string returnedpropertyCode = await responsepropertyCode.Content.ReadAsStringAsync();

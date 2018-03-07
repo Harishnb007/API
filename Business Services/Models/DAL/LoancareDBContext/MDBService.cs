@@ -134,6 +134,6 @@ namespace Business_Services.Models.DAL.LoancareDBContext
                 .IsUnicode(false);
         }
         //Added by BBSR Team on 5th March 2018 : Defect # 1218
-        public virtual DbSet<TransDescription> TransDescription { get; set; }
+       // public virtual DbSet<TransDescription> TransDescription { get; set; }
     }
 }
