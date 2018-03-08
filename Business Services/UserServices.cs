@@ -898,6 +898,7 @@ namespace Business_Services
             var Decryptdata = objgenerateToken.Decrypt(lcAuthToken);
             dynamic ObjUserId = JsonConvert.DeserializeObject(Decryptdata);
             bool objisenrolled = ObjUserId.eStatement;
+            string processCode = string.Empty;
             //string UserName = ObjUserId.UserName;
             try
             {
@@ -957,6 +958,8 @@ namespace Business_Services
                 MyAccount_GetAccountInfo propertyaddress = JsonConvert.DeserializeObject<MyAccount_GetAccountInfo>(returnedDataloan);
 
                 Property_Address = propertyaddress.msg.custAddress;
+
+                processCode = propertyaddress.msg.processStop;
 
                 var response = await API_Connection.GetAsync(lcToken, "/api/OneTimePayment/GetMockedPendingTransactions/?loanNo=" + loan_number + "&schDate=&");
                 string returnedData1 = await response.Content.ReadAsStringAsync();
@@ -1041,8 +1044,8 @@ namespace Business_Services
                     loan_principal_balance = userLoanAmount.loan_principal_balance,
                     last_payment_date = userLoanAmount.last_payment_date,
                     is_enrolled = userLoanAmount.is_enrolled,
-                    is_escrow_loan = escrowInfo.lastAna.Contains('*') ? false : true
-
+                    is_escrow_loan = escrowInfo.lastAna.Contains('*') ? false : true,
+                    is_bankruptcy = (processCode == "K" || processCode == "k") ? true : false
                 };
                 return new ResponseModel(UserLoanIfo);
             }
