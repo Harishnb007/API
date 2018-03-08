@@ -391,7 +391,7 @@ namespace Business_Services
 
         public async Task<ResponseModel> GetgetstatementspdfAsync(string lcAuthToken, string loan_number, string Date,string Key)
         {
-            string lcToken = tokenServices.GetLctoken(tokenValue);
+            string lcToken = tokenServices.GetLctoken(lcAuthToken);
             try
             {
                 var statement_url = "/Statements/EStatementHandler.Pdf?loanNo=" + loan_number + "&statementDate=" + Date + "&statementKey=" + Key;
@@ -399,12 +399,8 @@ namespace Business_Services
                 var responsestream = await API_Connection.GetAsync(lcToken, statement_url);
                 string returnedDatastream = await responsestream.Content.ReadAsStringAsync();
 
-                retArr = await responsestream.Content.ReadAsByteArrayAsync();
-                //   return     responsestream.setContentType("application/pdf");
                  return new ResponseModel(returnedDatastream);
-               // var x = retArr.Skip(1).Take(y.Length - 2).ToArray();
-
-               // return new File(retArr, "application/pdf","Pd")
+        
             }
             catch (Exception Ex)
             {
@@ -1442,8 +1438,7 @@ namespace Business_Services
         }
 
         //Modified by BBSR Team on 10th Jan 2018
-        public async Task<ResponseModel> GetPaymentHistoryForLoanAsync(string mobileToken, string loanNumber)
-        {
+     
 
         //Modified by BBSR Team on 10th Jan 2018
         public async Task<ResponseModel> GetPaymentHistoryForLoanAsync(string mobileToken, string loanNumber)
@@ -1466,7 +1461,7 @@ namespace Business_Services
                     descriptionlist.Add(a.tranCodeDesc);
 
                 }
-
+                descriptionlist = descriptionlist.Distinct().ToList();
                 var eventId = 2;
                 var resourceName = "Payment";
                 var toEmail = "";
@@ -1476,7 +1471,7 @@ namespace Business_Services
                 var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
                 string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
-                return new ResponseModel(activityDetails);
+                return new ResponseModel(descriptionlist);
             }
             catch (Exception ex)
             {
