@@ -49,8 +49,6 @@ namespace LoanCare_Mobile_API.Controllers
                 tokenValue = tokenValues.FirstOrDefault();
             }
 
-
-
             // var payment = await userService.UpdatePasswordAsync(tokenValue, loanDetails, objPasswordUpd);
 
             var payment = await userService.getUserDetailsAsyn(tokenValue, userId);
@@ -72,6 +70,28 @@ namespace LoanCare_Mobile_API.Controllers
                 tokenValue = tokenValues.FirstOrDefault();
             }
             var payment = await userService.GetPushNotificationForUser(tokenValue, pushNotification);
+            if (payment == null)
+            {
+                return NotFound();
+            }
+            return Ok(payment);
+        }
+
+
+        [Route("GetPin")]
+        [HttpGet]
+        public async Task<IHttpActionResult> GetPin()
+        {
+
+            // To do - Move the following code to a single method & use it across the project
+            IEnumerable<string> tokenValues;
+            string tokenValue = "";
+            if (Request.Headers.TryGetValues("AuthorizationToken", out tokenValues))
+            {
+                tokenValue = tokenValues.FirstOrDefault();
+            }
+
+            var payment = await userService.GetPinforMobileAsync(tokenValue);
             if (payment == null)
             {
                 return NotFound();
@@ -191,7 +211,31 @@ namespace LoanCare_Mobile_API.Controllers
                 return NotFound();
             }
             return Ok(payment);
-        }    
+        }
+
+        [Route("RefreshToken/{LoanNumber}")]
+        [HttpGet]
+        public async Task<IHttpActionResult> GetRefresh(string LoanNumber)
+        {
+            IEnumerable<string> tokenValues;
+            string tokenValue = "";
+            if (Request.Headers.TryGetValues("AuthorizationToken", out tokenValues))
+            {
+                tokenValue = tokenValues.FirstOrDefault();
+            }
+            Business_Services.Models.GenerateNewToken objgenerateToken = new GenerateNewToken();
+            var Decryptdata = objgenerateToken.Decrypt(tokenValue);
+
+            dynamic ObjUserId = JsonConvert.DeserializeObject(Decryptdata);
+            string objUId = ObjUserId.UserId;
+            string objPWd = ObjUserId.Password;
+            var payment = await userService.GetRefereshToken(tokenValue, LoanNumber, objPWd);
+            if (payment == null)
+            {
+                return NotFound();
+            }
+            return Ok(payment);
+        }
 
         //[Route("Setpin")]
         //[HttpPut]
@@ -409,7 +453,7 @@ namespace LoanCare_Mobile_API.Controllers
 
         [Route("InsertSecurityAnswer")]
         [HttpPost]
-        public async Task<IHttpActionResult> InsertSecurityAnswer([FromBody]List<QuestionSummary> questionSummary)
+        public async Task<IHttpActionResult> InsertSecurityAnswer([FromBody]Question questionSummary)
         {
             //Debug.WriteLine("Authenticate method has been invoked..");    
 
@@ -422,10 +466,9 @@ namespace LoanCare_Mobile_API.Controllers
 
 
             var Decryptdata = Decrypt(tokenValue);
-
             dynamic ObjUserId = JsonConvert.DeserializeObject(Decryptdata);
             string objUserIdUpd = ObjUserId.UserId;
-
+          
             var responsedata = await userService.InsertSecurityAnswerAsyn(tokenValue, questionSummary, objUserIdUpd);
 
             if (responsedata != null)

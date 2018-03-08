@@ -159,8 +159,8 @@ namespace LoanCare_Mobile_API.Controllers
             return Ok(payment);
         }
 
-        [Route("getstatementspdf/{URL}")]
-        public async Task<IHttpActionResult> getstatementspdf(string URL)
+        [Route("getstatementspdf/{Date}/{loan_number}/{Key}")]
+        public async Task<IHttpActionResult> getstatementspdf(string Date, string loan_number, string Key)
         {
             // To do - Move the following code to a single method & use it across the project
             IEnumerable<string> tokenValues;
@@ -169,7 +169,7 @@ namespace LoanCare_Mobile_API.Controllers
             {
                 tokenValue = tokenValues.FirstOrDefault();
             }
-            var payment = await loanService.GetgetstatementspdfAsync(tokenValue, URL);
+            var payment = await loanService.GetgetstatementspdfAsync(tokenValue,loan_number,Date, Key);
             if (payment == null)
             {
                 return NotFound();
