@@ -67,10 +67,29 @@ namespace LoanCare_Mobile_API.Controllers
             var lcAuthTokenValueTask = _tokenServices.AuthenticateAsync(userCred.username, userCred.password);
             await Task.WhenAll(lcAuthTokenValueTask);
 
-            var GetTokenTask = GetAuthTokenAsync(userCred.username, userCred.password, lcAuthTokenValueTask.Result, userCred.Is_New_MobileUser,userCred.username,userCred.resourcename,userCred.log);
-            await Task.WhenAll(GetTokenTask);
+            dynamic value = lcAuthTokenValueTask.Result;
+            var id = ((Business_Services.Models.Helpers.ResponseWithToken)value).errorId;
+            var errorMessage = ((Business_Services.Models.Helpers.ResponseWithToken)value).errorMessage;
+            var tokenValue = ((Business_Services.Models.Helpers.ResponseWithToken)value).tokenValue;
 
-            return GetTokenTask.Result;
+            if (((Business_Services.Models.Helpers.ResponseWithToken)value).errorId == 0)
+            {
+                var GetTokenTask = GetAuthTokenAsync(userCred.username, userCred.password, tokenValue.ToString(),
+                userCred.Is_New_MobileUser, userCred.username, userCred.resourcename, userCred.log);
+                await Task.WhenAll(GetTokenTask);
+
+                return GetTokenTask.Result;
+            }
+            else
+            {
+                var responseMobileUser = Request.CreateResponse(HttpStatusCode.OK, new ResponseModel
+                {
+                    status = new Status { CustomErrorCode = id, Message = errorMessage },
+                    data = ""
+                });
+
+                return responseMobileUser;
+            }
         }
 
       
@@ -108,7 +127,8 @@ namespace LoanCare_Mobile_API.Controllers
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        private async Task<HttpResponseMessage> GetAuthTokenAsync(string userId, string Password, string lcAuthToken, bool Is_New_MobileUser, string UserName,string resourcename,string log)
+        private async Task<HttpResponseMessage> GetAuthTokenAsync(string userId, string Password, string lcAuthToken, bool Is_New_MobileUser, 
+            string UserName,string resourcename,string log)
         {
             AuthTokenAndUserDetails Auth_data = new AuthTokenAndUserDetails();
             IUserServices userService = new UserServices();
@@ -119,7 +139,8 @@ namespace LoanCare_Mobile_API.Controllers
                 Business_Services.Models.User userDetails = (Business_Services.Models.User)details.Result.data;
                 //Debug.WriteLine(userDetails.first_name);
 
-                var token = _tokenServices.GenerateToken(userDetails.username, Password, userDetails.ClientId, lcAuthToken, userDetails.username,resourcename,log, userDetails.is_enrolled, userId);
+                var token = _tokenServices.GenerateToken(userDetails.username, Password, userDetails.ClientId, lcAuthToken,
+                    userDetails.username,resourcename,log, userDetails.is_enrolled, userId);
 
                 var Decryptdata = Decrypt(token);
 

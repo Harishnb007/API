@@ -60,23 +60,25 @@ namespace Business_Services
             string returnedData = await trackresponse.Content.ReadAsStringAsync();
             return returnedData;
         }
-        public async Task<string> AuthenticateAsync(string userName, string password)
+        public async Task<ResponseWithToken> AuthenticateAsync(string userName, string password)
         {
-           
+
             HttpContent content;
             ResponseWithToken response;
             Payment AuthUser = new Payment();
             AuthUser.loan_number = "";
             try
             {
-                  content = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", userName }, { "password", password } });
-                  response = await API_Connection.PostAsync("/api/Auth/Authenticate", content);
-               
-                return response.tokenValue;
-            }
-            catch (Exception Ex) {
+                content = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", userName }, { "password", password }, { "ssn", "" } });
+                response = await API_Connection.PostAsync("/api/Auth/Authenticate", content);
 
-                return "Problem occurred trying to validate the user credentials. Please try again.";
+                return response;
+            }
+            catch (Exception Ex)
+            {
+                response = new ResponseWithToken();
+                response.errorMessage = "Problem occurred trying to validate the user credentials. Please try again.";
+                return response;
             }
         }
 
