@@ -23,7 +23,7 @@ namespace Business_Services.B2C_WebAPI
         /*SIT URL*/
         private static Uri baseAddress = new Uri("https://lcuiqa.test.servicelinkfnf.com");
         /*UAT URL*/
-        // private static Uri baseAddress = new Uri("https://lcui.test.servicelinkfnf.com");
+         //private static Uri baseAddress = new Uri("https://lcui.test.servicelinkfnf.com");
         static API_Connection()
         {
           
