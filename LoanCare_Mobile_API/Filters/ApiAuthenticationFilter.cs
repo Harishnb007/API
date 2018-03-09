@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Http.Controllers;
 using System.Threading;
 using System.Diagnostics;
+using Business_Services.Models.Helpers;
 
 namespace LoanCare_Mobile_API.Filters
 {
@@ -22,7 +23,7 @@ namespace LoanCare_Mobile_API.Filters
             if(provider != null)
             {
                 Debug.WriteLine("Authenticating credentials - {0} {1}", name, password);
-                string token = provider.AuthenticateAsync(name, password).Result;
+                ResponseWithToken token = provider.AuthenticateAsync(name, password).Result;
                 Debug.WriteLine("Token - " + token);
 
                 if(token != null)
