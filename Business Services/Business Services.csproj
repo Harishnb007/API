@@ -80,6 +80,7 @@
     <Compile Include="Models\DAL\LoancareDBContext\MobileUser.cs" />
     <Compile Include="Models\DAL\LoancareDBContext\PaymentAlert.cs" />
     <Compile Include="Models\DAL\LoancareDBContext\PaymentTransactionMapping.cs" />
+    <Compile Include="Models\DAL\LoancareDBContext\TransDescription.cs" />
     <Compile Include="Models\DAL\LoancareDBContext\UserAlert.cs" />
     <Compile Include="Models\DAL\LoancareDBContext\UserFeedback.cs" />
     <Compile Include="Models\DAL\LoancareEntites\BankAccounts.cs" />
