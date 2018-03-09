@@ -107,14 +107,37 @@ namespace Business_Services.B2C_WebAPI
             message.Headers.Add("Cookie", "locale=en-US");
             message.Content = content;
             var result = await client.SendAsync(message);
-            result.EnsureSuccessStatusCode();
+            returnData.errorId = 0;
+            returnData.tokenValue = "";
+            returnData.errorMessage = "";
 
-            string setCookieValue = HttpUtility.UrlDecode(result.Headers.GetValues("Set-Cookie").FirstOrDefault());
-            Regex regex = new Regex("lcauth=(.*?);");
-            var v = regex.Match(setCookieValue);
+            if (result.IsSuccessStatusCode)
+            {
+                result.EnsureSuccessStatusCode();
 
-            returnData.message = result;
-            returnData.tokenValue = v.Groups[1].ToString();
+                if (result.Headers.TryGetValues("Set-Cookie", out IEnumerable<string> cookieValues))
+                {
+                    string setCookieValue = HttpUtility.UrlDecode(result.Headers.GetValues("Set-Cookie").FirstOrDefault());
+                    Regex regex = new Regex("lcauth=(.*?);");
+                    var v = regex.Match(setCookieValue);
+                    returnData.tokenValue = v.Groups[1].ToString();
+                    returnData.message = result;
+                }
+                else
+                {
+                    var responseAsString = await result.Content.ReadAsStringAsync();
+                    ErrorModel resultSet = JsonConvert.DeserializeObject<ErrorModel>(responseAsString);
+                    returnData.errorId = 1;
+                    returnData.errorMessage = resultSet.msg;
+                }
+            }
+            else
+            {
+                var responseAsString = await result.Content.ReadAsStringAsync();
+                ErrorModel resultSet = JsonConvert.DeserializeObject<ErrorModel>(responseAsString);
+                returnData.errorId = resultSet.errorID;
+                returnData.errorMessage = resultSet.message;                
+            }
 
             return returnData;
         }

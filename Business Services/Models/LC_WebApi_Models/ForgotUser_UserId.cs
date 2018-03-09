@@ -40,7 +40,7 @@ public class User
     public bool csrAccess { get; set; }
     public string langPref { get; set; }
     public object sftPassword { get; set; }
-    public object emailAddress { get; set; }
+    public string emailAddress { get; set; }
     public object recoveryPin { get; set; }
     public object contactType { get; set; }
 }

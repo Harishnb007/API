@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 
 namespace Business_Services.Models.Helpers
 {
-    internal class ResponseWithToken
+    public class ResponseWithToken
     {
-        internal HttpResponseMessage message { get; set; }
-        internal string tokenValue { get; set; }
+        public HttpResponseMessage message { get; set; }
+        public string tokenValue { get; set; }
+        public string errorMessage { get; set; }
+        public int errorId { get; set; }
     }
 }

@@ -391,7 +391,7 @@ namespace Business_Services
 
         public async Task<ResponseModel> GetgetstatementspdfAsync(string lcAuthToken, string loan_number, string Date,string Key)
         {
-            string lcToken = tokenServices.GetLctoken(tokenValue);
+            string lcToken = tokenServices.GetLctoken(lcAuthToken);
             try
             {
                 var statement_url = "/Statements/EStatementHandler.Pdf?loanNo=" + loan_number + "&statementDate=" + Date + "&statementKey=" + Key;
@@ -399,12 +399,8 @@ namespace Business_Services
                 var responsestream = await API_Connection.GetAsync(lcToken, statement_url);
                 string returnedDatastream = await responsestream.Content.ReadAsStringAsync();
 
-                retArr = await responsestream.Content.ReadAsByteArrayAsync();
-                //   return     responsestream.setContentType("application/pdf");
                  return new ResponseModel(returnedDatastream);
-               // var x = retArr.Skip(1).Take(y.Length - 2).ToArray();
-
-               // return new File(retArr, "application/pdf","Pd")
+        
             }
             catch (Exception Ex)
             {
@@ -1361,9 +1357,7 @@ namespace Business_Services
         //}
 
 
-        //Modified by BBSR Team on 10th Jan 2018
-
-        // Modified By BBSR Team on 6th March 2018 : Defect # 955
+        // Modified By BBSR Team on 6th March 2018 : Defect # 955 : Start
         public async Task<ResponseModel> GetPaymentFeeSchedule(string loanNumber, string MobileToken)
         {
             // To do - Use DI
@@ -1384,44 +1378,33 @@ namespace Business_Services
                 string returnedaquisitiondate = await responseaquisitiondate.Content.ReadAsStringAsync();
                 dynamic objaquisitiondate = JsonConvert.DeserializeObject(returnedaquisitiondate);
                 string straquisitiondate = objaquisitiondate.acquisitionDate;
-                string acqMsg = "As a courtesy no fee will be assessed for utilizing this service during your initial 60 days as a new customer";
+                string straquisitionmessage = string.Empty;
 
                 List<PaymentFeeSheduledate> feeList = new List<PaymentFeeSheduledate>();
-                //Need to add the >= 60 Aquisition date Condition
 
-                if ((DateTime.Now - Convert.ToDateTime(straquisitiondate)).Days > 60)
-                {
-                    acqMsg = "";
-                    //As a courtesy no fee will be assessed for utilizing this service during your initial 60 days as a new customer
-                    foreach (var duedate in paymentInfo.clientFeeCollection)
-                    {
-                        feeList.Add(new PaymentFeeSheduledate
-                        {
-                            OverdueStartdays = duedate.daysOverdueStart,
-                            OverdueEnddays = duedate.daysOverdueEnd,
-                            FeeAmount = duedate.feeAmount
-                        });
-                    }
-                }
-                else
+                foreach (var duedate in paymentInfo.clientFeeCollection)
                 {
                     feeList.Add(new PaymentFeeSheduledate
                     {
-                        OverdueStartdays = 0,
-                        OverdueEnddays = 0,
-                        FeeAmount = 0
+                        OverdueStartdays = duedate.daysOverdueStart,
+                        OverdueEnddays = duedate.daysOverdueEnd,
+                        FeeAmount = duedate.feeAmount
+
                     });
-
                 }
-                
-
+                //Need to add the >60 Aquisition date Condition
+                //Modified By BBSR Team on 8th March 2018 : Defect # 955
+                if ((DateTime.Now - Convert.ToDateTime(straquisitiondate)).Days < 60)
+                {
+                    straquisitionmessage = "As a courtesy no fee will be assessed for utilizing this service during your initial 60 days as a new customer.";
+                }
 
                 PaymentFeeShedule paymentData = new PaymentFeeShedule()
                 {
                     dueDate = calenderDuedate.Payment.dueDate,
                     aquisitiondDate = objaquisitiondate.acquisitionDate,
-                    paymentFeesheduledate = feeList,
-                    AquisitionMessage = acqMsg
+                    AquisitionMessage = straquisitionmessage,
+                    paymentFeesheduledate = feeList
                 };
 
                 var eventId = 2;
@@ -1441,9 +1424,8 @@ namespace Business_Services
             }
         }
 
-        //Modified by BBSR Team on 10th Jan 2018
-        public async Task<ResponseModel> GetPaymentHistoryForLoanAsync(string mobileToken, string loanNumber)
-        {
+        // Modified By BBSR Team on 6th March 2018 : Defect # 955 : End
+
 
         //Modified by BBSR Team on 10th Jan 2018
         public async Task<ResponseModel> GetPaymentHistoryForLoanAsync(string mobileToken, string loanNumber)
@@ -1466,7 +1448,7 @@ namespace Business_Services
                     descriptionlist.Add(a.tranCodeDesc);
 
                 }
-
+                descriptionlist = descriptionlist.Distinct().ToList();
                 var eventId = 2;
                 var resourceName = "Payment";
                 var toEmail = "";
@@ -1476,7 +1458,7 @@ namespace Business_Services
                 var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
                 string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
-                return new ResponseModel(activityDetails);
+                return new ResponseModel(descriptionlist);
             }
             catch (Exception ex)
             {

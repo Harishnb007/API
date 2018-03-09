@@ -106,6 +106,7 @@
     <Compile Include="Models\LC_WebApi_Models\Calender_GetPaymentInfo.cs" />
     <Compile Include="Models\LC_WebApi_Models\Eft_disclosure.cs" />
     <Compile Include="Models\LC_WebApi_Models\Escrow_CallEscrow.cs" />
+    <Compile Include="Models\LC_WebApi_Models\ForgotPassword.cs" />
     <Compile Include="Models\LC_WebApi_Models\ForgotUser_UserId.cs" />
     <Compile Include="Models\LC_WebApi_Models\Getdetails_estatement.cs" />
     <Compile Include="Models\LC_WebApi_Models\getuserInfo.cs" />
@@ -149,6 +150,7 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="Models\Helpers\Dummy.json" />
+    <Compile Include="Models\LC_WebApi_Models\ErrorModel.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
