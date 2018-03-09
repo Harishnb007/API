@@ -2377,13 +2377,14 @@ namespace Business_Services
                 {
                     tokenValue = tokenValues.FirstOrDefault();
                 }
+               // Fix for Defect LMA - 1068 start
               //  dynamic objUser = JsonConvert.DeserializeObject(returnedData);
                 var ErrorMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(objUser);
 
                 var responsepropertyCode = await API_Connection.GetAsync("/api/Helper/GetStatePropertyCode/?loanNo=" + userDetail.loanNumber);
                 string returnedpropertyCode = await responsepropertyCode.Content.ReadAsStringAsync();
                 dynamic propertycode = JsonConvert.DeserializeObject(returnedpropertyCode);
-
+                // Fix for Defect LMA - 1068 End
                 if (ErrorMessage.updated == true)
                 {
                     string clientName = ErrorMessage.client.clientName;
