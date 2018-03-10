@@ -79,7 +79,7 @@ namespace Business_Services.Models.LC_WebApi_Models
         public bool isarm { get; set; }
         public string ssn { get; set; }
         public bool isPurged { get; set; }
-        public DateTime estatementPrefDate { get; set; }
+        public DateTime? estatementPrefDate { get; set; }
     }
 
 
