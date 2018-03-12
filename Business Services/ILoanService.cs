@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Business_Services.Models.DAL.LoancareEntites;
 using Business_Services.Models.LC_WebApi_Models;
+using System.Net.Http;
 
 namespace Business_Services
 {
@@ -70,8 +71,8 @@ namespace Business_Services
         Task<ResponseModel> PostManageNotificationForAsync(string MobileToken, Business_Services.Models.ManageNotification ModifyPayment);
         Task<ResponseModel> ValidatePasswordAsync(string mobileToken, UserAuth userData);
         //Task<ResponseModel> GetgetstatementspdfAsync(string lcAuthToken, string loan_number, string Date, string Key);
-        Task<ResponseModel> GetgetstatementspdfAsync(string lcAuthToken, GeneratePdf generatePdf);
-
+        // Task<ResponseModel> GetgetstatementspdfAsync(string lcAuthToken, GeneratePdf generatePdf);
+       Task<HttpResponseMessage> GetgetstatementspdfAsync(string lcAuthToken, GeneratePdf generatePdf);
         Task<ResponseModel> GetpdfstreamAsync(string lcAuthToken, string statement_url);
     }
 }

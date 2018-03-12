@@ -389,25 +389,55 @@ namespace Business_Services
             }
         }
 
-        public async Task<ResponseModel> GetgetstatementspdfAsync(string lcAuthToken, GeneratePdf generatePdf)
+        //public async Task<HttpResponseMessage> GetgetstatementspdfAsync(string lcAuthToken, GeneratePdf generatePdf)
+        //{
+        //    string lcToken = tokenServices.GetLctoken(lcAuthToken);
+        //    try
+        //    {
+        //        var statement_url = "/Statements/EStatementHandler.Pdf?loanNo=" + generatePdf.LoanNumber + "&statementDate=" + generatePdf.date + "&statementKey=" + generatePdf.Key;
+        //        // MemoryStream mem = new MemoryStream();
+        //        var responsestream = await API_Connection.GetAsync(lcToken, statement_url);
+        //        string returnedDatastream = await responsestream.Content.ReadAsStringAsync();
+
+
+        //        return returnedDatastream;
+
+        //        // return Task.FromResult(returnedDatastream);
+        //    }
+
+        //    catch (Exception Ex)
+        //    {
+
+        //        return null;
+        //    }
+        //}
+
+
+        public async Task<HttpResponseMessage> GetgetstatementspdfAsync(string tokenValue, GeneratePdf generatePdf)
+
         {
-            string lcToken = tokenServices.GetLctoken(lcAuthToken);
+
+            string lcToken = tokenServices.GetLctoken(tokenValue);
+
             try
             {
                 var statement_url = "/Statements/EStatementHandler.Pdf?loanNo=" + generatePdf.LoanNumber + "&statementDate=" + generatePdf.date + "&statementKey=" + generatePdf.Key;
-               // MemoryStream mem = new MemoryStream();
-                var responsestream = await API_Connection.GetAsync(lcToken, statement_url);
-                string returnedDatastream = await responsestream.Content.ReadAsStringAsync();
 
-                 return new ResponseModel(returnedDatastream);
-        
+                      var responsestream = await API_Connection.GetAsync(lcToken, statement_url);
+                     string returnedDatastream = await responsestream.Content.ReadAsStringAsync();
+                return responsestream;
             }
+
             catch (Exception Ex)
+
             {
 
-                return new ResponseModel(null, 1, Ex.Message);
+                return null;
+
             }
+
         }
+
 
 
         public async Task<ResponseModel> GetgetstatementsAsync(string lcAuthToken, string loan_number)
