@@ -1018,6 +1018,9 @@ namespace Business_Services
             string noOfPayments = string.Empty;
             decimal paymentAmt = 0.0M;
             AutoDraft_GetAutoDraft pendingInfoAutoDraft = new AutoDraft_GetAutoDraft();
+            decimal onetimePayFee = 0.0M;
+            string straquisitiondate = string.Empty;
+
             bool autodraft = false;
             try
             {
@@ -1031,6 +1034,13 @@ namespace Business_Services
                 returnedData = await pendingresponse.Content.ReadAsStringAsync();
                 pendingInfoPayment = JsonConvert.DeserializeObject<List<OneTimePayment_GetMockedPendingTransactions>>(returnedData);
 
+
+                var getAcquisitionData = await API_Connection.GetAsync(lcToken, "/api/OneTimePayment/GetAcquisitionDate/" + loanNumber + "? _");
+                string returnedaquisitiondata = await getAcquisitionData.Content.ReadAsStringAsync();
+                dynamic objaquisitiondata = JsonConvert.DeserializeObject(returnedaquisitiondata);
+                straquisitiondate = objaquisitiondata.acquisitionDate;
+
+               
                 try
                 {
                     var autoDraftResponse = await API_Connection.GetAsync(lcToken, "api/AutoDraft/GetAutoDraft/" + loanNumber + "? _");
@@ -1087,6 +1097,15 @@ namespace Business_Services
                 paymentAmt = paymentAmt * Convert.ToInt32(noOfPayments);
             }
 
+            if ((DateTime.Now - Convert.ToDateTime(straquisitiondate)).Days < 67)
+            {
+                onetimePayFee = 0;
+            }
+            else
+            {
+                onetimePayFee = loanInfo.payment.delqFee;
+            }
+
             Payment paymentData = new Payment
             {
                 isAutoDraftAvailable = autodraft,
@@ -1111,14 +1130,14 @@ namespace Business_Services
                 total_amount = paymentAmt
                 + loanInfo.payment.addlFees
                                  + loanInfo.payment.nsfFeesDue + loanInfo.payment.otherFeesDue +
-                                 loanInfo.payment.delqFee,
+                                 onetimePayFee,
                 number_of_payments = noOfPayments,
                 additional_principal = 0,
                 additional_escrow = 0,
                 late_fees_due = loanInfo.payment.addlFees,
                 nsf_fees_due = loanInfo.payment.nsfFeesDue,
                 other_fees_due = loanInfo.payment.otherFeesDue,
-                onetime_payment_fees = loanInfo.payment.delqFee,
+                onetime_payment_fees = onetimePayFee,
                 loanType = loanInfo.payment.loanType,
                 userRowId = loanInfo.payment.userRowId,
                 principal_balance = loanInfo.payment.principalBalance,
@@ -1207,7 +1226,8 @@ namespace Business_Services
             bool account_status = false;
             AutoDraft_GetAutoDraft pendingInfoAutoDraft = new AutoDraft_GetAutoDraft();
             bool autodraft = false;
-
+            string straquisitiondate;
+            decimal onetimePayFee;
             try
             {
                 var response = await API_Connection.GetAsync(lcToken, "/api/OnetimePayment/GetPaymentInfo/?loanNo=" + loanNumber + "&schDate=" + payment_date.ToString("MM/dd/yyyy"));
@@ -1215,6 +1235,11 @@ namespace Business_Services
                 //to do get account status
                 account_status = true;
                 loanInfo = JsonConvert.DeserializeObject<OnetimePayment_GetPaymentInfo>(returnedData);
+
+                var getAcquisitionData = await API_Connection.GetAsync(lcToken, "/api/OneTimePayment/GetAcquisitionDate/" + loanNumber + "? _");
+                string returnedaquisitiondata = await getAcquisitionData.Content.ReadAsStringAsync();
+                dynamic objaquisitiondata = JsonConvert.DeserializeObject(returnedaquisitiondata);
+                straquisitiondate = objaquisitiondata.acquisitionDate;
 
                 try
                 {
@@ -1235,6 +1260,16 @@ namespace Business_Services
             {
                 return new ResponseModel(null, 1, Ex.Message);
             }
+
+            if ((DateTime.Now - Convert.ToDateTime(straquisitiondate)).Days < 67)
+            {
+                onetimePayFee = 0;
+            }
+            else
+            {
+                onetimePayFee = loanInfo.payment.delqFee;
+            }
+
             Payment paymentData = new Payment
             {
                 isAutoDraftAvailable = autodraft,
@@ -1262,7 +1297,7 @@ namespace Business_Services
                 late_fees_due = loanInfo.payment.addlFees,
                 nsf_fees_due = loanInfo.payment.nsfFeesDue,
                 other_fees_due = loanInfo.payment.otherFeesDue,
-                onetime_payment_fees = loanInfo.payment.delqFee,
+                onetime_payment_fees = onetimePayFee,
                 loanType = loanInfo.payment.loanType,
                 userRowId = loanInfo.payment.userRowId,
                 principal_balance = loanInfo.payment.principalBalance,
@@ -2926,6 +2961,7 @@ namespace Business_Services
             }
         }
 
+        //Defect # 1070 : Modified By BBSR team on 12th March 2018 : START
         private static PaymentDetails NewMethod(Loan_GetCurrentLoanInfo loanInfo, Activity_AccountActivity loanactivityInfo, Escrow_CallEscrow escrowInfo)
         {
 
@@ -2939,8 +2975,6 @@ namespace Business_Services
 
                 Pendingloandetails paymentdetails = new Pendingloandetails
                 {
-
-
                     totalPaymentReceivedAmount = objpaymentdetail.totalPaymentReceivedAmount,
                     escrowPaidAmount = objpaymentdetail.escrowPaidAmount,
                     principalPmtAmount = objpaymentdetail.principalPmtAmount,
@@ -2976,19 +3010,22 @@ namespace Business_Services
                     paymentList.Add(paymentdetails);
                 }
             }
+
+            //Defect # 1070 : START
+
             var transactiondate = paymentList.Max(x => x.dueDate);
+            //var transactiondate = paymentList.Max(x => x.transactionAppliedDate);
+
+            //var Paymentdata = (from paymentdetails in paymentList
+            //                   where paymentdetails.dueDate == transactiondate
+            //                   select paymentdetails).FirstOrDefault();   
 
             var Paymentdata = (from paymentdetails in paymentList
-                               where paymentdetails.dueDate == transactiondate
+                               where paymentdetails.escrowPaidAmount > 0 && paymentdetails.principalPmtAmount > 0 && paymentdetails.interestPaidAmount > 0
+                               orderby paymentdetails.transactionAppliedDate descending
                                select paymentdetails).FirstOrDefault();
 
-
-            //var Paymentdata = (from paymentde in Paymentdatapending
-            //                   where paymentdetails.dueDate == transactiondate
-            //                   select paymentdetails).First();
-            //var q = from n in pendingpaymentList
-            //        //group n by n.transactionAppliedDate into g
-            //        select new { totalPaymentReceivedAmount = , Date = g.Max(t => t.transactionAppliedDate) };
+            //Defect # 1070 : END
 
             PaymentDetails loan_duedatedate = new PaymentDetails();
 
@@ -3027,23 +3064,6 @@ namespace Business_Services
                 last_regular_payment.escrow_amount = "0.00";
             }
 
-            //if (loanInfo.lastEscrowPD == "")
-            //{
-
-            //    loanInfo.lastEscrowPD = "0.00";
-            //}
-            //if (loanInfo.lastPrinPD == "")
-            //{
-            //    loanInfo.lastPrinPD = "0.00";
-            //}
-            //if (loanInfo.lastIntPD == "")
-            //{
-            //    loanInfo.lastIntPD = "0.00";
-            //}
-
-            //var lastescrowlenth = Convert.ToDecimal(loanInfo.lastEscrowPD);
-            //var lastPrinPDlenth = Convert.ToDecimal(loanInfo.lastPrinPD);
-            //var lastintPDlenth = Convert.ToDecimal(loanInfo.lastIntPD);
 
             var Total_Amount = loanInfo.netPresent;
             last_regular_payment.total_amount = Convert.ToString(Total_Amount);
@@ -3063,6 +3083,7 @@ namespace Business_Services
             loan_duedatedate.next_monthly_payment = next_monthly_payment;
             return (loan_duedatedate);
         }
+        //Defect # 1070 : Modified By BBSR team on 12th March 2018 : END
 
 
         public async Task<ResponseModel> UpdatePaymentAsync(string mobileToken, string loanNumber, DateTime payment_date, Payment payment)
