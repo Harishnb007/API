@@ -1018,10 +1018,11 @@ namespace Business_Services
             string noOfPayments = string.Empty;
             decimal paymentAmt = 0.0M;
             AutoDraft_GetAutoDraft pendingInfoAutoDraft = new AutoDraft_GetAutoDraft();
+            bool autodraft = false;
             decimal onetimePayFee = 0.0M;
+
             string straquisitiondate = string.Empty;
 
-            bool autodraft = false;
             try
             {
                 var response = await API_Connection.GetAsync(lcToken, "/api/OnetimePayment/GetPaymentInfo/?loanNo=" + loanNumber + "&schDate=" + "");
@@ -1034,13 +1035,15 @@ namespace Business_Services
                 returnedData = await pendingresponse.Content.ReadAsStringAsync();
                 pendingInfoPayment = JsonConvert.DeserializeObject<List<OneTimePayment_GetMockedPendingTransactions>>(returnedData);
 
-
                 var getAcquisitionData = await API_Connection.GetAsync(lcToken, "/api/OneTimePayment/GetAcquisitionDate/" + loanNumber + "? _");
+
                 string returnedaquisitiondata = await getAcquisitionData.Content.ReadAsStringAsync();
+
                 dynamic objaquisitiondata = JsonConvert.DeserializeObject(returnedaquisitiondata);
+
                 straquisitiondate = objaquisitiondata.acquisitionDate;
 
-               
+
                 try
                 {
                     var autoDraftResponse = await API_Connection.GetAsync(lcToken, "api/AutoDraft/GetAutoDraft/" + loanNumber + "? _");
@@ -1105,6 +1108,7 @@ namespace Business_Services
             {
                 onetimePayFee = loanInfo.payment.delqFee;
             }
+
 
             Payment paymentData = new Payment
             {
@@ -1228,6 +1232,8 @@ namespace Business_Services
             bool autodraft = false;
             string straquisitiondate;
             decimal onetimePayFee;
+
+
             try
             {
                 var response = await API_Connection.GetAsync(lcToken, "/api/OnetimePayment/GetPaymentInfo/?loanNo=" + loanNumber + "&schDate=" + payment_date.ToString("MM/dd/yyyy"));
@@ -1236,10 +1242,15 @@ namespace Business_Services
                 account_status = true;
                 loanInfo = JsonConvert.DeserializeObject<OnetimePayment_GetPaymentInfo>(returnedData);
 
+
                 var getAcquisitionData = await API_Connection.GetAsync(lcToken, "/api/OneTimePayment/GetAcquisitionDate/" + loanNumber + "? _");
+
                 string returnedaquisitiondata = await getAcquisitionData.Content.ReadAsStringAsync();
+
                 dynamic objaquisitiondata = JsonConvert.DeserializeObject(returnedaquisitiondata);
+
                 straquisitiondate = objaquisitiondata.acquisitionDate;
+
 
                 try
                 {
