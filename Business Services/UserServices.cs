@@ -2391,42 +2391,37 @@ namespace Business_Services
                 string returnedData = await response.Content.ReadAsStringAsync();
                 dynamic objUser = JsonConvert.DeserializeObject(returnedData);
 
+                //Email User Registration ... Updated on 10th March 2018 by BBSR Team : Defect # 1162 & 1068 : START
+                //var ErrorMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(objUser);                
+
                 IEnumerable<string> tokenValues;
                 string tokenValue = "";
                 if (response.Headers.TryGetValues("AuthorizationToken", out tokenValues))
                 {
                     tokenValue = tokenValues.FirstOrDefault();
                 }
-               // Fix for Defect LMA - 1068 start
-              //  dynamic objUser = JsonConvert.DeserializeObject(returnedData);
-                var ErrorMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(objUser);
 
                 var responsepropertyCode = await API_Connection.GetAsync("/api/Helper/GetStatePropertyCode/?loanNo=" + userDetail.loanNumber);
                 string returnedpropertyCode = await responsepropertyCode.Content.ReadAsStringAsync();
                 dynamic propertycode = JsonConvert.DeserializeObject(returnedpropertyCode);
-                // Fix for Defect LMA - 1068 End
-                if (ErrorMessage.updated == true)
-                {
-                    string clientName = ErrorMessage.client.clientName;
 
-                    string strUserName = ErrorMessage.user.userName;
+                if (objUser.updated == true)
+                {
+                    string clientName = objUser.client.clientName;
+
+                    string strUserName = userDetail.username;
                     byte[] userName = System.Text.ASCIIEncoding.ASCII.GetBytes(strUserName);
                     string decodeduserName = System.Convert.ToBase64String(userName);
 
+                    string strUserID = objUser.obj.user.id;
 
-                    string strUserID = ErrorMessage.user.userID;
-
-
-                    string loanNo = ErrorMessage.userLoan.loanNo;
-                    string clientPhone = ErrorMessage.client.clientPhone;
+                    string loanNo = userDetail.loanNumber;
+                    string clientPhone = objUser.client.clientPhone;
                     string clientUrl = "www.myloancare.com";
 
-                    string strUserEmail = ErrorMessage.userLoan.emailAddress;
+                    string strUserEmail = userDetail.email;
                     byte[] userEmail = System.Text.ASCIIEncoding.ASCII.GetBytes(strUserEmail);
                     string decodeduserEmail = System.Convert.ToBase64String(userEmail);
-
-                    ////string freedommortageURL = ErrorMessage.client.privateLabelURL;
-                    ////string FreedomMortage = ErrorMessage.client.clientName;
 
                     Dictionary<string, string> someDictMail = new Dictionary<string, string>();
                     someDictMail.Add("emailData[0][key]", "clientname");
@@ -2441,21 +2436,21 @@ namespace Business_Services
                     someDictMail.Add("emailData[3][key]", "clientPhone");
                     someDictMail.Add("emailData[3][value]", clientPhone);
                     someDictMail.Add("emailData[3][update]", "undefined");
-                    someDictMail.Add("emailData[3][key]", "url");
-                    someDictMail.Add("emailData[3][value]", clientUrl);
-                    someDictMail.Add("emailData[3][update]", "undefined");
-                    someDictMail.Add("emailData[3][key]", "PROPERTY_STATE_CODE");
-                    someDictMail.Add("emailData[3][value]", propertycode);
-                    someDictMail.Add("emailData[3][update]", "undefined");
+                    someDictMail.Add("emailData[4][key]", "url");
+                    someDictMail.Add("emailData[4][value]", clientUrl);
+                    someDictMail.Add("emailData[4][update]", "undefined");
+                    someDictMail.Add("emailData[5][key]", "PROPERTY_STATE_CODE");
+                    someDictMail.Add("emailData[5][value]", propertycode);
+                    someDictMail.Add("emailData[5][update]", "undefined");
                     someDictMail.Add("update", "undefined");
 
-
                     var contentmail = new FormUrlEncodedContent(someDictMail);
-                    var responsemail = await API_Connection.PostAsync(tokenValue, "/api/EmailNotification/SendEmailConfirmationForTemplate/?template=LoanCareRegistration&toEmail=" + decodeduserEmail + "&pageName=disclosure&userID=" + strUserID, contentmail);
+                    var responsemail = await API_Connection.PostUserRegisAsync("/api/EmailNotification/SendEmailConfirmationForTemplate/?template=LoanCareRegistration&toEmail=" + decodeduserEmail + "&pageName=disclosure&userID=" + strUserID, contentmail);
                 }
 
+                //Email User Registration ... Updated on 10th March 2018 by BBSR Team : Defect # 1162 & 1068 : END
 
-                    return new ResponseModel(objUser);
+                return new ResponseModel(objUser);
             }
             catch (Exception Ex)
             {

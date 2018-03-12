@@ -1461,7 +1461,9 @@ namespace Business_Services
                         }
                         else
                         {
-                            strpayment_description = a.tranCodeDesc;
+                            //1218 : Change - Added "Other" as extra group for those not matches in Document or DataBase Table.
+                            //strpayment_description = a.tranCodeDesc;
+                            strpayment_description = "Other";
                         }
                     }
 
@@ -1558,7 +1560,8 @@ namespace Business_Services
                         }
                         else
                         {
-                            strpayment_description = activity.tranCodeDesc;
+                            //1218 : Change - Added "Other" as extra group for those not matches in Document or DataBase Table.
+                            strpayment_description = "Other_" + activity.tranCodeDesc;
                         }
                     }
                     //Modified by BBSR Team on 5th March 2018 : Defect # 1218
