@@ -2458,6 +2458,31 @@ namespace Business_Services
                 return new ResponseModel(null, 1, Ex.Message);
             }
         }
+        public async Task<string> trackinglog(string lcAuthToken, Tracking tracking)
+        {
+
+            Business_Services.Models.GenerateNewToken objgenerateToken = new GenerateNewToken();
+
+            var Decryptdata = objgenerateToken.Decrypt(lcAuthToken);
+
+            dynamic ObjUserId = JsonConvert.DeserializeObject(Decryptdata);
+
+            string resourcename = ObjUserId.resourcename;
+
+            string logview = ObjUserId.log;
+
+            var toEmail = "";
+
+            var trackresponse = await API_Connection.GetAsync(lcAuthToken, "/api/Helper/AddTrackingInfo/?eventId=" + tracking.eventId + "&resourceName=" + resourcename + "&toEmail=" + toEmail + "&log=" + logview + "&actionName=" + tracking.actionName);
+
+            string returnedData = await trackresponse.Content.ReadAsStringAsync();
+
+            return returnedData;
+
+        }
+
+
+
 
     }
 }

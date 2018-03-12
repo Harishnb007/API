@@ -389,12 +389,12 @@ namespace Business_Services
             }
         }
 
-        public async Task<ResponseModel> GetgetstatementspdfAsync(string lcAuthToken, string loan_number, string Date,string Key)
+        public async Task<ResponseModel> GetgetstatementspdfAsync(string lcAuthToken, GeneratePdf generatePdf)
         {
             string lcToken = tokenServices.GetLctoken(lcAuthToken);
             try
             {
-                var statement_url = "/Statements/EStatementHandler.Pdf?loanNo=" + loan_number + "&statementDate=" + Date + "&statementKey=" + Key;
+                var statement_url = "/Statements/EStatementHandler.Pdf?loanNo=" + generatePdf.LoanNumber + "&statementDate=" + generatePdf.date + "&statementKey=" + generatePdf.Key;
                // MemoryStream mem = new MemoryStream();
                 var responsestream = await API_Connection.GetAsync(lcToken, statement_url);
                 string returnedDatastream = await responsestream.Content.ReadAsStringAsync();
@@ -829,7 +829,8 @@ namespace Business_Services
                     phone_other_2_number = LoanDetailsemail.phone_other_2_number,
                     phone_other_2_type = LoanDetailsemail.phone_other_2_type,
                     phone_other_3_number = LoanDetailsemail.phone_other_3_number,
-                    phone_other_3_type = LoanDetailsemail.phone_other_3_type
+                    phone_other_3_type = LoanDetailsemail.phone_other_3_type,
+                    country = Convert.ToString(getuserinfoPhoneNo.contactinfo.contactInfo.mailingAddressCountry)
                 };
 
                 var eventId = 5;
