@@ -117,6 +117,31 @@ namespace LoanCare_Mobile_API.Controllers
             return Ok(payment);
         }
 
+        [Route("TrackingLog")]
+        [HttpPost]
+        public async Task<IHttpActionResult> Tracking_Log(Tracking tracking)
+        {
+            IEnumerable<string> tokenValues;
+
+            string tokenValue = "";
+
+            if (Request.Headers.TryGetValues("AuthorizationToken", out tokenValues))
+
+            {
+                tokenValue = tokenValues.FirstOrDefault();
+            }        
+            var responsedata = await userService.trackinglog(tokenValue, tracking);
+            if (responsedata != null)
+
+            {
+                return Ok(responsedata);
+            }
+            else
+            {
+                return BadRequest("Error!");
+            }
+        }
+
 
 
         //[Route("MyLoanSetpin/{LoanNumber}/{pin}")]
@@ -572,25 +597,25 @@ namespace LoanCare_Mobile_API.Controllers
             return Ok(Forgot_UserId);
         }
 
-        [Route("ForgotPassword")]
-        [HttpPost]
-        public async Task<IHttpActionResult> ForgotPassword(Business_Services.Models.User userDetail)
-        {
-            IEnumerable<string> tokenValues;
-            string tokenValue = "";
-            if (Request.Headers.TryGetValues("AuthorizationToken", out tokenValues))
-            {
-                tokenValue = tokenValues.FirstOrDefault();
-            }
+        //[Route("ForgotPassword")]
+        //[HttpPost]
+        //public async Task<IHttpActionResult> ForgotPassword(Business_Services.Models.User userDetail)
+        //{
+        //    IEnumerable<string> tokenValues;
+        //    string tokenValue = "";
+        //    if (Request.Headers.TryGetValues("AuthorizationToken", out tokenValues))
+        //    {
+        //        tokenValue = tokenValues.FirstOrDefault();
+        //    }
 
-            var Forgot_Password = await userService.ForgotPassword(userDetail);
+        //    var Forgot_Password = await userService.ForgotPassword(userDetail);
 
-            if (Forgot_Password == null)
-            {
-                return NotFound();
-            }
-            return Ok(Forgot_Password);
-        }
+        //    if (Forgot_Password == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return Ok(Forgot_Password);
+        //}
 
         [Route("ValidateSecurityAnswer")]
         [HttpPost]
