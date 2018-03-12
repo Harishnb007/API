@@ -1395,7 +1395,9 @@ namespace Business_Services
                 }
                 //Need to add the >60 Aquisition date Condition
                 //Modified By BBSR Team on 8th March 2018 : Defect # 955
-                if ((DateTime.Now - Convert.ToDateTime(straquisitiondate)).Days < 60)
+                //if ((DateTime.Now - Convert.ToDateTime(straquisitiondate)).Days < 60)
+                //Modified By BBSR Team on 12th March 2018 (Days Diff modified to 67): Defect # 955
+                if ((DateTime.Now - Convert.ToDateTime(straquisitiondate)).Days < 67)
                 {
                     straquisitionmessage = "As a courtesy no fee will be assessed for utilizing this service during your initial 60 days as a new customer.";
                 }
