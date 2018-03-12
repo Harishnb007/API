@@ -1064,7 +1064,7 @@ namespace Business_Services
                     loan_principal_balance = userLoanAmount.loan_principal_balance,
                     last_payment_date = userLoanAmount.last_payment_date,
                     is_enrolled = userLoanAmount.is_enrolled,
-                    is_escrow_loan = escrowInfo.lastAna.Contains('*') ? false : true,
+                    is_escrow_loan = Convert.ToString(escrowInfo.pmtEscrow) == "0.00" ? false : true,
                     is_bankruptcy = (processCode == "K" || processCode == "k") ? true : false
                 };
                 return new ResponseModel(UserLoanIfo);
