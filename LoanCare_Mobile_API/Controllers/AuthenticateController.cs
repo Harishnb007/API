@@ -216,7 +216,8 @@ namespace LoanCare_Mobile_API.Controllers
                 // To do - Pass the user ID instead of hardcoded value
                 // loans = new Business_Services.Models.Loan { first_name = userDetails.first_name, loans = userDetails.loans, last_name = userDetails.last_name,username =userDetails.username }
                 // };
-                if (Auth_data.MobileSignedUp == "False")
+                bool checkClientForRollout = false;
+                if (checkClientForRollout ) //&& Auth_data.MobileSignedUp == "False")
                 {
                     var responsedata = Request.CreateResponse(HttpStatusCode.OK, new ResponseModel
                     {
@@ -224,9 +225,7 @@ namespace LoanCare_Mobile_API.Controllers
                         data = null
                     });
 
-                }
-                if (Auth_data.MobileSignedUp == "True")
-                {
+                } else  {
                     var responsedata = Request.CreateResponse(HttpStatusCode.OK, new ResponseModel
                     {
                         status = new Status { CustomErrorCode = 0, Message = "success" },
@@ -249,15 +248,15 @@ namespace LoanCare_Mobile_API.Controllers
            
                 ResponseModel responseModel = new ResponseModel();
                 Status status = new Status();
-            if (Auth_data.MobileSignedUp == "False")
+            bool checkClientForRolloutt = false;
+            if (checkClientForRolloutt)// && Auth_data.MobileSignedUp == "False")
             {
                 responseModel.data = null;
                 status.CustomErrorCode = 1;
                 status.Message = "You are not allowed to login from Mobile App at this time as it is still not enabled for " + Auth_data.ClientName + ".Please use website. ";
                 responseModel.status = status;
             }
-            if (Auth_data.MobileSignedUp == "True") {
-
+            else {
                 responseModel.data = Auth_data;
                 status.CustomErrorCode = 1;
                 status.Message = "Success";
@@ -265,7 +264,6 @@ namespace LoanCare_Mobile_API.Controllers
             }
             var responsemMobileflag = responseModel;
             var responsemsg = Request.CreateResponse(responsemMobileflag);
-                      
             return responsemsg;
 
         }

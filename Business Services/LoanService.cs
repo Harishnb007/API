@@ -1525,7 +1525,6 @@ namespace Business_Services
 
         }
 
-
         //Modified by BBSR Team on 10th Jan 2018 : The logic to extract the Activity details changed 
         public async Task<ResponseModel> GetPaymentDescriptionsForLoanAsync(string mobileToken, string loanNumber)
         {
