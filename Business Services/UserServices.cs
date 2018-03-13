@@ -1527,7 +1527,8 @@ namespace Business_Services
             {
                 // To do - Use DI
 
-                string lcToken = lcAuthToken;
+                TokenServices tokenServices = new TokenServices();
+                string lcToken = tokenServices.GetLctoken(lcAuthToken);
 
 
                 byte[] password = System.Text.ASCIIEncoding.ASCII.GetBytes(passwordData.password);
@@ -1553,9 +1554,19 @@ namespace Business_Services
 
                 var content = new FormUrlEncodedContent(someDict);
                 var response = await API_Connection.PostAsync(lcToken, "/api/User/ReminderAndForgotPasswordUpdate/", content);
-                dynamic Message = await response.message.Content.ReadAsStringAsync();
+                dynamic message = await response.message.Content.ReadAsStringAsync();
+                ErrorModel contentError = JsonConvert.DeserializeObject<ErrorModel>(message);
 
-                return new ResponseModel(null, 0, "success");
+                if(contentError.updated == false)
+                {
+                    return new ResponseModel(null, 1, contentError.msg);
+                }
+                else
+                {
+                    return new ResponseModel(null, 0, "success");
+
+                }
+                
 
             }
 
