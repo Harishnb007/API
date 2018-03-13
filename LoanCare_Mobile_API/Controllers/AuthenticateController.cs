@@ -68,27 +68,42 @@ namespace LoanCare_Mobile_API.Controllers
             await Task.WhenAll(lcAuthTokenValueTask);
 
             dynamic value = lcAuthTokenValueTask.Result;
+
             var id = ((Business_Services.Models.Helpers.ResponseWithToken)value).errorId;
             var errorMessage = ((Business_Services.Models.Helpers.ResponseWithToken)value).errorMessage;
             var tokenValue = ((Business_Services.Models.Helpers.ResponseWithToken)value).tokenValue;
+            var pwdChange = ((Business_Services.Models.Helpers.ResponseWithToken)value).changePassword;
+            var authenticateData = ((Business_Services.Models.Helpers.ResponseWithToken)value).authenticateResult;
 
-            if (((Business_Services.Models.Helpers.ResponseWithToken)value).errorId == 0)
+            if (id == 0)
             {
-                var GetTokenTask = GetAuthTokenAsync(userCred.username, userCred.password, tokenValue.ToString(),
-                userCred.Is_New_MobileUser, userCred.username, userCred.resourcename, userCred.log);
-                await Task.WhenAll(GetTokenTask);
+                if (pwdChange == "Y") {
+                    var responseChangePwd = Request.CreateResponse(HttpStatusCode.OK, new ResponseModel
+                    {
+                        status = new Status { CustomErrorCode = 100, Message = "success" },
+                        data = authenticateData
+                    });
 
-                return GetTokenTask.Result;
+                    return responseChangePwd;
+                }
+                else
+                {
+                    var GetTokenTask = GetAuthTokenAsync(userCred.username, userCred.password, tokenValue.ToString(),
+                    userCred.Is_New_MobileUser, userCred.username, userCred.resourcename, userCred.log);
+                    await Task.WhenAll(GetTokenTask);
+
+                    return GetTokenTask.Result;
+                }
             }
             else
             {
-                var responseMobileUser = Request.CreateResponse(HttpStatusCode.OK, new ResponseModel
+                var responseInvalidUser = Request.CreateResponse(HttpStatusCode.OK, new ResponseModel
                 {
                     status = new Status { CustomErrorCode = id, Message = errorMessage },
                     data = ""
                 });
 
-                return responseMobileUser;
+                return responseInvalidUser;
             }
         }
 

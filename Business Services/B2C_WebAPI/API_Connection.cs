@@ -110,6 +110,8 @@ namespace Business_Services.B2C_WebAPI
             returnData.errorId = 0;
             returnData.tokenValue = "";
             returnData.errorMessage = "";
+            returnData.changePassword = "N";
+            returnData.authenticateResult = new Authenticate();
 
             if (result.IsSuccessStatusCode)
             {
@@ -120,7 +122,19 @@ namespace Business_Services.B2C_WebAPI
                     string setCookieValue = HttpUtility.UrlDecode(result.Headers.GetValues("Set-Cookie").FirstOrDefault());
                     Regex regex = new Regex("lcauth=(.*?);");
                     var v = regex.Match(setCookieValue);
-                    returnData.tokenValue = v.Groups[1].ToString();
+
+                    var responseAsString = await result.Content.ReadAsStringAsync();
+                    Authenticate resultSet = JsonConvert.DeserializeObject<Authenticate>(responseAsString);
+
+                    if (resultSet.objUserInfo.user.changePassword == "Y")
+                    {
+                        returnData.authenticateResult = resultSet;
+                        returnData.changePassword = "Y";
+                    }
+                    else
+                    {
+                        returnData.tokenValue = v.Groups[1].ToString();
+                    }
                     returnData.message = result;
                 }
                 else
