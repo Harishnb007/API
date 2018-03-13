@@ -54,5 +54,7 @@ namespace Business_Services
         //Modified by BBSR Team on 18th Jan 2018 : Forgot User / Password
         Task<string> trackinglog(string lcAuthToken, Tracking tracking);
         Task<ResponseModel> GetPinforMobileAsync(string MobileToken);
+
+        Task<ResponseModel> ChangePasswordAsync(string lcAuthToken, ChangePassword passwordData);
     }
 }

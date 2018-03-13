@@ -370,6 +370,26 @@ namespace LoanCare_Mobile_API.Controllers
             return Ok(payment);
         }
 
+
+        [Route("changepwd")]
+        [HttpPost]
+        public async Task<IHttpActionResult> changePassword(ChangePassword passwordData)
+        {
+            IEnumerable<string> tokenValues;
+            string tokenValue = "";
+            if (Request.Headers.TryGetValues("AuthorizationToken", out tokenValues))
+            {
+                tokenValue = tokenValues.FirstOrDefault();
+            }
+
+            var password = await userService.ChangePasswordAsync(tokenValue, passwordData);
+            if (password == null)
+            {
+                return NotFound();
+            }
+            return Ok(password);
+        }
+
         static string _Pwd = "This_is_just_a_token_text_for_dev";
         // To do - move this to config file
 

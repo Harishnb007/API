@@ -1520,6 +1520,51 @@ namespace Business_Services
         }
 
 
+
+        public async Task<ResponseModel> ChangePasswordAsync(string lcAuthToken,ChangePassword passwordData)
+        {
+            try
+            {
+                // To do - Use DI
+
+                string lcToken = lcAuthToken;
+
+
+                byte[] password = System.Text.ASCIIEncoding.ASCII.GetBytes(passwordData.password);
+                string decodedStringpassword = System.Convert.ToBase64String(password);
+
+                byte[] userId = System.Text.ASCIIEncoding.ASCII.GetBytes(passwordData.userId);
+                string decodedStringuserId = System.Convert.ToBase64String(userId);
+
+                byte[] ssn = System.Text.ASCIIEncoding.ASCII.GetBytes(passwordData.ssn);
+                string decodedStringssn = System.Convert.ToBase64String(ssn);
+
+                Dictionary<string, string> someDict = new Dictionary<string, string>();
+                someDict.Add("password", decodedStringpassword);
+                someDict.Add("userId", decodedStringuserId);
+                someDict.Add("existinguserId", decodedStringuserId);
+                someDict.Add("ssn", decodedStringssn);
+                someDict.Add("loanno", passwordData.loanNumber);
+                someDict.Add("timeval", DateTime.Now.ToString().Split(' ')[0] + " at " + DateTime.Now.ToString().Split(' ')[1].Split(':')[0] + ":" + DateTime.Now.ToString().Split(' ')[1].Split(':')[1] + "  " + DateTime.Now.ToString().Split(' ')[2]);
+                someDict.Add("url", "");
+                someDict.Add("emailaddress", passwordData.emailaddress);
+                someDict.Add("clientname", "");
+                someDict.Add("PROPERTY_STATE_CODE", "");
+
+                var content = new FormUrlEncodedContent(someDict);
+                var response = await API_Connection.PostAsync(lcToken, "/api/User/ReminderAndForgotPasswordUpdate/", content);
+                dynamic Message = await response.message.Content.ReadAsStringAsync();
+
+                return new ResponseModel(null, 0, "success");
+
+            }
+
+            catch (Exception Ex)
+            {
+                return new ResponseModel(passwordData, 1, Ex.Message);
+            }
+        }
+
         //public async Task<ResponseModel> SetPinAsync(string MobileToken, UpdatePassword PinDetail)
         //{
         //    try

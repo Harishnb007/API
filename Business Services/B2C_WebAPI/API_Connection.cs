@@ -124,16 +124,26 @@ namespace Business_Services.B2C_WebAPI
                     var v = regex.Match(setCookieValue);
 
                     var responseAsString = await result.Content.ReadAsStringAsync();
-                    Authenticate resultSet = JsonConvert.DeserializeObject<Authenticate>(responseAsString);
+                    
 
-                    if (resultSet.objUserInfo.user.changePassword == "Y")
+                    if (responseAsString.Contains("loanPaid"))
                     {
-                        returnData.authenticateResult = resultSet;
-                        returnData.changePassword = "Y";
+                        Authenticate resultSet = JsonConvert.DeserializeObject<Authenticate>(responseAsString);
+                        if (resultSet.objUserInfo.user.changePassword == "Y")
+                        {
+                            returnData.authenticateResult = resultSet;
+                            returnData.changePassword = "Y";
+                        }
+                        else
+                        {
+                            returnData.tokenValue = v.Groups[1].ToString();
+                        }
                     }
                     else
                     {
-                        returnData.tokenValue = v.Groups[1].ToString();
+                        ErrorModel contentError = JsonConvert.DeserializeObject<ErrorModel>(responseAsString);
+                        returnData.errorId = 1;
+                        returnData.errorMessage = contentError.msg;
                     }
                     returnData.message = result;
                 }
