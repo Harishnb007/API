@@ -2207,19 +2207,29 @@ namespace Business_Services
                 string returnedData = await response.Content.ReadAsStringAsync();
                 MyAccount_GetAccountInfo getuserinfo = JsonConvert.DeserializeObject<MyAccount_GetAccountInfo>(returnedData);
 
+                //Defect#1189 : Added by BBSr Team on 12th March 2018
+                var responsepropertyCode = await API_Connection.GetAsync("/api/Helper/GetStatePropertyCode/?loanNo=" + estatementdetails.loanNumber);
+                string returnedpropertyCode = await responsepropertyCode.Content.ReadAsStringAsync();
+                dynamic propertycode = JsonConvert.DeserializeObject(returnedpropertyCode);
+                //Defect#1189 : Added by BBSr Team on 12th March 2018
+
                 Dictionary<string, string> someDict = new Dictionary<string, string>();
-                someDict.Add("email", getuserinfo.msg.emailAddress);
-                someDict.Add("loanNo", estatementdetails.loanNumber);
+                someDict.Add("LoanNo", estatementdetails.loanNumber);
+                someDict.Add("Email", getuserinfo.msg.emailAddress);
+                someDict.Add("PROPERTY_STATE_CODE", propertycode); //Defect#1189 : Added by BBSr Team on 12th March 2018
 
                 var content = new FormUrlEncodedContent(someDict);
 
-                var responseEstatement = await API_Connection.PostAsync(lcToken, "/api/EStatement/EnrollStatement/", content);
+                //Defect#1189 : Added by BBSr Team on 12th March 2018
+                //var responseEstatement = await API_Connection.PostAsync(lcToken, "/api/EStatement/EnrollStatement/", content);
+                var responseEstatement = await API_Connection.PostUserRegisAsync("/api/EStatement/EnrollStatement/", content);
+                //Defect#1189 : Added by BBSr Team on 12th March 2018
+
                 dynamic Message = await responseEstatement.message.Content.ReadAsStringAsync();
                 var ResponseMsg = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Message);
                 string resmsg = ResponseMsg;
                 if (resmsg == "")
                 {
-
                     eStatementenroll = true;
                 }
 
@@ -2228,8 +2238,6 @@ namespace Business_Services
 
                 var Token = responseregeneratedToken.tokenValue;
 
-
-                //var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token,resourcename,logview, eStatementenroll);
                 var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token, objusername, resourcename, logview, eStatementenroll);
                 estatementdetails.Token = MobileTokenNew;
                 return new ResponseModel(estatementdetails);
@@ -2270,27 +2278,37 @@ namespace Business_Services
                 string returnedData = await response.Content.ReadAsStringAsync();
                 MyAccount_GetAccountInfo getuserinfo = JsonConvert.DeserializeObject<MyAccount_GetAccountInfo>(returnedData);
 
+
+                //Defect#1189 : Added by BBSr Team on 12th March 2018
+                var responsepropertyCode = await API_Connection.GetAsync("/api/Helper/GetStatePropertyCode/?loanNo=" + Cstatementdetails.loanNumber);
+                string returnedpropertyCode = await responsepropertyCode.Content.ReadAsStringAsync();
+                dynamic propertycode = JsonConvert.DeserializeObject(returnedpropertyCode);
+                //Defect#1189 : Added by BBSr Team on 12th March 2018
+
                 Dictionary<string, string> someDict = new Dictionary<string, string>();
-                someDict.Add("email", getuserinfo.msg.emailAddress);
-                someDict.Add("loanNo", Cstatementdetails.loanNumber);
+                someDict.Add("LoanNo", Cstatementdetails.loanNumber);
+                someDict.Add("Email", getuserinfo.msg.emailAddress);
+                someDict.Add("PROPERTY_STATE_CODE", propertycode); //Defect#1189 : Added by BBSr Team on 12th March 2018
 
                 var content = new FormUrlEncodedContent(someDict);
 
-                var responseCstatement = await API_Connection.PostAsync(lcToken, "/api/EStatement/CancelStatement/", content);
+                //Defect#1189 : Added by BBSr Team on 12th March 2018
+                //var responseCstatement = await API_Connection.PostAsync(lcToken, "/api/EStatement/CancelStatement/", content);
+                var responseCstatement = await API_Connection.PostUserRegisAsync("/api/EStatement/CancelStatement/", content);
+                //Defect#1189 : Added by BBSr Team on 12th March 2018
+
                 dynamic Message = await responseCstatement.message.Content.ReadAsStringAsync();
                 var ResponseMsg = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Message);
                 string resmsg = ResponseMsg;
                 if (resmsg == "")
                 {
-
                     eStatemente = false;
                 }
+
                 var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", objPWd } });
                 var responseregeneratedToken = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
 
                 var Token = responseregeneratedToken.tokenValue;
-
-
                 var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token, objusername, resourcename, logview, eStatemente);
                 Cstatementdetails.Token = MobileTokenNew;
                 return new ResponseModel(Cstatementdetails);

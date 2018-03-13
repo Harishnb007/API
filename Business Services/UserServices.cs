@@ -2428,7 +2428,8 @@ namespace Business_Services
                     someDictMail.Add("emailData[0][value]", clientName);
                     someDictMail.Add("emailData[0][update]", "undefined");
                     someDictMail.Add("emailData[1][key]", "username");
-                    someDictMail.Add("emailData[1][value]", decodeduserName);
+                    //someDictMail.Add("emailData[1][value]", decodeduserName);
+                    someDictMail.Add("emailData[1][value]", strUserName); // Modified by BBSR Team on 12th March from the Decoded Username to simple UserName
                     someDictMail.Add("emailData[1][update]", "undefined");
                     someDictMail.Add("emailData[2][key]", "loanNo");
                     someDictMail.Add("emailData[2][value]", loanNo);
