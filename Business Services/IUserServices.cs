@@ -47,12 +47,14 @@ namespace Business_Services
 
         //Modified by BBSR Team on 18th Jan 2018 : Forgot User / Password
         Task<ResponseModel> ForgotUser_Id(Business_Services.Models.User userDetail);
-       // Task<ResponseModel> ForgotPassword(Business_Services.Models.User userDetail);
+        Task<ResponseModel> ForgotPassword(Business_Services.Models.User userDetail);
         Task<ResponseModel> ValidateSecurityAnswer(Business_Services.Models.User userDetail);
         Task<ResponseModel> ResetSendPassword(Business_Services.Models.User userDetail);
         Task<ResponseModel> SetPinAsync(string MobileToken, UpdatePassword loanDetails);
         //Modified by BBSR Team on 18th Jan 2018 : Forgot User / Password
         Task<string> trackinglog(string lcAuthToken, Tracking tracking);
         Task<ResponseModel> GetPinforMobileAsync(string MobileToken);
+
+        Task<ResponseModel> ChangePasswordAsync(string lcAuthToken, ChangePassword passwordData);
     }
 }

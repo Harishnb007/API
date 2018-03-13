@@ -72,6 +72,8 @@ namespace Business_Services
                 content = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", userName }, { "password", password }, { "ssn", "" } });
                 response = await API_Connection.PostAsync("/api/Auth/Authenticate", content);
 
+
+
                 return response;
             }
             catch (Exception Ex)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Business_Services.Models.LC_WebApi_Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -13,5 +14,8 @@ namespace Business_Services.Models.Helpers
         public string tokenValue { get; set; }
         public string errorMessage { get; set; }
         public int errorId { get; set; }
+        public Authenticate authenticateResult { get; set; }
+
+        public string changePassword { get; set; }
     }
 }

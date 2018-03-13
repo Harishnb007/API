@@ -20,5 +20,7 @@ namespace Business_Services.Models.LC_WebApi_Models
 
         [JsonProperty]
         public string msg { get; set; }
+
+        public bool updated { get; set; }
     }
 }

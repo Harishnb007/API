@@ -50,6 +50,8 @@ namespace Business_Services.Models
         public string phone_other_2_type_concern { get; set; }
         public string phone_other_3_number_concern { get; set; }
         public string phone_other_3_type_concern { get; set; }
+
+        public string MobileSignedUp { get; set; }
         public List<LoanSummary> loanss { get; set; }
     }
 

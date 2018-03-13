@@ -36,4 +36,16 @@ namespace Business_Services.Models
         [JsonProperty]
         public string User_Id { get; set; }
     }
+
+
+    public class ChangePassword
+    {
+
+        public string password { get; set; }
+        public string userId { get; set; }
+        public string emailaddress { get; set; }
+        public string ssn { get; set; }
+        public string loanNumber { get; set; }
+
+    }
 }

@@ -142,8 +142,6 @@ namespace LoanCare_Mobile_API.Controllers
             }
         }
 
-
-
         //[Route("MyLoanSetpin/{LoanNumber}/{pin}")]
         //[HttpGet]
         //public IHttpActionResult Getpin(string LoanNumber, string pin)
@@ -372,6 +370,26 @@ namespace LoanCare_Mobile_API.Controllers
             return Ok(payment);
         }
 
+
+        [Route("changepwd")]
+        [HttpPost]
+        public async Task<IHttpActionResult> changePassword(ChangePassword passwordData)
+        {
+            IEnumerable<string> tokenValues;
+            string tokenValue = "";
+            if (Request.Headers.TryGetValues("AuthorizationToken", out tokenValues))
+            {
+                tokenValue = tokenValues.FirstOrDefault();
+            }
+
+            var password = await userService.ChangePasswordAsync(tokenValue, passwordData);
+            if (password == null)
+            {
+                return NotFound();
+            }
+            return Ok(password);
+        }
+
         static string _Pwd = "This_is_just_a_token_text_for_dev";
         // To do - move this to config file
 
@@ -597,25 +615,25 @@ namespace LoanCare_Mobile_API.Controllers
             return Ok(Forgot_UserId);
         }
 
-        //[Route("ForgotPassword")]
-        //[HttpPost]
-        //public async Task<IHttpActionResult> ForgotPassword(Business_Services.Models.User userDetail)
-        //{
-        //    IEnumerable<string> tokenValues;
-        //    string tokenValue = "";
-        //    if (Request.Headers.TryGetValues("AuthorizationToken", out tokenValues))
-        //    {
-        //        tokenValue = tokenValues.FirstOrDefault();
-        //    }
+        [Route("ForgotPassword")]
+        [HttpPost]
+        public async Task<IHttpActionResult> ForgotPassword(Business_Services.Models.User userDetail)
+        {
+            IEnumerable<string> tokenValues;
+            string tokenValue = "";
+            if (Request.Headers.TryGetValues("AuthorizationToken", out tokenValues))
+            {
+                tokenValue = tokenValues.FirstOrDefault();
+            }
 
-        //    var Forgot_Password = await userService.ForgotPassword(userDetail);
+            var Forgot_Password = await userService.ForgotPassword(userDetail);
 
-        //    if (Forgot_Password == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return Ok(Forgot_Password);
-        //}
+            if (Forgot_Password == null)
+            {
+                return NotFound();
+            }
+            return Ok(Forgot_Password);
+        }
 
         [Route("ValidateSecurityAnswer")]
         [HttpPost]
