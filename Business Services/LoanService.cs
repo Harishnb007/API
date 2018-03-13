@@ -2133,6 +2133,7 @@ namespace Business_Services
 
         }
 
+        // Modified by BBSr Team on 12th March 2018 : Defect # 1189 : START
         public async Task<ResponseModel> PosteStatementForLoanAsync(string MobileToken, Business_Services.Models.User estatementdetails)
         {
             // To do - Use DI
@@ -2174,10 +2175,9 @@ namespace Business_Services
                 var content = new FormUrlEncodedContent(someDict);
 
                 //Defect#1189 : Added by BBSr Team on 12th March 2018
-                //var responseEstatement = await API_Connection.PostAsync(lcToken, "/api/EStatement/EnrollStatement/", content);
-                var responseEstatement = await API_Connection.PostUserRegisAsync("/api/EStatement/EnrollStatement/", content);
+                var responseEstatement = await API_Connection.PostAsync(lcToken, "/api/EStatement/EnrollStatement/", content);
+                //var responseEstatement = await API_Connection.PostUserRegisAsync("/api/EStatement/EnrollStatement/", content);
                 //Defect#1189 : Added by BBSr Team on 12th March 2018
-
                 dynamic Message = await responseEstatement.message.Content.ReadAsStringAsync();
                 var ResponseMsg = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Message);
                 string resmsg = ResponseMsg;
@@ -2204,7 +2204,6 @@ namespace Business_Services
 
 
         }
-
 
 
         public async Task<ResponseModel> PostCancelStatementForLoanAsync(string MobileToken, Business_Services.Models.User Cstatementdetails)
@@ -2246,8 +2245,8 @@ namespace Business_Services
                 var content = new FormUrlEncodedContent(someDict);
 
                 //Defect#1189 : Added by BBSr Team on 12th March 2018
-                //var responseCstatement = await API_Connection.PostAsync(lcToken, "/api/EStatement/CancelStatement/", content);
-                var responseCstatement = await API_Connection.PostUserRegisAsync("/api/EStatement/CancelStatement/", content);
+                var responseCstatement = await API_Connection.PostAsync(lcToken, "/api/EStatement/CancelStatement/", content);
+                //var responseCstatement = await API_Connection.PostUserRegisAsync("/api/EStatement/CancelStatement/", content);
                 //Defect#1189 : Added by BBSr Team on 12th March 2018
 
                 dynamic Message = await responseCstatement.message.Content.ReadAsStringAsync();
@@ -2272,6 +2271,9 @@ namespace Business_Services
                 return new ResponseModel(null, 1, "Error cancelling e-Statement. Please contact Customer Service at 1-800-274-6600");
             }
         }
+
+        // Modified by BBSr Team on 12th March 2018 : Defect # 1189 : END
+
 
         //Modified By BBSR Team on 8th Jan 2018 : Cell Phone Disclosure Issue
         public async Task<ResponseModel> PostupdateprofileForAsync(string MobileToken, LoanContactDetail LoanContactDetail)
@@ -3026,14 +3028,9 @@ namespace Business_Services
             //Defect # 1070 : START
 
             var transactiondate = paymentList.Max(x => x.dueDate);
-            //var transactiondate = paymentList.Max(x => x.transactionAppliedDate);
-
-            //var Paymentdata = (from paymentdetails in paymentList
-            //                   where paymentdetails.dueDate == transactiondate
-            //                   select paymentdetails).FirstOrDefault();   
 
             var Paymentdata = (from paymentdetails in paymentList
-                               where paymentdetails.escrowPaidAmount > 0 && paymentdetails.principalPmtAmount > 0 && paymentdetails.interestPaidAmount > 0
+                               where paymentdetails.principalPmtAmount > 0 && paymentdetails.interestPaidAmount > 0
                                orderby paymentdetails.transactionAppliedDate descending
                                select paymentdetails).FirstOrDefault();
 
@@ -3045,40 +3042,63 @@ namespace Business_Services
 
             LastRegularPayment last_regular_payment = new LastRegularPayment();
 
-            last_regular_payment.principal_amount = Convert.ToString(Paymentdata.principalPmtAmount);
-
-            if (Convert.ToString(Paymentdata.principalPmtAmount) == "")
+            if (Paymentdata != null)
             {
+                if (Convert.ToString(Paymentdata.principalPmtAmount) == "")
+                {
+                    last_regular_payment.principal_amount = "0.00";
+                }
+                else
+                {
+                    last_regular_payment.principal_amount = Convert.ToString(Paymentdata.principalPmtAmount);
+                }
 
+                if (Convert.ToString(Paymentdata.interestPaidAmount) == "")
+                {
+                    last_regular_payment.interest_amount = "0.00";
+                }
+                else
+                {
+                    last_regular_payment.interest_amount = Convert.ToString(Paymentdata.interestPaidAmount);
+                }
+
+                if (Convert.ToString(Paymentdata.transactionAppliedDate) == "")
+                {
+                    last_regular_payment.last_payment_date = "";
+                }
+                else if (Convert.ToString(Paymentdata.transactionAppliedDate) != "")
+                {
+                    last_regular_payment.last_payment_date = Convert.ToDateTime(Paymentdata.transactionAppliedDate).ToString("MM/dd/yy");
+                }
+
+                if (Convert.ToString(Paymentdata.escrowPaidAmount) == "")
+                {
+                    last_regular_payment.escrow_amount = "0.00";
+                }
+                else
+                {
+                    last_regular_payment.escrow_amount = Convert.ToString(Paymentdata.escrowPaidAmount);
+                }
+
+                if (Convert.ToString(Paymentdata.totalPaymentReceivedAmount) == "")
+                {
+                    last_regular_payment.total_amount = "0.00";
+                }
+                else
+                {
+                    last_regular_payment.total_amount = Convert.ToString(Paymentdata.totalPaymentReceivedAmount);
+                }
+
+            }
+            else
+            {
                 last_regular_payment.principal_amount = "0.00";
-            }
-            //var ip = Paymentdata.interestPaidAmount * 100;
-            //float ipm = ip;
-            last_regular_payment.interest_amount = Convert.ToString(Paymentdata.interestPaidAmount);
-            if (Convert.ToString(Paymentdata.interestPaidAmount) == "")
-            {
                 last_regular_payment.interest_amount = "0.00";
-            }
-            if (Convert.ToString(Paymentdata.transactionAppliedDate) == "")
-            {
-
                 last_regular_payment.last_payment_date = "";
-            }
-            else if (Convert.ToString(Paymentdata.transactionAppliedDate) != "")
-            {
-                last_regular_payment.last_payment_date = Convert.ToDateTime(Paymentdata.transactionAppliedDate).ToString("MM/dd/yy");
-            }
-
-            last_regular_payment.escrow_amount = Convert.ToString(Paymentdata.escrowPaidAmount);
-            if (Convert.ToString(Paymentdata.escrowPaidAmount) == "")
-            {
-
                 last_regular_payment.escrow_amount = "0.00";
+                last_regular_payment.total_amount = "0.00";
             }
 
-
-            var Total_Amount = loanInfo.netPresent;
-            last_regular_payment.total_amount = Convert.ToString(Total_Amount);
             loan_duedatedate.last_regular_payment = last_regular_payment;
 
             NextMonthlyPayment next_monthly_payment = new NextMonthlyPayment();
