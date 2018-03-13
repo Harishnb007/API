@@ -896,7 +896,9 @@ namespace Business_Services
             dynamic ObjUserId = JsonConvert.DeserializeObject(Decryptdata);
             bool objisenrolled = ObjUserId.eStatement;
 
-
+            var responseEscrow = await API_Connection.GetAsync(lcToken, "/api/Escrow/CallEscrow/?LoanNo=" + loanNumber);
+            string returnedEscrowData = await responseEscrow.Content.ReadAsStringAsync();
+            Escrow_CallEscrow escrowInfo = JsonConvert.DeserializeObject<Escrow_CallEscrow>(returnedEscrowData);
 
             Loan LoanStatus = new Loan();
             var response = await API_Connection.GetAsync(lcToken, "/api/Loan/GetCurrentLoanInfo/" + loanNumber);
@@ -1012,6 +1014,7 @@ namespace Business_Services
                 maturity_date = loanInfo.maturityDate,
                 co_borrower_name = acctInfo.msg.coBorrower,
                 is_autodraft = autoDrftInfo.nextDraftDate != "" ? true : false,
+                is_escrow_loan = Convert.ToString(escrowInfo.pmtEscrow) == "0.00" ? false : true,
                 auto_draftdate = Convert.ToString((autoDrftInfo.nextDraftDate != "") ? DateTime.ParseExact(autoDrftInfo.nextDraftDate, "MM/dd/yyyy", CultureInfo.InvariantCulture) : new DateTime())
             });
         }
