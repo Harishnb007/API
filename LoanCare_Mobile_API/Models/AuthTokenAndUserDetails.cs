@@ -41,6 +41,7 @@ namespace LoanCare_Mobile_API.Models
         public string phone_other_1_number { get; set; }
         public string phone_other_2_number { get; set; }
         public string phone_other_3_number { get; set; }
+        public string MobileSignedUp { get; set; }
         public List<LoanSummarys> loans { get; set; }
     }
 
