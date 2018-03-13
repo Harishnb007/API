@@ -142,8 +142,6 @@ namespace LoanCare_Mobile_API.Controllers
             }
         }
 
-
-
         //[Route("MyLoanSetpin/{LoanNumber}/{pin}")]
         //[HttpGet]
         //public IHttpActionResult Getpin(string LoanNumber, string pin)

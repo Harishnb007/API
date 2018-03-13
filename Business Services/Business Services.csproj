@@ -80,8 +80,8 @@
     <Compile Include="Models\DAL\LoancareDBContext\MobileUser.cs" />
     <Compile Include="Models\DAL\LoancareDBContext\PaymentAlert.cs" />
     <Compile Include="Models\DAL\LoancareDBContext\PaymentTransactionMapping.cs" />
-    <Compile Include="Models\DAL\LoancareDBContext\TransDescription.cs" />
-    <Compile Include="Models\DAL\LoancareDBContext\UserAlert.cs" />
+	 <Compile Include="Models\DAL\LoancareDBContext\TransDescription.cs" />
+     <Compile Include="Models\DAL\LoancareDBContext\UserAlert.cs" />
     <Compile Include="Models\DAL\LoancareDBContext\UserFeedback.cs" />
     <Compile Include="Models\DAL\LoancareEntites\BankAccounts.cs" />
     <Compile Include="Models\DAL\LoancareEntites\SecurityQandA.cs" />
@@ -93,6 +93,7 @@
     <Compile Include="Models\Escrow.cs" />
     <Compile Include="Models\EstatementDetails.cs" />
     <Compile Include="Models\GenerateNewToken.cs" />
+    <Compile Include="Models\GeneratePdf.cs" />
     <Compile Include="Models\GenericContent.cs" />
     <Compile Include="Models\Helpers\Encryptor.cs" />
     <Compile Include="Models\Helpers\ResponseModel.cs" />
@@ -107,8 +108,8 @@
     <Compile Include="Models\LC_WebApi_Models\Calender_GetPaymentInfo.cs" />
     <Compile Include="Models\LC_WebApi_Models\Eft_disclosure.cs" />
     <Compile Include="Models\LC_WebApi_Models\Escrow_CallEscrow.cs" />
-    <Compile Include="Models\LC_WebApi_Models\ForgotPassword.cs" />
-    <Compile Include="Models\LC_WebApi_Models\ForgotUser_UserId.cs" />
+	 <Compile Include="Models\LC_WebApi_Models\ForgotPassword.cs" />
+     <Compile Include="Models\LC_WebApi_Models\ForgotUser_UserId.cs" />
     <Compile Include="Models\LC_WebApi_Models\Getdetails_estatement.cs" />
     <Compile Include="Models\LC_WebApi_Models\getuserInfo.cs" />
     <Compile Include="Models\LC_WebApi_Models\Loan_GetCurrentLoanInfo.cs" />
@@ -122,7 +123,8 @@
     <Compile Include="Models\LC_WebApi_Models\secQuesCollection.cs" />
     <Compile Include="Models\LC_WebApi_Models\User_GetUserInformation.cs" />
     <Compile Include="Models\LC_WebApi_Models\User_UserInformation.cs" />
-    <Compile Include="Models\LC_WebApi_Models\ValidateSecurityAnswer.cs" />
+	<Compile Include="Models\LC_WebApi_Models\ValidateSecurityAnswer.cs" />
+ 
     <Compile Include="Models\LegalPrivacyTerms.cs" />
     <Compile Include="Models\Loan.cs" />
     <Compile Include="Models\LoanContactDetail.cs" />
@@ -139,6 +141,7 @@
     <Compile Include="Models\SecurityQuestion.cs" />
     <Compile Include="Models\Statement.cs" />
     <Compile Include="Models\Token.cs" />
+    <Compile Include="Models\Tracking.cs" />
     <Compile Include="Models\UpdateEmail.cs" />
     <Compile Include="Models\UpdatePassword.cs" />
     <Compile Include="Models\User.cs" />
@@ -152,8 +155,8 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="Models\Helpers\Dummy.json" />
-    <Compile Include="Models\LC_WebApi_Models\ErrorModel.cs" />
-    <None Include="packages.config" />
+	<Compile Include="Models\LC_WebApi_Models\ErrorModel.cs" />
+     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

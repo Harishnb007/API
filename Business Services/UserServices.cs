@@ -80,14 +80,14 @@ namespace Business_Services
 
                 var response = await API_Connection.DeleteAsync(lcToken, "/api/BankAccountInformation/DeleteBankDetails", content);
 
-                var eventId = 5;
-                var resourceName = "One-Time+Payment";
-                var toEmail = "";
-                var log = "Manage+Bank+Account+Page+-+DeleteBank";
-                var actionName = "DELETE";
+                //var eventId = 5;
+                //var resourceName = "One-Time+Payment";
+                //var toEmail = "";
+                //var log = "Manage+Bank+Account+Page+-+DeleteBank";
+                //var actionName = "DELETE";
 
-                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+                //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
                 return new ResponseModel(response);
 
@@ -163,14 +163,14 @@ namespace Business_Services
                 }
             }
 
-            var eventId = 5;
-            var resourceName = "Profile";
-            var toEmail = "";
-            var log = "Viewed+Security+Question";
-            var actionName = "VIEW";
+            //var eventId = 5;
+            //var resourceName = "Profile";
+            //var toEmail = "";
+            //var log = "Viewed+Security+Question";
+            //var actionName = "VIEW";
 
-            var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-            string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+            //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+            //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
             return new ResponseModel(questionDetails);
         }
@@ -257,14 +257,14 @@ namespace Business_Services
 
                 }
 
-                var eventId = 2;
-                var resourceName = "Payment";
-                var toEmail = "";
-                var log = "Viewed+Manage+Bank+Account+page";
-                var actionName = "VIEW";
+                //var eventId = 2;
+                //var resourceName = "Payment";
+                //var toEmail = "";
+                //var log = "Viewed+Manage+Bank+Account+page";
+                //var actionName = "VIEW";
 
-                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+                //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
                 return new ResponseModel(banklist);
             }
@@ -279,14 +279,14 @@ namespace Business_Services
             TokenServices tokenServices = new TokenServices();
             string lcToken = tokenServices.GetLctoken(mobileToken);
 
-            var eventId = 7;
-            var resourceName = "Account";
-            var toEmail = "";
-            var log = "Viewed+Manage+Account+page";
-            var actionName = "VIEW";
+            //var eventId = 7;
+            //var resourceName = "Account";
+            //var toEmail = "";
+            //var log = "Viewed+Manage+Account+page";
+            //var actionName = "VIEW";
 
-            var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-            string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+            //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+            //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
             UserAlertCount Users = new UserAlertCount();
             var responseuser = await API_Connection.GetAsync(lcToken, "api/Personal/GetBorrowerContactInfo/" + LoanNumber);
@@ -2189,14 +2189,14 @@ namespace Business_Services
                 var response = await API_Connection.PostAsync(lcToken, "/api/User/Updatesecurityquesions/", content);
                 return new ResponseModel(response);
 
-                var eventId = 5;
-                var resourceName = "Manage+Security+Preference";
-                var toEmail = "";
-                var log = "Manage+Security+Preference+page+-+Security+Questions";
-                var actionName = "UPDATE";
+                //var eventId = 5;
+                //var resourceName = "Manage+Security+Preference";
+                //var toEmail = "";
+                //var log = "Manage+Security+Preference+page+-+Security+Questions";
+                //var actionName = "UPDATE";
 
-                var trackresponse = await API_Connection.GetAsync("/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+                //var trackresponse = await API_Connection.GetAsync("/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
             }
             catch (Exception Ex)
             {
@@ -2461,29 +2461,16 @@ namespace Business_Services
         }
         public async Task<string> trackinglog(string lcAuthToken, Tracking tracking)
         {
-
             Business_Services.Models.GenerateNewToken objgenerateToken = new GenerateNewToken();
-
             var Decryptdata = objgenerateToken.Decrypt(lcAuthToken);
-
             dynamic ObjUserId = JsonConvert.DeserializeObject(Decryptdata);
-
             string resourcename = ObjUserId.resourcename;
-
             string logview = ObjUserId.log;
-
             var toEmail = "";
 
-            var trackresponse = await API_Connection.GetAsync(lcAuthToken, "/api/Helper/AddTrackingInfo/?eventId=" + tracking.eventId + "&resourceName=" + resourcename + "&toEmail=" + toEmail + "&log=" + logview + "&actionName=" + tracking.actionName);
-
+            var trackresponse = await API_Connection.GetAsync(lcAuthToken, "/api/Helper/AddTrackingInfo/?eventId=" + tracking.eventId + "&resourceName=" + tracking.resourcename + "&toEmail=" + toEmail + "&log=" + tracking.Log + "&actionName=" + tracking.actionName);
             string returnedData = await trackresponse.Content.ReadAsStringAsync();
-
             return returnedData;
-
         }
-
-
-
-
     }
 }
