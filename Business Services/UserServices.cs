@@ -1458,14 +1458,14 @@ namespace Business_Services
                             var contentmail = new FormUrlEncodedContent(someDictMail);
                             var responsemail = await API_Connection.PostAsync(lcToken, "/api/EmailNotification/SendEmailConfirmationForTemplate/?template=UpdateUserPassword&toEmail=bGFtZXJlLm5pY2hvbGFzQGdtYWlsLmNvbQ==&pageName=manageSecurityPref-UpdateUserPassword&userID=&securityEnabled=true", contentmail);
 
-                            var eventId = 5;
-                            var resourceName = "Manage+Security+Preference";
-                            var toEmail = "";
-                            var log = "Viewed+Security+Preference+page+-+Update+Password";
-                            var actionName = "UPDATE";
+                            //var eventId = 5;
+                            //var resourceName = "Manage+Security+Preference";
+                            //var toEmail = "";
+                            //var log = "Viewed+Security+Preference+page+-+Update+Password";
+                            //var actionName = "UPDATE";
 
-                            var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                            string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+                            //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                            //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
                         }
 
                         var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", loanDetails.password } });
