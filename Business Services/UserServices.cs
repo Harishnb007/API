@@ -1298,14 +1298,14 @@ namespace Business_Services
                 contactUs_details.business_hours = BusinesshrsList;
                 contactUs_details.email_topics = Etopics;
 
-                var eventId = 6;
-                var resourceName = "Account+Services";
-                var toEmail = "";
-                var log = "Viewed+Contact+Us+Page";
-                var actionName = "VIEW";
+                //var eventId = 6;
+                //var resourceName = "Account+Services";
+                //var toEmail = "";
+                //var log = "Viewed+Contact+Us+Page";
+                //var actionName = "VIEW";
 
-                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+                //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
                 return new ResponseModel(contactUs_details);
             }
@@ -1458,14 +1458,14 @@ namespace Business_Services
                             var contentmail = new FormUrlEncodedContent(someDictMail);
                             var responsemail = await API_Connection.PostAsync(lcToken, "/api/EmailNotification/SendEmailConfirmationForTemplate/?template=UpdateUserPassword&toEmail=bGFtZXJlLm5pY2hvbGFzQGdtYWlsLmNvbQ==&pageName=manageSecurityPref-UpdateUserPassword&userID=&securityEnabled=true", contentmail);
 
-                            var eventId = 5;
-                            var resourceName = "Manage+Security+Preference";
-                            var toEmail = "";
-                            var log = "Viewed+Security+Preference+page+-+Update+Password";
-                            var actionName = "UPDATE";
+                            //var eventId = 5;
+                            //var resourceName = "Manage+Security+Preference";
+                            //var toEmail = "";
+                            //var log = "Viewed+Security+Preference+page+-+Update+Password";
+                            //var actionName = "UPDATE";
 
-                            var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                            string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+                            //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                            //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
                         }
 
                         var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", loanDetails.password } });
@@ -2522,7 +2522,7 @@ namespace Business_Services
             TokenServices tokenServices = new TokenServices();
             string lcToken = tokenServices.GetLctoken(lcAuthToken);
             var toEmail = "";
-            var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + tracking.eventId + "&resourceName=" + tracking.resourcename + "&toEmail=" + toEmail + "&log=" + tracking.Log + "&actionName=" + tracking.actionName);
+            var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + tracking.eventId + "&resourceName=" + tracking.resourcename + "&toEmail=" + toEmail + "&log=" + tracking.Log + "&actionName=" + tracking.action);
             string returnedData = await trackresponse.Content.ReadAsStringAsync();
             return returnedData;
         }
