@@ -95,14 +95,14 @@ namespace Business_Services
             try
             {
 
-                var eventId = 2;
-                var resourceName = "Payment";
-                var toEmail = "";
-                var log = "Viewed+Autodraft";
-                var actionName = "VIEW";
+                //var eventId = 2;
+                //var resourceName = "Payment";
+                //var toEmail = "";
+                //var log = "Viewed+Autodraft";
+                //var actionName = "VIEW";
 
-                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+                //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
 
                 var response = await API_Connection.GetAsync(lcToken, "/api/AutoDraft/GetAutoDraft/" + loanNumber);
@@ -187,14 +187,14 @@ namespace Business_Services
                 TokenServices tokenServices = new TokenServices();
                 string lcToken = tokenServices.GetLctoken(mobileToken);
 
-                var eventId = 1;
-                var resourceName = "Others";
-                var toEmail = "";
-                var log = "Viewed+Notification";
-                var actionName = "VIEW";
+                //var eventId = 1;
+                //var resourceName = "Others";
+                //var toEmail = "";
+                //var log = "Viewed+Notification";
+                //var actionName = "VIEW";
 
-                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+                //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
 
                 var response = await API_Connection.GetAsync(lcToken, "/api/EStatement/GetAllNotificationByLoanNumber/?loanNo=" + loanNumber);
@@ -833,6 +833,7 @@ namespace Business_Services
         }
 
 
+        //Modified by BBSR Team on 14th March 2018 : Wrong Enrollment Value in "/api/user/loan/{loan_number} : START
         public async Task<ResponseModel> GetLoanAsync(string mobileToken, string loanNumber)
         {
             // To do - Use DI
@@ -846,9 +847,7 @@ namespace Business_Services
             dynamic ObjUserId = JsonConvert.DeserializeObject(Decryptdata);
             bool objisenrolled = ObjUserId.eStatement;
 
-            var responseEscrow = await API_Connection.GetAsync(lcToken, "/api/Escrow/CallEscrow/?LoanNo=" + loanNumber);
-            string returnedEscrowData = await responseEscrow.Content.ReadAsStringAsync();
-            Escrow_CallEscrow escrowInfo = JsonConvert.DeserializeObject<Escrow_CallEscrow>(returnedEscrowData);
+
 
             Loan LoanStatus = new Loan();
             var response = await API_Connection.GetAsync(lcToken, "/api/Loan/GetCurrentLoanInfo/" + loanNumber);
@@ -910,7 +909,7 @@ namespace Business_Services
                 {
                     AutoLoan.is_enrolled = true;
                 }
-               // AutoLoan.is_enrolled = objisenrolled;
+                // AutoLoan.is_enrolled = objisenrolled;
                 AutoLoan.loan_interest_rate = loanInfo.intRate;
                 AutoLoan.escrow_balance = Convert.ToDecimal(loanInfo.escrowBalance);
                 AutoLoan.property_value = Convert.ToDecimal(loanInfo.propertyValue);
@@ -955,7 +954,8 @@ namespace Business_Services
                 loan_total_amount = Convert.ToDecimal(loanInfo.netPresent),
                 loan_duedate = loanInfo.dueDate.Substring(5, 2) + "/" + loanInfo.dueDate.Substring(8, 2) + "/" + loanInfo.dueDate.Substring(2, 2),
                 loan_type = loanInfo.loanType,
-                is_enrolled = (userInfo.currentUserLoan.eStatement == null) ? false : true,
+                //is_enrolled = (userInfo.currentUserLoan.eStatement == null) ? false : true, //Commented by BBSr Team on 14th March 2018 : Wrong Enrollment Value in "/api/user/loan/{loan_number}"
+                is_enrolled = (isenrolledloan == null) ? false : true, //Added by BBSr Team on 14th March 2018 : Wrong Enrollment Value in "/api/user/loan/{loan_number}"
                 loan_interest_rate = loanInfo.intRate,
                 escrow_balance = Convert.ToDecimal(loanInfo.escrowBalance),
                 property_value = Convert.ToDecimal(loanInfo.propertyValue),
@@ -964,10 +964,10 @@ namespace Business_Services
                 maturity_date = loanInfo.maturityDate,
                 co_borrower_name = acctInfo.msg.coBorrower,
                 is_autodraft = autoDrftInfo.nextDraftDate != "" ? true : false,
-                is_escrow_loan = Convert.ToString(escrowInfo.pmtEscrow) == "0.00" ? false : true,
                 auto_draftdate = Convert.ToString((autoDrftInfo.nextDraftDate != "") ? DateTime.ParseExact(autoDrftInfo.nextDraftDate, "MM/dd/yyyy", CultureInfo.InvariantCulture) : new DateTime())
             });
         }
+        //Modified by BBSR Team on 14th March 2018 : Wrong Enrollment Value in "/api/user/loan/{loan_number} : END
 
         public async Task<ResponseModel> PostLogoutForAsync(string MobileToken)
         {
