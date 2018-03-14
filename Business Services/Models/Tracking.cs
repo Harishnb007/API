@@ -11,7 +11,7 @@ namespace Business_Services.Models
            
         public string eventId { get; set; }
         // public string toEmail { get; set; }
-        public string actionName { get; set; }
+        public string action { get; set; }
         public string resourcename { get; set; }
         public string Log { get; set; }
 

@@ -2522,7 +2522,7 @@ namespace Business_Services
             TokenServices tokenServices = new TokenServices();
             string lcToken = tokenServices.GetLctoken(lcAuthToken);
             var toEmail = "";
-            var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + tracking.eventId + "&resourceName=" + tracking.resourcename + "&toEmail=" + toEmail + "&log=" + tracking.Log + "&actionName=" + tracking.actionName);
+            var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + tracking.eventId + "&resourceName=" + tracking.resourcename + "&toEmail=" + toEmail + "&log=" + tracking.Log + "&actionName=" + tracking.action);
             string returnedData = await trackresponse.Content.ReadAsStringAsync();
             return returnedData;
         }
