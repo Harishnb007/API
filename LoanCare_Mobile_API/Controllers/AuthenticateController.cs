@@ -75,12 +75,13 @@ namespace LoanCare_Mobile_API.Controllers
             var pwdChange = ((Business_Services.Models.Helpers.ResponseWithToken)value).changePassword;
             var authenticateData = ((Business_Services.Models.Helpers.ResponseWithToken)value).authenticateResult;
 
-            var token = _tokenServices.GenerateToken(userCred.username, userCred.password,0, authenticateData.objUserInfo.user.password,
-                 userCred.username, userCred.resourcename, userCred.log, false, userCred.username);
-            authenticateData.objUserInfo.user.password = token;
+           
             if (id == 0)
             {
                 if (pwdChange == "Y") {
+                    var token = _tokenServices.GenerateToken(userCred.username, userCred.password, 0, authenticateData.objUserInfo.user.password,
+                userCred.username, userCred.resourcename, userCred.log, false, userCred.username);
+                    authenticateData.objUserInfo.user.password = token;
                     var responseChangePwd = Request.CreateResponse(HttpStatusCode.OK, new ResponseModel
                     {
                         status = new Status { CustomErrorCode = 100, Message = "success" },

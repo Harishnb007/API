@@ -1298,14 +1298,14 @@ namespace Business_Services
                 contactUs_details.business_hours = BusinesshrsList;
                 contactUs_details.email_topics = Etopics;
 
-                var eventId = 6;
-                var resourceName = "Account+Services";
-                var toEmail = "";
-                var log = "Viewed+Contact+Us+Page";
-                var actionName = "VIEW";
+                //var eventId = 6;
+                //var resourceName = "Account+Services";
+                //var toEmail = "";
+                //var log = "Viewed+Contact+Us+Page";
+                //var actionName = "VIEW";
 
-                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+                //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
                 return new ResponseModel(contactUs_details);
             }
