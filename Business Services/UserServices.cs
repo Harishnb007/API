@@ -432,6 +432,7 @@ namespace Business_Services
                     listsecquestion.secQuesCollection = objSecurity;
                     listsecquestion.user = objsequstionuser;
                     listsecquestion.userLoan = objsequserloan;
+                    listsecquestion.secQuesstatus = objSecurityQuestionstatus;
                     //listsecquestion.secQuesstatus = objSecurityQuestionstatus;
                     //if (!returnedData.Contains("success"))
                     //{

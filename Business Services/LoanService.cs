@@ -1949,7 +1949,7 @@ namespace Business_Services
             var Decryptdata = objgenerateToken.Decrypt(MobileToken);
             string lcToken = tokenServices.GetLctoken(MobileToken);
             dynamic ObjUserId = JsonConvert.DeserializeObject(Decryptdata);
-            string objUId = ObjUserId.UserId;
+            string obj_UId = ObjUserId.UserId;
             string objPWd = ObjUserId.Password;
             int objCId = ObjUserId.ClientId;
             string objusername = ObjUserId.UserName;
@@ -2033,45 +2033,28 @@ namespace Business_Services
                 var ErrorMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(ErrMessage);
                 string Errmsg = ErrorMessage;
                 if (Errmsg == "Response status code does not indicate success: 401 (Unauthorized).") { }
-                
-                //var eventId = 5;
-                //var resourceName = "Update+Email";
-                //var toEmail = "";
-                //var log = "Viewed+Update+Email+page";
-                //var actionName = "VIEW";
+      
 
-                //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
-
-                var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", objPWd } });
+                var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", obj_UId }, { "password", objPWd } });
                 var responseregeneratedToken = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
 
                 var Token = responseregeneratedToken.tokenValue;
 
-
-                var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token, objusername, resourcename, logview, eStatemente);
+                var MobileTokenNew = objgenerateToken.GenerateToken(obj_UId, objPWd, objCId, Token, objusername, resourcename, logview, eStatemente);
                 loanDetails.Token = MobileTokenNew;
 
                 return new ResponseModel(loanDetails);
             }
             catch (Exception Ex)
             {
-                //var eventId = 5;
-                //var resourceName = "Update+Email";
-                //var toEmail = "";
-                //var log = "Viewed+Update+Email+page";
-                //var actionName = "VIEW";
 
-                //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
-
-                var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", objPWd } });
+                var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", obj_UId }, { "password", objPWd } });
                 var responseregeneratedToken = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
 
                 var Token = responseregeneratedToken.tokenValue;
 
 
-                var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token, objusername, resourcename, logview, eStatemente);
+                var MobileTokenNew = objgenerateToken.GenerateToken(obj_UId, objPWd, objCId, Token, objusername, resourcename, logview, eStatemente);
                 loanDetails.Token = MobileTokenNew;
                 return new ResponseModel(loanDetails);
             }
