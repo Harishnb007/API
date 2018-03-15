@@ -124,7 +124,7 @@ namespace Business_Services.B2C_WebAPI
                     var v = regex.Match(setCookieValue);
 
                     var responseAsString = await result.Content.ReadAsStringAsync();
-                    
+                    returnData.tokenValue = v.Groups[1].ToString();
 
                     if (responseAsString.Contains("loanPaid"))
                     {
@@ -132,12 +132,9 @@ namespace Business_Services.B2C_WebAPI
                         if (resultSet.objUserInfo.user.changePassword == "Y")
                         {
                             returnData.authenticateResult = resultSet;
+                            returnData.authenticateResult.AuthorizationToken = v.Groups[1].ToString();
                             returnData.changePassword = "Y";
-                        }
-                        else
-                        {
-                            returnData.tokenValue = v.Groups[1].ToString();
-                        }
+                        }                        
                     }
                     else
                     {

@@ -15,6 +15,9 @@ namespace Business_Services.Models.LC_WebApi_Models
 
         [JsonProperty]
         public ObjUserInfo objUserInfo { get; set; }
+
+
+        public string AuthorizationToken { get; set; }
     }
 
 

@@ -66,6 +66,7 @@ namespace LoanCare_Mobile_API.Controllers
 
             var lcAuthTokenValueTask = _tokenServices.AuthenticateAsync(userCred.username, userCred.password);
             await Task.WhenAll(lcAuthTokenValueTask);
+            IUserServices userService = new UserServices();
 
             dynamic value = lcAuthTokenValueTask.Result;
 
@@ -78,10 +79,19 @@ namespace LoanCare_Mobile_API.Controllers
            
             if (id == 0)
             {
-                if (pwdChange == "Y") {
-                   // var token = _tokenServices.GenerateToken(userCred.username, userCred.password, 0, authenticateData.objUserInfo.user.password,
-               // userCred.username, userCred.resourcename, userCred.log, false, userCred.username);
-                //    authenticateData.objUserInfo.user.password = token;
+                if (pwdChange == "Y")
+                {
+                    var details = userService.getPartialUserDetailsAsync(authenticateData.AuthorizationToken, userCred.username, userCred.Is_New_MobileUser);
+
+                    await Task.WhenAll(details);
+                    Business_Services.Models.User userDetails = (Business_Services.Models.User)details.Result.data;
+                    //Debug.WriteLine(userDetails.first_name);
+
+                    var token = _tokenServices.GenerateToken(userCred.username, userCred.password, userDetails.ClientId, authenticateData.AuthorizationToken,
+                        userDetails.username, userCred.resourcename, userCred.log, userDetails.is_enrolled, userCred.username);
+
+                    authenticateData.AuthorizationToken = token;
+
                     var responseChangePwd = Request.CreateResponse(HttpStatusCode.OK, new ResponseModel
                     {
                         status = new Status { CustomErrorCode = 100, Message = "success" },
@@ -139,7 +149,6 @@ namespace LoanCare_Mobile_API.Controllers
         //    }
         //    return Ok(payment);
         //}
-
 
         /// <summary>
         /// Returns auth token for the validated user

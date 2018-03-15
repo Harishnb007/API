@@ -910,6 +910,36 @@ namespace Business_Services
             }
         }
 
+        public async Task<ResponseModel> getPartialUserDetailsAsync(string lcAuthToken, string loan_number, bool Is_New_MobileUser)
+        {
+            try
+            {
+                Business_Services.Models.User userDetails = new Business_Services.Models.User();
+
+                Business_Services.Models.User Auth_data = new Models.User();
+                var responseUserInfo = await API_Connection.GetAsync(lcAuthToken, "/api/User/GetUserInformation");
+                string returnedData = await responseUserInfo.Content.ReadAsStringAsync();
+                dynamic objUserName = JsonConvert.DeserializeObject(returnedData);
+
+                var responseClientName = await API_Connection.GetAsync(lcAuthToken, "/api/Helper/GetClientData/");
+                string returnedDataClientName = await responseClientName.Content.ReadAsStringAsync();
+                dynamic objClientName = JsonConvert.DeserializeObject(returnedDataClientName);
+
+
+                userDetails.ClientId = objUserName.currentUserLoan.clientID;
+                userDetails.username = objUserName.user.userName;
+                userDetails.is_enrolled = (objUserName.currentUserLoan.eStatement == null) ? false : true;
+
+                return new ResponseModel(userDetails);
+            }
+            catch (Exception Ex)
+            {
+
+                return new ResponseModel(null, 1, Ex.Message);
+            }
+
+        }
+
         public async Task<ResponseModel> getUserDetailsAsyn(string lcAuthToken, string loan_number)
         {
             Token tokenObject = JsonConvert.DeserializeObject<Token>(Encryptor.Decrypt(lcAuthToken));
