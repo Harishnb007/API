@@ -450,15 +450,7 @@ namespace Business_Services
                 var response = await API_Connection.GetAsync(lcToken, "/api/EStatement/GetPdfListStr/?loanNo=" + loan_number);
                 string returnedData = await response.Content.ReadAsStringAsync();
                 Getdetails_estatement getEstatementInfo = JsonConvert.DeserializeObject<Getdetails_estatement>(returnedData);
-
-                //var eventId = 4;
-                //var resourceName = "eStatement";
-                //var toEmail = "";
-                //var log = "Viewed+eStatement";
-                //var actionName = "VIEW";
-
-                //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+           
 
                 List<EsatementDateurl> estatement = new List<EsatementDateurl>();
 
@@ -481,19 +473,7 @@ namespace Business_Services
                 {
                     estatement = estatement
                 };
-                foreach (var estatemen in estatement)
-                {
-
-                    MemoryStream mem = new MemoryStream();
-                    var responsestream = await API_Connection.GetAsync(lcToken, estatemen.statement_url);
-                    string returnedDatastream = await responsestream.Content.ReadAsStringAsync();
-                    //byte[] datastream = Encoding.ASCII.GetBytes(returnedDatastream);
-                    var byteArray = Encoding.UTF8.GetBytes(returnedDatastream);
-                    //byte[] byteArray = Encoding.ASCII.GetBytes(contents);
-                    MemoryStream stream = new MemoryStream(byteArray);
-
-
-                }
+               
 
                 return new ResponseModel(estatementresult);
             }
