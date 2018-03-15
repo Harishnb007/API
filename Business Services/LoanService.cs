@@ -2858,6 +2858,11 @@ namespace Business_Services
                 var content = new FormUrlEncodedContent(someDict);
                 var response = await API_Connection.PostAsync(lcToken, "/api/OnetimePayment/InsertPaymentInfo/", content);
 
+                if(response.errorId != 0)
+                {
+                    return new ResponseModel(null, response.errorId, response.errorMessage);
+                }
+
                 return new ResponseModel(paymentdata);
             }
             catch (Exception ex)

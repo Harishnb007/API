@@ -221,17 +221,49 @@ namespace Business_Services.B2C_WebAPI
             message.Headers.Add("formToken", tokens.formToken);
             message.Content = content;
             var result = await client.SendAsync(message);
-            result.EnsureSuccessStatusCode();
+            
             ResponseWithToken returnData = new ResponseWithToken();
-            if (result.Headers.TryGetValues("Set-Cookie", out IEnumerable<string> cookieValues))
+
+            returnData.errorId = 0;
+            //if (result.Headers.TryGetValues("Set-Cookie", out IEnumerable<string> cookieValues))
+            //{
+            //    string setCookieValue = HttpUtility.UrlDecode(cookieValues.FirstOrDefault());
+            //    Regex regex = new Regex("lcauth=(.*?);");
+            //    var v = regex.Match(setCookieValue);
+            //    if (v != null)
+            //    {
+            //        returnData.tokenValue = v.Groups[1].ToString(); 
+            //    }
+            //}
+
+            //returnData.message = result;
+
+            //return returnData;
+
+
+
+            if (result.IsSuccessStatusCode)
             {
-                string setCookieValue = HttpUtility.UrlDecode(cookieValues.FirstOrDefault());
-                Regex regex = new Regex("lcauth=(.*?);");
-                var v = regex.Match(setCookieValue);
-                if (v != null)
+                result.EnsureSuccessStatusCode();
+
+                if (result.Headers.TryGetValues("Set-Cookie", out IEnumerable<string> cookieValues))
                 {
-                    returnData.tokenValue = v.Groups[1].ToString(); 
+                    string setCookieValue = HttpUtility.UrlDecode(result.Headers.GetValues("Set-Cookie").FirstOrDefault());
+                    Regex regex = new Regex("lcauth=(.*?);");
+                    var v = regex.Match(setCookieValue);
+
+                    if (v != null)
+                    {
+                        returnData.tokenValue = v.Groups[1].ToString();
+                    }
                 }
+            }
+            else
+            {
+                var responseAsString = await result.Content.ReadAsStringAsync();
+                ErrorModel resultSet = JsonConvert.DeserializeObject<ErrorModel>(responseAsString);
+                returnData.errorId = resultSet.errorID;
+                returnData.errorMessage = resultSet.message;
             }
 
             returnData.message = result;
