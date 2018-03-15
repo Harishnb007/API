@@ -847,7 +847,9 @@ namespace Business_Services
             dynamic ObjUserId = JsonConvert.DeserializeObject(Decryptdata);
             bool objisenrolled = ObjUserId.eStatement;
 
-
+            var responseEscrow = await API_Connection.GetAsync(lcToken, "/api/Escrow/CallEscrow/?LoanNo=" + loanNumber);
+            string returnedEscrowData = await responseEscrow.Content.ReadAsStringAsync();
+            Escrow_CallEscrow escrowInfo = JsonConvert.DeserializeObject<Escrow_CallEscrow>(returnedEscrowData);
 
             Loan LoanStatus = new Loan();
             var response = await API_Connection.GetAsync(lcToken, "/api/Loan/GetCurrentLoanInfo/" + loanNumber);
@@ -964,6 +966,7 @@ namespace Business_Services
                 maturity_date = loanInfo.maturityDate,
                 co_borrower_name = acctInfo.msg.coBorrower,
                 is_autodraft = autoDrftInfo.nextDraftDate != "" ? true : false,
+                is_escrow_loan = Convert.ToString(escrowInfo.pmtEscrow) == "0.00" ? false : true,
                 auto_draftdate = Convert.ToString((autoDrftInfo.nextDraftDate != "") ? DateTime.ParseExact(autoDrftInfo.nextDraftDate, "MM/dd/yyyy", CultureInfo.InvariantCulture) : new DateTime())
             });
         }
@@ -1946,7 +1949,7 @@ namespace Business_Services
             var Decryptdata = objgenerateToken.Decrypt(MobileToken);
             string lcToken = tokenServices.GetLctoken(MobileToken);
             dynamic ObjUserId = JsonConvert.DeserializeObject(Decryptdata);
-            string objUId = ObjUserId.UserId;
+            string obj_UId = ObjUserId.UserId;
             string objPWd = ObjUserId.Password;
             int objCId = ObjUserId.ClientId;
             string objusername = ObjUserId.UserName;
@@ -2030,45 +2033,28 @@ namespace Business_Services
                 var ErrorMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(ErrMessage);
                 string Errmsg = ErrorMessage;
                 if (Errmsg == "Response status code does not indicate success: 401 (Unauthorized).") { }
-                
-                //var eventId = 5;
-                //var resourceName = "Update+Email";
-                //var toEmail = "";
-                //var log = "Viewed+Update+Email+page";
-                //var actionName = "VIEW";
+      
 
-                //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
-
-                var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", objPWd } });
+                var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", obj_UId }, { "password", objPWd } });
                 var responseregeneratedToken = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
 
                 var Token = responseregeneratedToken.tokenValue;
 
-
-                var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token, objusername, resourcename, logview, eStatemente);
+                var MobileTokenNew = objgenerateToken.GenerateToken(obj_UId, objPWd, objCId, Token, objusername, resourcename, logview, eStatemente);
                 loanDetails.Token = MobileTokenNew;
 
                 return new ResponseModel(loanDetails);
             }
             catch (Exception Ex)
             {
-                //var eventId = 5;
-                //var resourceName = "Update+Email";
-                //var toEmail = "";
-                //var log = "Viewed+Update+Email+page";
-                //var actionName = "VIEW";
 
-                //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
-
-                var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", objPWd } });
+                var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", obj_UId }, { "password", objPWd } });
                 var responseregeneratedToken = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
 
                 var Token = responseregeneratedToken.tokenValue;
 
 
-                var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token, objusername, resourcename, logview, eStatemente);
+                var MobileTokenNew = objgenerateToken.GenerateToken(obj_UId, objPWd, objCId, Token, objusername, resourcename, logview, eStatemente);
                 loanDetails.Token = MobileTokenNew;
                 return new ResponseModel(loanDetails);
             }
@@ -2871,6 +2857,11 @@ namespace Business_Services
 
                 var content = new FormUrlEncodedContent(someDict);
                 var response = await API_Connection.PostAsync(lcToken, "/api/OnetimePayment/InsertPaymentInfo/", content);
+
+                if(response.errorId != 0)
+                {
+                    return new ResponseModel(null, response.errorId, response.errorMessage);
+                }
 
                 return new ResponseModel(paymentdata);
             }
