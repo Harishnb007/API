@@ -684,7 +684,7 @@ namespace Business_Services
                 using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
                 {
                     var setpin = ctx.MobileUsers.Where(s => s.User_Id == userName).FirstOrDefault();
-
+                    
                     if (setpin == null)
                     {
                         if (Is_New_MobileUser == false)
@@ -2605,8 +2605,9 @@ namespace Business_Services
             //HttpContent content = null;
             TokenServices tokenServices = new TokenServices();
             string lcToken = tokenServices.GetLctoken(lcAuthToken);
+            string Mobile_resource = "Mobile_" + tracking.resourcename;
             var toEmail = "";
-            var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + tracking.eventId + "&resourceName=" + tracking.resourcename + "&toEmail=" + toEmail + "&log=" + tracking.Log + "&actionName=" + tracking.action);
+            var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + tracking.eventId + "&resourceName=" + Mobile_resource + "&toEmail=" + toEmail + "&log=" + tracking.Log + "&actionName=" + tracking.action);
             string returnedData = await trackresponse.Content.ReadAsStringAsync();
             return returnedData;
         }
