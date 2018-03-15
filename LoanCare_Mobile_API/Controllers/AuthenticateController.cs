@@ -230,7 +230,7 @@ namespace LoanCare_Mobile_API.Controllers
                 // loans = new Business_Services.Models.Loan { first_name = userDetails.first_name, loans = userDetails.loans, last_name = userDetails.last_name,username =userDetails.username }
                 // };
                 bool checkClientForRollout = false;
-                if (checkClientForRollout ) //&& Auth_data.MobileSignedUp == "False")
+                if (Auth_data.MobileSignedUp == "False")
                 {
                     var responsedata = Request.CreateResponse(HttpStatusCode.OK, new ResponseModel
                     {
@@ -262,7 +262,7 @@ namespace LoanCare_Mobile_API.Controllers
                 ResponseModel responseModel = new ResponseModel();
                 Status status = new Status();
             bool checkClientForRolloutt = false;
-            if (checkClientForRolloutt)// && Auth_data.MobileSignedUp == "False")
+            if (Auth_data.MobileSignedUp == "False")
             {
                 responseModel.data = null;
                 status.CustomErrorCode = 1;

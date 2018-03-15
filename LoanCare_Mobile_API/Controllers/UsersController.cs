@@ -635,6 +635,8 @@ namespace LoanCare_Mobile_API.Controllers
             return Ok(Forgot_Password);
         }
 
+
+
         [Route("ValidateSecurityAnswer")]
         [HttpPost]
         public async Task<IHttpActionResult> ValidateSecurityAnswer(Business_Services.Models.User userDetail)
@@ -674,5 +676,25 @@ namespace LoanCare_Mobile_API.Controllers
             }
             return Ok(Forgot_Password);
         }
+
+        //[Route("LogFile")]
+        //[HttpPost]
+        //public async Task<IHttpActionResult> LogFile(string TrackingLogFile)
+        //{
+        //    IEnumerable<string> tokenValues;
+        //    string tokenValue = "";
+        //    if (Request.Headers.TryGetValues("AuthorizationToken", out tokenValues))
+        //    {
+        //        tokenValue = tokenValues.FirstOrDefault();
+        //    }
+
+        //    var Forgot_Password = await userService.trackinglogfile(TrackingLogFile);
+
+        //    if (Forgot_Password == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return Ok(Forgot_Password);
+        //}
     }
 }

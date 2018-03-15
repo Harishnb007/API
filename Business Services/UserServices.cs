@@ -470,6 +470,23 @@ namespace Business_Services
             }
         }
 
+        //public async Task<string> trackinglogfile(string TrackingLog)
+        //{
+        //    try
+        //    {
+
+
+
+        //        return "";
+                
+               
+        //    }
+        //    catch (Exception Ex)
+        //    {
+        //        return Ex.Message;
+        //    }
+        //}
+
         //Added by BBSR_Team on 24th Jan 2018
         public async Task<ResponseModel> ValidateSecurityAnswer(Business_Services.Models.User userDetail)
         {
