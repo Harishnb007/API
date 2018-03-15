@@ -2070,25 +2070,26 @@ namespace Business_Services
                 var content = new FormUrlEncodedContent(someDict);
 
                 var response = await API_Connection.PostAsync(lcToken, "/api/Investor/SaveLinkLoan/", content);
-                dynamic Message = await response.message.Content.ReadAsStringAsync();
 
-                var ErrorMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Message);
-                string ErrMsg = ErrorMessage.msg;
-                if (ErrMsg != "Success")
+                if (response.errorId != 0)
                 {
                     loanDetails.issuccess = false;
-                    loanDetails.Message = ErrMsg;
+                    loanDetails.Message = response.errorMessage;
                 }
-                var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", objPWd } });
-                var responseregeneratedToken = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
+                else
+                {
+                    var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", objPWd } });
+                    response = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
 
-                var Token = responseregeneratedToken.tokenValue;
-
-
-                var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token, objusername, resourcename, logview, eStatemente);
-                loanDetails.Token = MobileTokenNew;
-
-                return new ResponseModel(loanDetails, 0, ErrMsg);
+                    if (response.errorId == 0)
+                    {
+                        var Token = response.tokenValue;
+                        var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token, objusername, resourcename, logview, eStatemente);
+                        loanDetails.Token = MobileTokenNew;
+                        return new ResponseModel(loanDetails, 0, null);
+                    }
+                }
+                return new ResponseModel(null, response.errorId, response.errorMessage);
             }
             catch (Exception ex)
             {
