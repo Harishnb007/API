@@ -3,6 +3,7 @@ using Business_Services.Models.LC_WebApi_Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -20,10 +21,9 @@ namespace Business_Services.B2C_WebAPI
 
         private static HttpClientHandler handler;
         private static HttpClient client;
-        /*SIT URL*/
-       private static Uri baseAddress = new Uri("https://lcuiqa.test.servicelinkfnf.com");
-        /*UAT URL*/
-       // private static Uri baseAddress = new Uri("https://lcui.test.servicelinkfnf.com");
+      
+       private static Uri baseAddress = new Uri(ConfigurationManager.AppSettings["B2Curl"]);
+
         static API_Connection()
         {
           

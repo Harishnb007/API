@@ -260,6 +260,27 @@ namespace LoanCare_Mobile_API.Controllers
             return Ok(payment);
         }
 
+
+        [Route("securityquestionPwd")]
+        [HttpPost]
+
+        public async Task<IHttpActionResult> securityquestionspwd([FromBody]string Password)
+        {
+            // To do - Move the following code to a single method & use it across the project
+            IEnumerable<string> tokenValues;
+            string tokenValue = "";
+            if (Request.Headers.TryGetValues("AuthorizationToken", out tokenValues))
+            {
+                tokenValue = tokenValues.FirstOrDefault();
+            }
+
+            var question_dtls = await userService.GetSecurityQuestionsValidatePwd(tokenValue, Password);
+            if (question_dtls == null)
+            {
+                return NotFound();
+            }
+            return Ok(question_dtls);
+        }
         //[Route("Setpin")]
         //[HttpPut]
         //public  IHttpActionResult Postsetpin(UpdatePassword PinDetail)

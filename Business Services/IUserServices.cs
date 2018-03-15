@@ -57,5 +57,6 @@ namespace Business_Services
         Task<ResponseModel> GetPinforMobileAsync(string MobileToken);
       //  Task<string> trackinglogfile(string TrackingLog);
         Task<ResponseModel> ChangePasswordAsync(string lcAuthToken, ChangePassword passwordData);
+        Task<ResponseModel> GetSecurityQuestionsValidatePwd(string lcAuthToken, string NewPassword);
     }
 }
