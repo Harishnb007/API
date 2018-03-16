@@ -66,11 +66,59 @@ namespace LoanCare_Mobile_API.Controllers
 
             var lcAuthTokenValueTask = _tokenServices.AuthenticateAsync(userCred.username, userCred.password);
             await Task.WhenAll(lcAuthTokenValueTask);
+            IUserServices userService = new UserServices();
 
-            var GetTokenTask = GetAuthTokenAsync(userCred.username, userCred.password, lcAuthTokenValueTask.Result, userCred.Is_New_MobileUser,userCred.username,userCred.resourcename,userCred.log);
-            await Task.WhenAll(GetTokenTask);
+            dynamic value = lcAuthTokenValueTask.Result;
 
-            return GetTokenTask.Result;
+            var id = ((Business_Services.Models.Helpers.ResponseWithToken)value).errorId;
+            var errorMessage = ((Business_Services.Models.Helpers.ResponseWithToken)value).errorMessage;
+            var tokenValue = ((Business_Services.Models.Helpers.ResponseWithToken)value).tokenValue;
+            var pwdChange = ((Business_Services.Models.Helpers.ResponseWithToken)value).changePassword;
+            var authenticateData = ((Business_Services.Models.Helpers.ResponseWithToken)value).authenticateResult;
+
+           
+            if (id == 0)
+            {
+                if (pwdChange == "Y")
+                {
+                    var details = userService.getPartialUserDetailsAsync(authenticateData.AuthorizationToken, userCred.username, userCred.Is_New_MobileUser);
+
+                    await Task.WhenAll(details);
+                    Business_Services.Models.User userDetails = (Business_Services.Models.User)details.Result.data;
+                    //Debug.WriteLine(userDetails.first_name);
+
+                    var token = _tokenServices.GenerateToken(userCred.username, userCred.password, userDetails.ClientId, authenticateData.AuthorizationToken,
+                        userDetails.username, userCred.resourcename, userCred.log, userDetails.is_enrolled, userCred.username);
+
+                    authenticateData.AuthorizationToken = token;
+
+                    var responseChangePwd = Request.CreateResponse(HttpStatusCode.OK, new ResponseModel
+                    {
+                        status = new Status { CustomErrorCode = 100, Message = "success" },
+                        data = authenticateData
+                    });
+
+                    return responseChangePwd;
+                }
+                else
+                {
+                    var GetTokenTask = GetAuthTokenAsync(userCred.username, userCred.password, tokenValue.ToString(),
+                    userCred.Is_New_MobileUser, userCred.username, userCred.resourcename, userCred.log);
+                    await Task.WhenAll(GetTokenTask);
+
+                    return GetTokenTask.Result;
+                }
+            }
+            else
+            {
+                var responseInvalidUser = Request.CreateResponse(HttpStatusCode.OK, new ResponseModel
+                {
+                    status = new Status { CustomErrorCode = id, Message = errorMessage },
+                    data = ""
+                });
+
+                return responseInvalidUser;
+            }
         }
 
       
@@ -102,77 +150,32 @@ namespace LoanCare_Mobile_API.Controllers
         //    return Ok(payment);
         //}
 
-
         /// <summary>
         /// Returns auth token for the validated user
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        private async Task<HttpResponseMessage> GetAuthTokenAsync(string userId, string Password, string lcAuthToken, bool Is_New_MobileUser, string UserName,string resourcename,string log)
+        private async Task<HttpResponseMessage> GetAuthTokenAsync(string userId, string Password, string lcAuthToken, bool Is_New_MobileUser,
+            string UserName, string resourcename, string log)
         {
             AuthTokenAndUserDetails Auth_data = new AuthTokenAndUserDetails();
             IUserServices userService = new UserServices();
             try
             {
-                var details = userService.getUserDetailsAsync(lcAuthToken, userId,Is_New_MobileUser);
+                var details = userService.getUserDetailsAsync(lcAuthToken, userId, Is_New_MobileUser);
                 await Task.WhenAll(details);
                 Business_Services.Models.User userDetails = (Business_Services.Models.User)details.Result.data;
                 //Debug.WriteLine(userDetails.first_name);
 
-                var token = _tokenServices.GenerateToken(userDetails.username, Password, userDetails.ClientId, lcAuthToken, userDetails.username,resourcename,log, userDetails.is_enrolled, userId);
+                var token = _tokenServices.GenerateToken(userDetails.username, Password, userDetails.ClientId, lcAuthToken,
+                    userDetails.username, resourcename, log, userDetails.is_enrolled, userId);
 
                 var Decryptdata = Decrypt(token);
 
                 dynamic objPassword = JsonConvert.DeserializeObject(Decryptdata);
 
                 List<LoanSummarys> loanS = new List<LoanSummarys>();
-                //AuthTokenAndUserDetails Auth_data = new AuthTokenAndUserDetails
-                //{
-                //using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
-                //{
-                //    var setpin = ctx.MobileUsers.Where(s => s.User_Id == userDetails.username).FirstOrDefault();
 
-                //    if (setpin == null)
-                //    {
-                //        if (Is_New_MobileUser == false)
-                //        {
-
-                //            Is_New_MobileUser = false;
-                //        }
-                //        else if (Is_New_MobileUser == true)
-                //        {
-
-                //            Is_New_MobileUser = true;
-                //        }
-                //        using (var context = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
-                //        {
-                //            Business_Services.Models.DAL.LoancareDBContext.MobileUser obj_Login = new Business_Services.Models.DAL.LoancareDBContext.MobileUser()
-                //            {
-                //                pin = "",
-                //                User_Id = userDetails.username,
-                //                mae_steps_completed = "0",
-                //                Mobile_Token_Id = "",
-                //                created_on = DateTime.Now,
-                //                Is_New_MobileUser = Is_New_MobileUser,
-                //                Legal_version = 0,
-                //                Privacy_version = 0,
-                //                Terms_version = 0
-                //            };
-                //            context.MobileUsers.Add(obj_Login);
-                //            context.Entry(obj_Login).State = EntityState.Added;
-                //            context.SaveChanges();
-                //            Auth_data.mae_steps_completed = "0";
-                //        }
-                //    }
-                //    else if (setpin != null)
-                //    {
-                //        Auth_data.mae_steps_completed = setpin.mae_steps_completed;
-                //    }
-                //    else if (setpin.mae_steps_completed == "")
-                //    {
-                //        setpin.mae_steps_completed = "0";
-                //    }
-                //}
 
                 Auth_data.AuthorizationToken = token;
                 Auth_data.Expires = DateTime.Now.AddSeconds(Convert.ToDouble(ConfigurationManager.AppSettings["AuthTokenExpiry"]));
@@ -208,6 +211,7 @@ namespace LoanCare_Mobile_API.Controllers
                 Auth_data.phone_other_1_number = userDetails.phone_other_1_number_concern;
                 Auth_data.phone_other_2_number = userDetails.phone_other_2_number_concern;
                 Auth_data.phone_other_3_number = userDetails.phone_other_3_number_concern;
+                Auth_data.MobileSignedUp = userDetails.MobileSignedUp;
 
                 foreach (var Add in userDetails.loanss)
                 {
@@ -225,95 +229,27 @@ namespace LoanCare_Mobile_API.Controllers
                 // To do - Pass the user ID instead of hardcoded value
                 // loans = new Business_Services.Models.Loan { first_name = userDetails.first_name, loans = userDetails.loans, last_name = userDetails.last_name,username =userDetails.username }
                 // };
-
-                var responsedata = Request.CreateResponse(HttpStatusCode.OK, new ResponseModel
+                bool checkClientForRollout = false;
+                if (Auth_data.MobileSignedUp == "False")
                 {
-                    status = new Status { CustomErrorCode = 0, Message = "success" },
-                    data = Auth_data
-                });
-                return responsedata;
+                    var responsedata = Request.CreateResponse(HttpStatusCode.OK, new ResponseModel
+                    {
+                        status = new Status { CustomErrorCode = 0, Message = "You are not allowed to login from Mobile App at this time as it is still not enabled for " + Auth_data.ClientName + ". Please use website. " },
+                        data = null
+                    });
+
+                } else  {
+                    var responsedata = Request.CreateResponse(HttpStatusCode.OK, new ResponseModel
+                    {
+                        status = new Status { CustomErrorCode = 0, Message = "success" },
+                        data = Auth_data
+                    });
+                    return responsedata;
+                }
             }
             catch (Exception Ex)
             {
-                //if (lcAuthToken != "Problem occurred trying to validate the user credentials.Please try again.")
-                //{
-                //    var details = userService.getUserDetailsAsync(lcAuthToken, userId);
-                //    await Task.WhenAll(details);
-                //    Business_Services.Models.User userDetails = (Business_Services.Models.User)details.Result.data;
-                //    //Debug.WriteLine(userDetails.first_name);
 
-                //    var token = _tokenServices.GenerateToken(userId, Password, userDetails.ClientId, lcAuthToken);
-                //    List<LoanSummarys> loanS = new List<LoanSummarys>();
-
-                //    using (var ctx = new Business_Services.Models.DAL.LoanCareContext.MDBServices())
-                //    {
-
-                //        if (Is_New_MobileUser == false)
-                //        {
-
-                //            Is_New_MobileUser = false;
-                //        }
-                //        else if (Is_New_MobileUser == true)
-                //        {
-
-                //            Is_New_MobileUser = true;
-                //        }
-                //        using (var context = new Business_Services.Models.DAL.LoanCareContext.MDBServices())
-                //        {
-                //            Business_Services.Models.DAL.LoanCareContext.Mobile_User obj_Login = new Business_Services.Models.DAL.LoanCareContext.Mobile_User()
-                //            {
-                //                pin = "",
-                //                User_Id = userId,
-                //                mae_steps_completed = "0",
-                //                Mobile_Token_Id = "",
-                //                created_on = DateTime.Now,
-                //                Is_New_MobileUser = Is_New_MobileUser
-                //            };
-                //            context.Mobile_User.Add(obj_Login);
-                //            context.Entry(obj_Login).State = EntityState.Added;
-                //            context.SaveChanges();
-                //            Auth_data.mae_steps_completed = "0";
-                //        }
-                //    }
-
-                //    Auth_data.AuthorizationToken = token;
-                //    Auth_data.Expires = DateTime.Now.AddSeconds(Convert.ToDouble(ConfigurationManager.AppSettings["AuthTokenExpiry"]));
-                //    Auth_data.username = userDetails.username;
-                //    Auth_data.setup_status = userDetails.setup_status;
-                //    Auth_data.first_name = userDetails.first_name;
-                //    Auth_data.last_name = userDetails.last_name;
-                //    Auth_data.middle_name = userDetails.middle_name;
-                //    Auth_data.email = userDetails.email;
-                //    Auth_data.id = userDetails.id;
-                //    Auth_data.ssn = userDetails.ssn;
-                //    Auth_data.password = userDetails.password;
-                //    Auth_data.loanNumber = userDetails.loanNumber;
-                //    Auth_data.NotifyEmail = userDetails.NotifyEmail;
-                //    Auth_data.discVer = userDetails.discVer;
-                //    Auth_data.is_successful = userDetails.is_successful;
-                //    Auth_data.address.isForeign = userDetails.addresss.isForeign;
-                //    Auth_data.address.street = userDetails.addresss.street;
-                //    Auth_data.address.city = userDetails.addresss.city;
-                //    Auth_data.address.zipcode = userDetails.addresss.zipcode;
-                //    Auth_data.address.phone = userDetails.addresss.phone;
-                //    Auth_data.address.state = userDetails.addresss.state;
-                //    Auth_data.address.country = userDetails.addresss.country;
-
-
-                //    foreach (var Add in userDetails.loanss)
-                //    {
-                //        loanS.Add(new LoanSummarys
-                //        {
-
-                //            loan_number = Add.loan_number,
-                //            property_address = Add.property_address
-
-                //        }
-                //         );
-
-                //    }
-                //    Auth_data.loans = loanS;
-                //}
                 var responseMobileUser = Request.CreateResponse(HttpStatusCode.OK, new ResponseModel
                 {
                     status = new Status { CustomErrorCode = 1, Message = "Problem occurred trying to validate the user credentials. Please try again." },
@@ -321,12 +257,28 @@ namespace LoanCare_Mobile_API.Controllers
                 });
                 return responseMobileUser;
             }
-            var response = Request.CreateResponse(HttpStatusCode.OK, new ResponseModel
+
+           
+                ResponseModel responseModel = new ResponseModel();
+                Status status = new Status();
+            bool checkClientForRolloutt = false;
+            if (Auth_data.MobileSignedUp == "False")
             {
-                status = new Status { CustomErrorCode = 0, Message = "success" },
-                data = Auth_data
-            });
-            return response;
+                responseModel.data = null;
+                status.CustomErrorCode = 1;
+                status.Message = "You are not allowed to login from Mobile App at this time as it is still not enabled for " + Auth_data.ClientName + ".Please use website. ";
+                responseModel.status = status;
+            }
+            else {
+                responseModel.data = Auth_data;
+                status.CustomErrorCode = 1;
+                status.Message = "Success";
+                responseModel.status = status;
+            }
+            var responsemMobileflag = responseModel;
+            var responsemsg = Request.CreateResponse(responsemMobileflag);
+            return responsemsg;
+
         }
 
         static string _Pwd = "This_is_just_a_token_text_for_dev";

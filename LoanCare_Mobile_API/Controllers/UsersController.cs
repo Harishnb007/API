@@ -117,7 +117,30 @@ namespace LoanCare_Mobile_API.Controllers
             return Ok(payment);
         }
 
+        [Route("TrackingLog")]
+        [HttpPost]
+        public async Task<IHttpActionResult> Tracking_Log(Tracking tracking)
+        {
+            IEnumerable<string> tokenValues;
 
+            string tokenValue = "";
+
+            if (Request.Headers.TryGetValues("AuthorizationToken", out tokenValues))
+
+            {
+                tokenValue = tokenValues.FirstOrDefault();
+            }        
+            var responsedata = await userService.trackinglog(tokenValue, tracking);
+            if (responsedata != null)
+
+            {
+                return Ok(responsedata);
+            }
+            else
+            {
+                return BadRequest("Error!");
+            }
+        }
 
         //[Route("MyLoanSetpin/{LoanNumber}/{pin}")]
         //[HttpGet]
@@ -237,6 +260,27 @@ namespace LoanCare_Mobile_API.Controllers
             return Ok(payment);
         }
 
+
+        [Route("securityquestionPwd")]
+        [HttpPost]
+
+        public async Task<IHttpActionResult> securityquestionspwd([FromBody]string Password)
+        {
+            // To do - Move the following code to a single method & use it across the project
+            IEnumerable<string> tokenValues;
+            string tokenValue = "";
+            if (Request.Headers.TryGetValues("AuthorizationToken", out tokenValues))
+            {
+                tokenValue = tokenValues.FirstOrDefault();
+            }
+
+            var question_dtls = await userService.GetSecurityQuestionsValidatePwd(tokenValue, Password);
+            if (question_dtls == null)
+            {
+                return NotFound();
+            }
+            return Ok(question_dtls);
+        }
         //[Route("Setpin")]
         //[HttpPut]
         //public  IHttpActionResult Postsetpin(UpdatePassword PinDetail)
@@ -345,6 +389,26 @@ namespace LoanCare_Mobile_API.Controllers
                 return NotFound();
             }
             return Ok(payment);
+        }
+
+
+        [Route("changepwd")]
+        [HttpPost]
+        public async Task<IHttpActionResult> changePassword(ChangePassword passwordData)
+        {
+            IEnumerable<string> tokenValues;
+            string tokenValue = "";
+            if (Request.Headers.TryGetValues("AuthorizationToken", out tokenValues))
+            {
+                tokenValue = tokenValues.FirstOrDefault();
+            }
+
+            var password = await userService.ChangePasswordAsync(tokenValue, passwordData);
+            if (password == null)
+            {
+                return NotFound();
+            }
+            return Ok(password);
         }
 
         static string _Pwd = "This_is_just_a_token_text_for_dev";
@@ -592,6 +656,8 @@ namespace LoanCare_Mobile_API.Controllers
             return Ok(Forgot_Password);
         }
 
+
+
         [Route("ValidateSecurityAnswer")]
         [HttpPost]
         public async Task<IHttpActionResult> ValidateSecurityAnswer(Business_Services.Models.User userDetail)
@@ -631,5 +697,25 @@ namespace LoanCare_Mobile_API.Controllers
             }
             return Ok(Forgot_Password);
         }
+
+        //[Route("LogFile")]
+        //[HttpPost]
+        //public async Task<IHttpActionResult> LogFile(string TrackingLogFile)
+        //{
+        //    IEnumerable<string> tokenValues;
+        //    string tokenValue = "";
+        //    if (Request.Headers.TryGetValues("AuthorizationToken", out tokenValues))
+        //    {
+        //        tokenValue = tokenValues.FirstOrDefault();
+        //    }
+
+        //    var Forgot_Password = await userService.trackinglogfile(TrackingLogFile);
+
+        //    if (Forgot_Password == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return Ok(Forgot_Password);
+        //}
     }
 }

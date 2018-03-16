@@ -80,14 +80,14 @@ namespace Business_Services
 
                 var response = await API_Connection.DeleteAsync(lcToken, "/api/BankAccountInformation/DeleteBankDetails", content);
 
-                var eventId = 5;
-                var resourceName = "One-Time+Payment";
-                var toEmail = "";
-                var log = "Manage+Bank+Account+Page+-+DeleteBank";
-                var actionName = "DELETE";
+                //var eventId = 5;
+                //var resourceName = "One-Time+Payment";
+                //var toEmail = "";
+                //var log = "Manage+Bank+Account+Page+-+DeleteBank";
+                //var actionName = "DELETE";
 
-                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+                //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
                 return new ResponseModel(response);
 
@@ -98,12 +98,95 @@ namespace Business_Services
             }
 
         }
+
+        public async Task<ResponseModel> GetSecurityQuestionsValidatePwd(string lcAuthToken, string NewPassword)
+        {
+            TokenServices tokenServices = new TokenServices();
+            string lcToken = tokenServices.GetLctoken(lcAuthToken);
+
+            Business_Services.Models.GenerateNewToken objgenerateToken = new GenerateNewToken();
+            var Decryptdata = objgenerateToken.Decrypt(lcAuthToken);
+
+            dynamic ObjUserId = JsonConvert.DeserializeObject(Decryptdata);
+            string obj_UId = ObjUserId.UserId;
+            string objPWd = ObjUserId.Password;
+            int objCId = ObjUserId.ClientId;
+            string objusername = ObjUserId.UserName;
+            if (objPWd == NewPassword)
+            {
+
+                var responseQuestionInfo = await API_Connection.GetAsync(lcToken, "/api/User/GetSecurtiyQuestions/");
+                string returnedData = await responseQuestionInfo.Content.ReadAsStringAsync();
+
+                dynamic objQuestion = JsonConvert.DeserializeObject(returnedData);
+
+                Business_Services.Models.SecurityQuestion questionDetails = new Business_Services.Models.SecurityQuestion();
+
+                questionDetails.questions = new List<SecurityQuestionSummary>();
+
+
+                questionDetails.pin = objQuestion.pin;
+                string strQuestion;
+                string strAnswer;
+
+                string strQuestionID;
+                string strUserID;
+
+                string strDecodeQuestion;
+                string strDecodeAnswer;
+                foreach (var questionNumber in objQuestion.secQuestions)
+                {
+                    // Send request to pull all question
+                    try
+                    {
+                        //Modified by BBSR Team on 12th Jan 2018
+                        strQuestionID = questionNumber.questionID;
+                        strUserID = questionNumber.userID;
+                        //Modified by BBSR Team on 12th Jan 2018
+
+                        strQuestion = questionNumber.secretQuestion;
+                        //Decode the Encoded value from the B2C site                  
+                        byte[] question = System.Convert.FromBase64String(strQuestion);
+                        strDecodeQuestion = System.Text.Encoding.UTF8.GetString(question, 0, question.Length);
+
+
+                        strAnswer = questionNumber.securityAnswer;
+
+
+                        //Decode the Encoded value from the B2C site
+                        if (!string.IsNullOrEmpty(strAnswer))
+                        {
+                            byte[] answer = System.Convert.FromBase64String(strAnswer);
+                            strDecodeAnswer = System.Text.Encoding.UTF8.GetString(answer, 0, answer.Length);
+                        }
+                        else
+                        { strDecodeAnswer = string.Empty; }
+
+                        questionDetails.questions.Add(new SecurityQuestionSummary() { question = strDecodeQuestion, answer = strDecodeAnswer, questionid = strQuestionID, userid = strUserID });
+
+                    }
+
+                    catch (Exception ex)
+                    {
+                        var Message = ex.Message;
+                        return new ResponseModel(Message);
+
+                    }
+                }
+
+                return new ResponseModel(questionDetails);
+            }
+            else
+            {
+                return new ResponseModel(null, 1, "Invalid Password");
+            }
+        }
         public async Task<ResponseModel> GetSecurityQuestions(string lcAuthToken)
         {
             TokenServices tokenServices = new TokenServices();
             string lcToken = tokenServices.GetLctoken(lcAuthToken);
 
-           
+
 
             var responseQuestionInfo = await API_Connection.GetAsync(lcToken, "/api/User/GetSecurtiyQuestions/");
             string returnedData = await responseQuestionInfo.Content.ReadAsStringAsync();
@@ -163,14 +246,14 @@ namespace Business_Services
                 }
             }
 
-            var eventId = 5;
-            var resourceName = "Profile";
-            var toEmail = "";
-            var log = "Viewed+Security+Question";
-            var actionName = "VIEW";
+            //var eventId = 5;
+            //var resourceName = "Profile";
+            //var toEmail = "";
+            //var log = "Viewed+Security+Question";
+            //var actionName = "VIEW";
 
-            var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-            string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+            //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+            //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
             return new ResponseModel(questionDetails);
         }
@@ -232,7 +315,7 @@ namespace Business_Services
                 var response = await API_Connection.GetAsync(lcToken, "/api/BankAccountInformation/GetBanksByUserId");
                 string returnedData = await response.Content.ReadAsStringAsync();
 
-                
+
 
                 Class1[] bankInfo = JsonConvert.DeserializeObject<Class1[]>(returnedData);
 
@@ -247,7 +330,7 @@ namespace Business_Services
                         bank_id = bdetail.id,
                         bank_name = bdetail.bankName,
                         account_number = decodedaccountNumber,
-                        account_nickname = bdetail.bankName.Length > 10 ? bdetail.bankName.Substring(0, 10) : bdetail.bankName,
+                        account_nickname = bdetail.bankName,
                         account_type = (bdetail.accountType == "C" ? "Checking Account" : "Saving Account"),
                         legal_name = bdetail.legalName,
                         routing_number = bdetail.routingNumber,
@@ -257,14 +340,14 @@ namespace Business_Services
 
                 }
 
-                var eventId = 2;
-                var resourceName = "Payment";
-                var toEmail = "";
-                var log = "Viewed+Manage+Bank+Account+page";
-                var actionName = "VIEW";
+                //var eventId = 2;
+                //var resourceName = "Payment";
+                //var toEmail = "";
+                //var log = "Viewed+Manage+Bank+Account+page";
+                //var actionName = "VIEW";
 
-                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+                //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
                 return new ResponseModel(banklist);
             }
@@ -279,14 +362,14 @@ namespace Business_Services
             TokenServices tokenServices = new TokenServices();
             string lcToken = tokenServices.GetLctoken(mobileToken);
 
-            var eventId = 7;
-            var resourceName = "Account";
-            var toEmail = "";
-            var log = "Viewed+Manage+Account+page";
-            var actionName = "VIEW";
+            //var eventId = 7;
+            //var resourceName = "Account";
+            //var toEmail = "";
+            //var log = "Viewed+Manage+Account+page";
+            //var actionName = "VIEW";
 
-            var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-            string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+            //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+            //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
             UserAlertCount Users = new UserAlertCount();
             var responseuser = await API_Connection.GetAsync(lcToken, "api/Personal/GetBorrowerContactInfo/" + LoanNumber);
@@ -330,7 +413,7 @@ namespace Business_Services
 
                     string loanNo = objForgotUser.userLoan.loanNo;
                     string clientPhone = objForgotUser.client.clientPhone;
-                   
+
 
                     string strUserEmail = objForgotUser.userLoan.emailAddress;
                     byte[] userEmail = System.Text.ASCIIEncoding.ASCII.GetBytes(strUserEmail);
@@ -384,32 +467,28 @@ namespace Business_Services
 
                 string returnedData = await UserDetails.Content.ReadAsStringAsync();
 
-                dynamic objForgotUser = JsonConvert.DeserializeObject(returnedData);
-                if (returnedData.Contains("success"))
+                ForgotPassword_SecurityQuestion objForgotPassword = JsonConvert.DeserializeObject<ForgotPassword_SecurityQuestion>(returnedData);
+                if (objForgotPassword.msg == "success")
                 {
                     secQuesCollectionforgotuser listsecquestion = new secQuesCollectionforgotuser();
                     List<SecurityQuestionForgotUser> objSecurity = new List<SecurityQuestionForgotUser>();
 
                     SequrityQuestionUserLoan objsequserloan = new SequrityQuestionUserLoan()
                     {
-                        id = objForgotUser.userLoan.id,
-                        loanNo = objForgotUser.userLoan.loanNo
-
+                        id = objForgotPassword.user.id,
+                        loanNo = objForgotPassword.user.userLoansList[0]
                     };
 
                     SequrityQuestionUser objsequstionuser = new SequrityQuestionUser()
                     {
-
-                        id = objForgotUser.user.id,
-                        ssn = objForgotUser.user.ssn
+                        id = objForgotPassword.user.id,
+                        ssn = ssn
                     };
 
-                    foreach (var SecQues in objForgotUser.secQuesCollection)
+                    foreach (var SecQues in objForgotPassword.secQuesCollection)
                     {
-
                         SecurityQuestionForgotUser ObjsecQuesCollection = new SecurityQuestionForgotUser()
                         {
-
                             isNew = SecQues.isNew,
                             phrases = SecQues.phrases,
                             questionID = SecQues.questionID,
@@ -437,32 +516,32 @@ namespace Business_Services
                     listsecquestion.user = objsequstionuser;
                     listsecquestion.userLoan = objsequserloan;
                     listsecquestion.secQuesstatus = objSecurityQuestionstatus;
-                    if (!returnedData.Contains("success"))
-                    {
+                    //listsecquestion.secQuesstatus = objSecurityQuestionstatus;
+                    //if (!returnedData.Contains("success"))
+                    //{
 
 
-                        return new ResponseModel(listsecquestion, 1, "Error");
-                    }
+                    //    return new ResponseModel(listsecquestion, 1, "Error");
+                    //}
 
-                    string clientUrl = "www.myloancare.com";
-                    string loanNo = objForgotUser.userLoan.loanNo;
-                    string userName = objForgotUser.user.userName;
-                    string Password = objForgotUser.user.password;
-                    string emailAddress = objForgotUser.userLoan.emailAddress;
-                    string clientName= objForgotUser.client.clientName;
-                    string clientPhone = objForgotUser.client.clientPhone;
-                    Dictionary<string, string> someDict = new Dictionary<string, string>();
-      
-                    someDict.Add("LoanNo", loanNo);
-                    someDict.Add("email", emailAddress);
-                    someDict.Add("clientName", clientName);
-                    someDict.Add("password", Password);
-                    someDict.Add("url", clientUrl);
-                    someDict.Add("PROPERTY_STATE_CODE", "");
-                    var content = new FormUrlEncodedContent(someDict);
-                    var response = await API_Connection.PostUserAsync("/api/Register/SendEmailforPassword/", content);
-                    string returnedDataemail = await response.Content.ReadAsStringAsync();
-                    dynamic objForgotemail = JsonConvert.DeserializeObject(returnedDataemail);
+                    //string clientUrl = "www.myloancare.com";
+                    //string userName = objForgotPassword.user.userName;
+                    //string Password = objForgotPassword.user.password;
+                    //string emailAddress = objForgotPassword.user.emailAddress;
+                    //string clientName= objForgotPassword.client.clientName;
+                    //string clientPhone = objForgotPassword.client.clientPhone;
+                    //Dictionary<string, string> someDict = new Dictionary<string, string>();
+
+                    //someDict.Add("LoanNo", Loan_Number);
+                    //someDict.Add("email", emailAddress);
+                    //someDict.Add("clientName", clientName);
+                    //someDict.Add("password", Password);
+                    //someDict.Add("url", clientUrl);
+                    //someDict.Add("PROPERTY_STATE_CODE", "");
+                    //var content = new FormUrlEncodedContent(someDict);
+                    //var response = await API_Connection.PostUserAsync("/api/Register/SendEmailforPassword/", content);
+                    //string returnedDataemail = await response.Content.ReadAsStringAsync();
+                    //dynamic objForgotemail = JsonConvert.DeserializeObject(returnedDataemail);
 
                     return new ResponseModel(listsecquestion);
                 }
@@ -474,6 +553,23 @@ namespace Business_Services
             }
         }
 
+        //public async Task<string> trackinglogfile(string TrackingLog)
+        //{
+        //    try
+        //    {
+
+
+
+        //        return "";
+                
+               
+        //    }
+        //    catch (Exception Ex)
+        //    {
+        //        return Ex.Message;
+        //    }
+        //}
+
         //Added by BBSR_Team on 24th Jan 2018
         public async Task<ResponseModel> ValidateSecurityAnswer(Business_Services.Models.User userDetail)
         {
@@ -482,20 +578,45 @@ namespace Business_Services
                 string strUserId = Convert.ToString(userDetail.id);
                 string strStatus = Convert.ToString(userDetail.status);
                 string strAttempt = Convert.ToString(userDetail.noOfAttempts);
+                string userName = Convert.ToString(userDetail.username);
+                string loanNo = Convert.ToString(userDetail.last_name);
 
                 //Validate Security Answers.
                 Dictionary<string, string> ConfDict = new Dictionary<string, string>();
                 ConfDict.Add("noOfAttempts", strAttempt);
                 ConfDict.Add("status", strStatus);
                 ConfDict.Add("userId", strUserId);
+                ConfDict.Add("userName", userName);
+                ConfDict.Add("lastName", loanNo);
 
                 var Confcontent = new FormUrlEncodedContent(ConfDict);
                 var ConfDetails = await API_Connection.PostUserAsync("/api/Register/ValidateSecurityAnswers", Confcontent);
 
                 string returnedConfData = await ConfDetails.Content.ReadAsStringAsync();
-                dynamic objConf = JsonConvert.DeserializeObject(returnedConfData);
+                ValidateSecurityAnswer objData = JsonConvert.DeserializeObject<ValidateSecurityAnswer>(returnedConfData);
 
-                return new ResponseModel(objConf);
+                if (objData.msg == "success")
+                {
+                    string clientUrl = "www.myloancare.com";
+                    string clientName = objData.client.clientName;
+                    string Password = objData.user.password;
+                    string emailAddress = objData.userLoan.emailAddress;
+                    Dictionary<string, string> someDict = new Dictionary<string, string>();
+
+                    someDict.Add("LoanNo", loanNo);
+                    someDict.Add("email", emailAddress);
+                    someDict.Add("clientName", clientName);
+                    someDict.Add("password", Password);
+                    someDict.Add("url", clientUrl);
+                    someDict.Add("PROPERTY_STATE_CODE", "");
+                    var content = new FormUrlEncodedContent(someDict);
+                    var response = await API_Connection.PostUserAsync("/api/Register/SendEmailforPassword/", content);
+                    string returnedDataemail = await response.Content.ReadAsStringAsync();
+                }
+
+                return new ResponseModel(objData, 0, "success");
+
+
             }
             catch (Exception Ex)
             {
@@ -503,15 +624,15 @@ namespace Business_Services
             }
         }
 
-        public async Task<ResponseModel> GetRefereshToken(string MobileToken, string loannumber,string password)
+        public async Task<ResponseModel> GetRefereshToken(string MobileToken, string loannumber, string password)
         {
             Business_Services.Models.GenerateNewToken objgenerateToken = new GenerateNewToken();
             try
             {
-             var content = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", loannumber }, { "password", password } });
-             var response = await API_Connection.PostAsync("/api/Auth/Authenticate", content);
-             var Token =    response.tokenValue;
-              var Decryptdata = objgenerateToken.Decrypt(MobileToken);
+                var content = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", loannumber }, { "password", password } });
+                var response = await API_Connection.PostAsync("/api/Auth/Authenticate", content);
+                var Token = response.tokenValue;
+                var Decryptdata = objgenerateToken.Decrypt(MobileToken);
 
                 dynamic ObjUserId = JsonConvert.DeserializeObject(Decryptdata);
                 string objUId = ObjUserId.UserId;
@@ -523,7 +644,7 @@ namespace Business_Services
                 string logview = ObjUserId.log;
                 bool eStatementenr = ObjUserId.eStatement;
                 var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token, objusername, resourcename, logview, eStatemente);
-               // loanDetails.Token = MobileTokenNew;
+                // loanDetails.Token = MobileTokenNew;
                 return new ResponseModel(MobileTokenNew);
             }
             catch (Exception Ex)
@@ -600,7 +721,7 @@ namespace Business_Services
                 dynamic objClientName = JsonConvert.DeserializeObject(returnedDataClientName);
 
                 string ClientName = objClientName.clientName;
-
+                string Client_MobileSignedUp = objClientName.mobileSignedUp;
                 string userName = objUserName.user.userName;
                 string LoanNumber = objUserName.currentUserLoan.loanNo;
 
@@ -628,7 +749,7 @@ namespace Business_Services
                 var responseLP = await API_Connection.GetAsync(lcAuthToken, "/api/User/LanguagePref/?userId=" + objUserName.user.userName);
                 string returnedDataLP = await responseLP.Content.ReadAsStringAsync();
 
-                 Business_Services.Models.User userDetails = new Business_Services.Models.User();
+                Business_Services.Models.User userDetails = new Business_Services.Models.User();
 
                 if (getdisclosure.contactinfo.contactInfo.primaryTelecomNumber.consentRevokeIndicatorCode == null && getdisclosure.contactinfo.contactInfo.primaryTelecomNumber.type == "C")
                 {
@@ -640,13 +761,13 @@ namespace Business_Services
                     userDetails.phone_secondary_number_concern = getdisclosure.contactinfo.contactInfo.secondaryTelecomNumber.phoneNumber;
                     userDetails.phone_secondary_type_concern = getdisclosure.contactinfo.contactInfo.secondaryTelecomNumber.type;
                 }
-                    foreach (var OtherTeleNo in getdisclosure.contactinfo.contactInfo.otherTelecomNumbers)
+                foreach (var OtherTeleNo in getdisclosure.contactinfo.contactInfo.otherTelecomNumbers)
                 {
 
-                    if (OtherTeleNo.sequenceNumber == 1 && OtherTeleNo.consentRevokeIndicatorCode==null&&OtherTeleNo.type == "C")
+                    if (OtherTeleNo.sequenceNumber == 1 && OtherTeleNo.consentRevokeIndicatorCode == null && OtherTeleNo.type == "C")
                     {
                         userDetails.phone_other_1_type_concern = OtherTeleNo.type;
-                      userDetails.phone_other_1_number_concern = OtherTeleNo.phoneNumber;
+                        userDetails.phone_other_1_number_concern = OtherTeleNo.phoneNumber;
                     }
                     if (OtherTeleNo.sequenceNumber == 2 && OtherTeleNo.consentRevokeIndicatorCode == null && OtherTeleNo.type == "C")
                     {
@@ -777,7 +898,6 @@ namespace Business_Services
                             questionDetails.pin = objQuestion.pin;
                             string strQuestion;
                             string strAnswer;
-
                             string strQuestionID;
                             string strUserID;
 
@@ -863,6 +983,7 @@ namespace Business_Services
                         userDetails.ClientId = objUserName.currentUserLoan.clientID;
                         userDetails.ClientName = ClientName;
                         userDetails.LoginId = loan_number;
+                        userDetails.MobileSignedUp = Client_MobileSignedUp;
                         return new ResponseModel(userDetails);
                     }
                 }
@@ -880,6 +1001,35 @@ namespace Business_Services
                 userDetails.id = objUserName.user.id;
                 userDetails.LoginId = loan_number;
                 userDetails.is_enrolled = (objUserName.currentUserLoan.eStatement == null) ? false : true;
+                userDetails.MobileSignedUp = Client_MobileSignedUp;
+                return new ResponseModel(userDetails);
+            }
+            catch (Exception Ex)
+            {
+
+                return new ResponseModel(null, 1, Ex.Message);
+            }
+        }
+
+        public async Task<ResponseModel> getPartialUserDetailsAsync(string lcAuthToken, string loan_number, bool Is_New_MobileUser)
+        {
+            try
+            {
+                Business_Services.Models.User userDetails = new Business_Services.Models.User();
+
+                Business_Services.Models.User Auth_data = new Models.User();
+                var responseUserInfo = await API_Connection.GetAsync(lcAuthToken, "/api/User/GetUserInformation");
+                string returnedData = await responseUserInfo.Content.ReadAsStringAsync();
+                dynamic objUserName = JsonConvert.DeserializeObject(returnedData);
+
+                var responseClientName = await API_Connection.GetAsync(lcAuthToken, "/api/Helper/GetClientData/");
+                string returnedDataClientName = await responseClientName.Content.ReadAsStringAsync();
+                dynamic objClientName = JsonConvert.DeserializeObject(returnedDataClientName);
+
+
+                userDetails.ClientId = objUserName.currentUserLoan.clientID;
+                userDetails.username = objUserName.user.userName;
+                userDetails.is_enrolled = (objUserName.currentUserLoan.eStatement == null) ? false : true;
 
                 return new ResponseModel(userDetails);
             }
@@ -888,6 +1038,7 @@ namespace Business_Services
 
                 return new ResponseModel(null, 1, Ex.Message);
             }
+
         }
 
         public async Task<ResponseModel> getUserDetailsAsyn(string lcAuthToken, string loan_number)
@@ -898,6 +1049,7 @@ namespace Business_Services
             var Decryptdata = objgenerateToken.Decrypt(lcAuthToken);
             dynamic ObjUserId = JsonConvert.DeserializeObject(Decryptdata);
             bool objisenrolled = ObjUserId.eStatement;
+            string processCode = string.Empty;
             //string UserName = ObjUserId.UserName;
             try
             {
@@ -923,11 +1075,11 @@ namespace Business_Services
                 var responseLP = await API_Connection.GetAsync(lcToken, "/api/User/LanguagePref/?userId=" + userName);
                 string returnedDataLP = await responseLP.Content.ReadAsStringAsync();
 
-                var responseEstatement = await API_Connection.GetAsync(lcToken, "/api/User/GetLoanData/?id="+ loan_number);
+                var responseEstatement = await API_Connection.GetAsync(lcToken, "/api/User/GetLoanData/?id=" + loan_number);
                 string returnedDateEstement = await responseEstatement.Content.ReadAsStringAsync();
                 dynamic getloanestatement = JsonConvert.DeserializeObject(returnedDateEstement);
                 string isenrolledloan = getloanestatement.currentUserLoan.eStatement;
-              
+
                 Business_Services.Models.User userDetails = new Business_Services.Models.User();
 
 
@@ -957,6 +1109,8 @@ namespace Business_Services
                 MyAccount_GetAccountInfo propertyaddress = JsonConvert.DeserializeObject<MyAccount_GetAccountInfo>(returnedDataloan);
 
                 Property_Address = propertyaddress.msg.custAddress;
+
+                processCode = propertyaddress.msg.processStop;
 
                 var response = await API_Connection.GetAsync(lcToken, "/api/OneTimePayment/GetMockedPendingTransactions/?loanNo=" + loan_number + "&schDate=&");
                 string returnedData1 = await response.Content.ReadAsStringAsync();
@@ -1041,8 +1195,8 @@ namespace Business_Services
                     loan_principal_balance = userLoanAmount.loan_principal_balance,
                     last_payment_date = userLoanAmount.last_payment_date,
                     is_enrolled = userLoanAmount.is_enrolled,
-                    is_escrow_loan = escrowInfo.lastAna.Contains('*') ? false : true
-
+                    is_escrow_loan = Convert.ToString(escrowInfo.pmtEscrow) == "0.00" ? false : true,
+                    is_bankruptcy = (processCode == "K" || processCode == "k") ? true : false
                 };
                 return new ResponseModel(UserLoanIfo);
             }
@@ -1181,9 +1335,9 @@ namespace Business_Services
             TokenServices tokenServices = new TokenServices();
             string lcToken = tokenServices.GetLctoken(mobileToken);
             try
-             {
+            {
 
-                
+
 
                 ContactUs contactUs_details = new ContactUs();
 
@@ -1275,14 +1429,14 @@ namespace Business_Services
                 contactUs_details.business_hours = BusinesshrsList;
                 contactUs_details.email_topics = Etopics;
 
-                var eventId = 6;
-                var resourceName = "Account+Services";
-                var toEmail = "";
-                var log = "Viewed+Contact+Us+Page";
-                var actionName = "VIEW";
+                //var eventId = 6;
+                //var resourceName = "Account+Services";
+                //var toEmail = "";
+                //var log = "Viewed+Contact+Us+Page";
+                //var actionName = "VIEW";
 
-                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+                //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
                 return new ResponseModel(contactUs_details);
             }
@@ -1435,14 +1589,14 @@ namespace Business_Services
                             var contentmail = new FormUrlEncodedContent(someDictMail);
                             var responsemail = await API_Connection.PostAsync(lcToken, "/api/EmailNotification/SendEmailConfirmationForTemplate/?template=UpdateUserPassword&toEmail=bGFtZXJlLm5pY2hvbGFzQGdtYWlsLmNvbQ==&pageName=manageSecurityPref-UpdateUserPassword&userID=&securityEnabled=true", contentmail);
 
-                            var eventId = 5;
-                            var resourceName = "Manage+Security+Preference";
-                            var toEmail = "";
-                            var log = "Viewed+Security+Preference+page+-+Update+Password";
-                            var actionName = "UPDATE";
+                            //var eventId = 5;
+                            //var resourceName = "Manage+Security+Preference";
+                            //var toEmail = "";
+                            //var log = "Viewed+Security+Preference+page+-+Update+Password";
+                            //var actionName = "UPDATE";
 
-                            var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                            string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+                            //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                            //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
                         }
 
                         var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", loanDetails.password } });
@@ -1450,7 +1604,7 @@ namespace Business_Services
 
                         var Token = responseregeneratedToken.tokenValue;
 
-                        var MobileTokenNew = objgenerateToken.GenerateToken(objUId, loanDetails.password, objCId, Token,objusername,resourcename,logview,eStatementenr);
+                        var MobileTokenNew = objgenerateToken.GenerateToken(objUId, loanDetails.password, objCId, Token, objusername, resourcename, logview, eStatementenr);
 
                         loanDetails.Token = MobileTokenNew;
 
@@ -1496,6 +1650,62 @@ namespace Business_Services
             }
         }
 
+
+
+        public async Task<ResponseModel> ChangePasswordAsync(string lcAuthToken,ChangePassword passwordData)
+        {
+            try
+            {
+                // To do - Use DI
+
+                TokenServices tokenServices = new TokenServices();
+                string lcToken = tokenServices.GetLctoken(lcAuthToken);
+
+
+                byte[] password = System.Text.ASCIIEncoding.ASCII.GetBytes(passwordData.password);
+                string decodedStringpassword = System.Convert.ToBase64String(password);
+
+                byte[] userId = System.Text.ASCIIEncoding.ASCII.GetBytes(passwordData.userId);
+                string decodedStringuserId = System.Convert.ToBase64String(userId);
+
+                byte[] ssn = System.Text.ASCIIEncoding.ASCII.GetBytes(passwordData.ssn);
+                string decodedStringssn = System.Convert.ToBase64String(ssn);
+
+                Dictionary<string, string> someDict = new Dictionary<string, string>();
+                someDict.Add("password", decodedStringpassword);
+                someDict.Add("userId", decodedStringuserId);
+                someDict.Add("existinguserId", decodedStringuserId);
+                someDict.Add("ssn", decodedStringssn);
+                someDict.Add("loanno", passwordData.loanNumber);
+                someDict.Add("timeval", DateTime.Now.ToString().Split(' ')[0] + " at " + DateTime.Now.ToString().Split(' ')[1].Split(':')[0] + ":" + DateTime.Now.ToString().Split(' ')[1].Split(':')[1] + "  " + DateTime.Now.ToString().Split(' ')[2]);
+                someDict.Add("url", "");
+                someDict.Add("emailaddress", passwordData.emailaddress);
+                someDict.Add("clientname", "");
+                someDict.Add("PROPERTY_STATE_CODE", "");
+
+                var content = new FormUrlEncodedContent(someDict);
+                var response = await API_Connection.PostAsync(lcToken, "/api/User/ReminderAndForgotPasswordUpdate/", content);
+                dynamic message = await response.message.Content.ReadAsStringAsync();
+                ErrorModel contentError = JsonConvert.DeserializeObject<ErrorModel>(message);
+
+                if(contentError.updated == false)
+                {
+                    return new ResponseModel(null, 1, contentError.msg);
+                }
+                else
+                {
+                    return new ResponseModel(null, 0, "success");
+
+                }
+                
+
+            }
+
+            catch (Exception Ex)
+            {
+                return new ResponseModel(passwordData, 1, Ex.Message);
+            }
+        }
 
         //public async Task<ResponseModel> SetPinAsync(string MobileToken, UpdatePassword PinDetail)
         //{
@@ -1897,102 +2107,110 @@ namespace Business_Services
                 string UserName = userName;
                 string User_Name = UserName.Trim();
 
-                var responseQuestionInfo = await API_Connection.GetAsync(lcToken, "/api/User/GetSecurtiyQuestions/");
-                string returnedData = await responseQuestionInfo.Content.ReadAsStringAsync();
-
-                dynamic objQuestion = JsonConvert.DeserializeObject(returnedData);
-
-               // Business_Services.Models.SecurityQuestion questionDetails = new Business_Services.Models.SecurityQuestion();
-
-               // questionDetails.questions = new List<SecurityQuestionSummary>();
-
-
-               string OldPinuser = objQuestion.pin;
-
-                //byte[] password = System.Text.ASCIIEncoding.ASCII.GetBytes(PinDetail.password);
-                //string decodedStringpassword = System.Convert.ToBase64String(password);
-
-                byte[] Pin = System.Text.ASCIIEncoding.ASCII.GetBytes(PinDetail.Pin);
-                string decodedStringPin = System.Convert.ToBase64String(Pin);
-
-                byte[] OldPin = System.Text.ASCIIEncoding.ASCII.GetBytes(OldPinuser);
-                string decodedStringOldPin = System.Convert.ToBase64String(OldPin);
-
-                byte[] userId = System.Text.ASCIIEncoding.ASCII.GetBytes(User_Name);
-                string decodedStringuserId = System.Convert.ToBase64String(userId);
-                string decodedStringexistinguserId = System.Convert.ToBase64String(userId);
-
-                Dictionary<string, string> someDict = new Dictionary<string, string>();
-
-                someDict.Add("password", "");
-                someDict.Add("userId", "");
-                someDict.Add("existinguserId", decodedStringexistinguserId);
-                someDict.Add("ssn", "");
-                someDict.Add("Pin", decodedStringPin);
-                someDict.Add("OldPin", decodedStringOldPin);
-                someDict.Add("ContactType", "");
-
-                var content = new FormUrlEncodedContent(someDict);
-                var response = await API_Connection.PostAsync(lcToken, "/api/User/UpdateUseridPassword/", content);
-
-                dynamic Message = await response.message.Content.ReadAsStringAsync();
-
-                var ErrorMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Message);
-
-                var responsepropertyCode = await API_Connection.GetAsync(lcToken, "/api/Helper/GetStatePropertyCode/?loanNo=" + PinDetail.User_Id);
-                string returnedpropertyCode = await responsepropertyCode.Content.ReadAsStringAsync();
-                dynamic propertycode = JsonConvert.DeserializeObject(returnedpropertyCode);
-
-
-                if (ErrorMessage.updated == true)
+                if (objPWd == PinDetail.password)
                 {
-                    string freedommortageURL = ErrorMessage.client.privateLabelURL;
-                    string FreedomMortage = ErrorMessage.client.clientName;
-                    PinDetail.Message = ErrorMessage.updated;
-                    Dictionary<string, string> someDictMail = new Dictionary<string, string>();
-                    someDictMail.Add("emailData[0][key]", "timeVal");
-                    someDictMail.Add("emailData[0][value]", Convert.ToString(DateTime.Now));
-                    someDictMail.Add("emailData[0][update]", "undefined");
-                    someDictMail.Add("emailData[1][key]", "Url");
-                    someDictMail.Add("emailData[1][value]", freedommortageURL);
-                    someDictMail.Add("emailData[1][update]", "undefined");
-                    someDictMail.Add("emailData[2][key]", "client");
-                    someDictMail.Add("emailData[2][value]", FreedomMortage);
-                    someDictMail.Add("emailData[2][update]", "undefined");
-                    someDictMail.Add("emailData[3][key]", "PROPERTY_STATE_CODE");
-                    someDictMail.Add("emailData[3][value]", propertycode);
-                    someDictMail.Add("emailData[3][update]", "undefined");
-                    someDictMail.Add("update", "undefined");
+
+                    var responseQuestionInfo = await API_Connection.GetAsync(lcToken, "/api/User/GetSecurtiyQuestions/");
+                    string returnedData = await responseQuestionInfo.Content.ReadAsStringAsync();
+
+                    dynamic objQuestion = JsonConvert.DeserializeObject(returnedData);
+
+                    // Business_Services.Models.SecurityQuestion questionDetails = new Business_Services.Models.SecurityQuestion();
+
+                    // questionDetails.questions = new List<SecurityQuestionSummary>();
 
 
-                    var contentmail = new FormUrlEncodedContent(someDictMail);
-                    var responsemail = await API_Connection.PostAsync(lcToken, "/api/EmailNotification/SendEmailConfirmationForTemplate/?template=UpdateUserPin&toEmail=c2NyZWRwYXRoQGdtYWlsLmNvbQ==&pageName=manageSecurityPref-UpdateUserPin&userID=&securityEnabled=false", contentmail);
+                    string OldPinuser = objQuestion.pin;
+
+                    //byte[] password = System.Text.ASCIIEncoding.ASCII.GetBytes(PinDetail.password);
+                    //string decodedStringpassword = System.Convert.ToBase64String(password);
+
+                    byte[] Pin = System.Text.ASCIIEncoding.ASCII.GetBytes(PinDetail.Pin);
+                    string decodedStringPin = System.Convert.ToBase64String(Pin);
+
+                    byte[] OldPin = System.Text.ASCIIEncoding.ASCII.GetBytes(OldPinuser);
+                    string decodedStringOldPin = System.Convert.ToBase64String(OldPin);
+
+                    byte[] userId = System.Text.ASCIIEncoding.ASCII.GetBytes(User_Name);
+                    string decodedStringuserId = System.Convert.ToBase64String(userId);
+                    string decodedStringexistinguserId = System.Convert.ToBase64String(userId);
+
+                    Dictionary<string, string> someDict = new Dictionary<string, string>();
+
+                    someDict.Add("password", "");
+                    someDict.Add("userId", "");
+                    someDict.Add("existinguserId", decodedStringexistinguserId);
+                    someDict.Add("ssn", "");
+                    someDict.Add("Pin", decodedStringPin);
+                    someDict.Add("OldPin", decodedStringOldPin);
+                    someDict.Add("ContactType", "");
+
+                    var content = new FormUrlEncodedContent(someDict);
+                    var response = await API_Connection.PostAsync(lcToken, "/api/User/UpdateUseridPassword/", content);
+
+                    dynamic Message = await response.message.Content.ReadAsStringAsync();
+
+                    var ErrorMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Message);
+
+                    var responsepropertyCode = await API_Connection.GetAsync(lcToken, "/api/Helper/GetStatePropertyCode/?loanNo=" + PinDetail.User_Id);
+                    string returnedpropertyCode = await responsepropertyCode.Content.ReadAsStringAsync();
+                    dynamic propertycode = JsonConvert.DeserializeObject(returnedpropertyCode);
+
+
+                    if (ErrorMessage.updated == true)
+                    {
+                        string freedommortageURL = ErrorMessage.client.privateLabelURL;
+                        string FreedomMortage = ErrorMessage.client.clientName;
+                        PinDetail.Message = ErrorMessage.updated;
+                        Dictionary<string, string> someDictMail = new Dictionary<string, string>();
+                        someDictMail.Add("emailData[0][key]", "timeVal");
+                        someDictMail.Add("emailData[0][value]", Convert.ToString(DateTime.Now));
+                        someDictMail.Add("emailData[0][update]", "undefined");
+                        someDictMail.Add("emailData[1][key]", "Url");
+                        someDictMail.Add("emailData[1][value]", freedommortageURL);
+                        someDictMail.Add("emailData[1][update]", "undefined");
+                        someDictMail.Add("emailData[2][key]", "client");
+                        someDictMail.Add("emailData[2][value]", FreedomMortage);
+                        someDictMail.Add("emailData[2][update]", "undefined");
+                        someDictMail.Add("emailData[3][key]", "PROPERTY_STATE_CODE");
+                        someDictMail.Add("emailData[3][value]", propertycode);
+                        someDictMail.Add("emailData[3][update]", "undefined");
+                        someDictMail.Add("update", "undefined");
+
+
+                        var contentmail = new FormUrlEncodedContent(someDictMail);
+                        var responsemail = await API_Connection.PostAsync(lcToken, "/api/EmailNotification/SendEmailConfirmationForTemplate/?template=UpdateUserPin&toEmail=c2NyZWRwYXRoQGdtYWlsLmNvbQ==&pageName=manageSecurityPref-UpdateUserPin&userID=&securityEnabled=false", contentmail);
+                    }
+
+                    var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", objPWd } });
+                    var responseregeneratedToken = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
+
+                    var Token = responseregeneratedToken.tokenValue;
+
+                    var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token, UserName, resourcename, logview, eStatementenr);
+
+                    PinDetail.Token = MobileTokenNew;
+
+                    if (ErrorMessage.updated == false)
+                    {
+                        PinDetail.Message = ErrorMessage.msg;
+                        PinDetail.Token = MobileToken;
+                        return new ResponseModel(PinDetail, 1, "Failed");
+                    }
+                    else
+                    {
+                        return new ResponseModel(PinDetail);
+                    }
                 }
-
-                var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", objPWd } });
-                var responseregeneratedToken = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
-
-                var Token = responseregeneratedToken.tokenValue;
-
-                var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token,UserName,resourcename,logview,eStatementenr);
-
-                PinDetail.Token = MobileTokenNew;
-
-                if (ErrorMessage.updated == false)
-                {
-                    PinDetail.Message = ErrorMessage.msg;
-                    PinDetail.Token = MobileToken;
-                    return new ResponseModel(PinDetail, 1, "Failed");
-                }
-                else
-                {
-                    return new ResponseModel(PinDetail);
+                else {
+                    return new ResponseModel(null,1,"Invalid Password");
                 }
             }
             catch (Exception Ex)
             {
                 return new ResponseModel(PinDetail, 1, Ex.Message);
             }
+
         }
 
 
@@ -2135,12 +2353,10 @@ namespace Business_Services
         //    }
         //}
 
-        //Modified by BBSR Team on 5th Jan 2018
-        //public async Task<string> UpdateSecurityAnswers(string lcAuthToken, List<QuestionSummary> secQuestions)
+
+        //Modified by BBSR Team on 14th Jan 2018 : Defect # 1253  : START      
         public async Task<ResponseModel> UpdateSecurityAnswers(string lcAuthToken, List<QuestionSummary> secQuestions)
         {
-
-            //HttpContent content = null;
             TokenServices tokenServices = new TokenServices();
             string lcToken = tokenServices.GetLctoken(lcAuthToken);
 
@@ -2163,8 +2379,60 @@ namespace Business_Services
                 }
 
                 var content = new System.Net.Http.StringContent(sData, System.Text.Encoding.UTF8, "application/x-www-form-urlencoded");
+                //var response = await API_Connection.PostUserRegisAsync("/api/User/Updatesecurityquesions/", content);
                 var response = await API_Connection.PostAsync(lcToken, "/api/User/Updatesecurityquesions/", content);
-                return new ResponseModel(response);
+
+                //return new ResponseModel(response);
+
+                Business_Services.Models.GenerateNewToken objgenerateToken = new GenerateNewToken();
+
+                var Decryptdata = objgenerateToken.Decrypt(lcAuthToken);
+                dynamic ObjQuestion = JsonConvert.DeserializeObject(Decryptdata);
+
+                string strLoanNumber = ObjQuestion.Loan_Number;
+
+                //string lcToken = tokenServices.GetLctoken(lcAuthToken);
+
+                var responseaccountInfo = await API_Connection.GetAsync(lcToken, "/api/MyAccount/GetAccountInfo/" + strLoanNumber);
+                string returnedData = await responseaccountInfo.Content.ReadAsStringAsync();
+                MyAccount_GetAccountInfo getuserinfo = JsonConvert.DeserializeObject<MyAccount_GetAccountInfo>(returnedData);
+
+
+                string strUserEmail = getuserinfo.msg.emailAddress;
+                byte[] userEmail = System.Text.ASCIIEncoding.ASCII.GetBytes(strUserEmail);
+                string decodeduserEmail = System.Convert.ToBase64String(userEmail);
+
+                var responseClientURL = await API_Connection.GetAsync(lcToken, "/api/Helper/GetClientData/");
+                dynamic URL = await responseClientURL.Content.ReadAsStringAsync();
+                var ClientURLmessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(URL);
+
+                string ClientName = ClientURLmessage.clientName;
+                string ClientURL = ClientURLmessage.clientURL;
+                string TimeValue = DateTime.Now.ToString();
+
+                var responsepropertyCode = await API_Connection.GetAsync("/api/Helper/GetStatePropertyCode/?loanNo=" + strLoanNumber);
+                string returnedpropertyCode = await responsepropertyCode.Content.ReadAsStringAsync();
+                dynamic propertycode = JsonConvert.DeserializeObject(returnedpropertyCode);
+
+                Dictionary<string, string> someDictMail = new Dictionary<string, string>();
+                someDictMail.Add("emailData[0][key]", "timeVal");
+                someDictMail.Add("emailData[0][value]", TimeValue);
+                someDictMail.Add("emailData[0][update]", "undefined");
+                someDictMail.Add("emailData[1][key]", "url");
+                someDictMail.Add("emailData[1][value]", ClientURL);
+                someDictMail.Add("emailData[1][update]", "undefined");
+                someDictMail.Add("emailData[2][key]", "client");
+                someDictMail.Add("emailData[2][value]", ClientName);
+                someDictMail.Add("emailData[2][update]", "undefined");
+                someDictMail.Add("emailData[3][key]", "PROPERTY_STATE_CODE");
+                someDictMail.Add("emailData[3][value]", propertycode);
+                someDictMail.Add("emailData[3][update]", "undefined");
+                someDictMail.Add("update", "undefined");
+
+                var contentmail = new FormUrlEncodedContent(someDictMail);
+                //var responsemail = await API_Connection.PostUserRegisAsync("/api/EmailNotification/SendEmailConfirmationForTemplate/?template=UpdateSecurityQuestion&toEmail=" + decodeduserEmail + "&pageName=manageSecurityPref-UpdateSecurityQuestion&userID=" + "&securityEnabled=false", contentmail);
+                var responsemail = await API_Connection.PostAsync(lcToken, "/api/EmailNotification/SendEmailConfirmationForTemplate/?template=UpdateSecurityQuestion&toEmail=" + decodeduserEmail + "&pageName=manageSecurityPref-UpdateSecurityQuestion&userID=" + "&securityEnabled=false", contentmail);
+
 
                 var eventId = 5;
                 var resourceName = "Manage+Security+Preference";
@@ -2174,6 +2442,8 @@ namespace Business_Services
 
                 var trackresponse = await API_Connection.GetAsync("/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
                 string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+
+                return new ResponseModel(response);
             }
             catch (Exception Ex)
             {
@@ -2181,13 +2451,14 @@ namespace Business_Services
             }
         }
 
+        //Modified by BBSR Team on 14th Jan 2018 : Defect # 1253  : END  
         public async Task<ResponseModel> InsertSecurityAnswerAsyn(string lcAuthToken, Question secQuestions, string objUserIdUpd)
         {
 
             //HttpContent content = null;
             TokenServices tokenServices = new TokenServices();
             string lcToken = tokenServices.GetLctoken(lcAuthToken);
-            
+
 
             Business_Services.Models.GenerateNewToken objgenerateToken = new GenerateNewToken();
 
@@ -2222,7 +2493,7 @@ namespace Business_Services
 
                 string InsertResponse = Updated_SecurityQuesion.updated;
 
-              
+
                 var responsePropertystateCD = await API_Connection.GetAsync(lcToken, "/api/Helper/GetStatePropertyCode/?loanNo=" + str_Loan);
                 dynamic Message = await responsePropertystateCD.Content.ReadAsStringAsync();
                 var PropcodeMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Message);
@@ -2232,15 +2503,16 @@ namespace Business_Services
                 string returnedData = await responseUserInfo.Content.ReadAsStringAsync();
                 dynamic objUseremail = JsonConvert.DeserializeObject(returnedData);
                 string Useremail = objUseremail.currentUserLoan.emailAddress;
-             
+
                 byte[] secr_email = System.Text.ASCIIEncoding.ASCII.GetBytes(Useremail);
                 string decoded_email = System.Convert.ToBase64String(secr_email);
 
-                if (InsertResponse == "True") {
+                if (InsertResponse == "True")
+                {
 
                     string freedommortageURL = Updated_SecurityQuesion.client.privateLabelURL;
                     string FreedomMortage = Updated_SecurityQuesion.client.clientName;
-             
+
                     Dictionary<string, string> someDictMail = new Dictionary<string, string>();
                     someDictMail.Add("emailData[0][key]", "timeVal");
                     someDictMail.Add("emailData[0][value]", Convert.ToString(DateTime.Now));
@@ -2258,7 +2530,7 @@ namespace Business_Services
                     string Page_Name = "manageSecurityPref-UpdateUserPassword";
                     string Update_Password = "UpdateUserPassword";
                     var contentmail = new FormUrlEncodedContent(someDictMail);
-                    var responsemail = await API_Connection.PostAsync(lcToken, "/api/EmailNotification/SendEmailConfirmationForTemplate/?template="+ Update_Password + "&toEmail="+ decoded_email + "&pageName="+ Page_Name + "&userID="+""+"&securityEnabled="+false, contentmail);
+                    var responsemail = await API_Connection.PostAsync(lcToken, "/api/EmailNotification/SendEmailConfirmationForTemplate/?template=" + Update_Password + "&toEmail=" + decoded_email + "&pageName=" + Page_Name + "&userID=" + "" + "&securityEnabled=" + false, contentmail);
                     string returnedSendemail = await responsemail.message.Content.ReadAsStringAsync();
                     dynamic objSendUseremail = JsonConvert.DeserializeObject(returnedSendemail);
                 }
@@ -2368,48 +2640,45 @@ namespace Business_Services
                 string returnedData = await response.Content.ReadAsStringAsync();
                 dynamic objUser = JsonConvert.DeserializeObject(returnedData);
 
+                //Email User Registration ... Updated on 10th March 2018 by BBSR Team : Defect # 1162 & 1068 : START
+                //var ErrorMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(objUser);                
+
                 IEnumerable<string> tokenValues;
                 string tokenValue = "";
                 if (response.Headers.TryGetValues("AuthorizationToken", out tokenValues))
                 {
                     tokenValue = tokenValues.FirstOrDefault();
                 }
-              //  dynamic objUser = JsonConvert.DeserializeObject(returnedData);
-                var ErrorMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(objUser);
 
                 var responsepropertyCode = await API_Connection.GetAsync("/api/Helper/GetStatePropertyCode/?loanNo=" + userDetail.loanNumber);
                 string returnedpropertyCode = await responsepropertyCode.Content.ReadAsStringAsync();
                 dynamic propertycode = JsonConvert.DeserializeObject(returnedpropertyCode);
 
-                if (ErrorMessage.updated == true)
+                if (objUser.updated == true)
                 {
-                    string clientName = ErrorMessage.client.clientName;
+                    string clientName = objUser.client.clientName;
 
-                    string strUserName = ErrorMessage.user.userName;
+                    string strUserName = userDetail.username;
                     byte[] userName = System.Text.ASCIIEncoding.ASCII.GetBytes(strUserName);
                     string decodeduserName = System.Convert.ToBase64String(userName);
 
+                    string strUserID = objUser.obj.user.id;
 
-                    string strUserID = ErrorMessage.user.userID;
-
-
-                    string loanNo = ErrorMessage.userLoan.loanNo;
-                    string clientPhone = ErrorMessage.client.clientPhone;
+                    string loanNo = userDetail.loanNumber;
+                    string clientPhone = objUser.client.clientPhone;
                     string clientUrl = "www.myloancare.com";
 
-                    string strUserEmail = ErrorMessage.userLoan.emailAddress;
+                    string strUserEmail = userDetail.email;
                     byte[] userEmail = System.Text.ASCIIEncoding.ASCII.GetBytes(strUserEmail);
                     string decodeduserEmail = System.Convert.ToBase64String(userEmail);
-
-                    ////string freedommortageURL = ErrorMessage.client.privateLabelURL;
-                    ////string FreedomMortage = ErrorMessage.client.clientName;
 
                     Dictionary<string, string> someDictMail = new Dictionary<string, string>();
                     someDictMail.Add("emailData[0][key]", "clientname");
                     someDictMail.Add("emailData[0][value]", clientName);
                     someDictMail.Add("emailData[0][update]", "undefined");
                     someDictMail.Add("emailData[1][key]", "username");
-                    someDictMail.Add("emailData[1][value]", decodeduserName);
+                    //someDictMail.Add("emailData[1][value]", decodeduserName);
+                    someDictMail.Add("emailData[1][value]", strUserName); // Modified by BBSR Team on 12th March from the Decoded Username to simple UserName
                     someDictMail.Add("emailData[1][update]", "undefined");
                     someDictMail.Add("emailData[2][key]", "loanNo");
                     someDictMail.Add("emailData[2][value]", loanNo);
@@ -2417,21 +2686,21 @@ namespace Business_Services
                     someDictMail.Add("emailData[3][key]", "clientPhone");
                     someDictMail.Add("emailData[3][value]", clientPhone);
                     someDictMail.Add("emailData[3][update]", "undefined");
-                    someDictMail.Add("emailData[3][key]", "url");
-                    someDictMail.Add("emailData[3][value]", clientUrl);
-                    someDictMail.Add("emailData[3][update]", "undefined");
-                    someDictMail.Add("emailData[3][key]", "PROPERTY_STATE_CODE");
-                    someDictMail.Add("emailData[3][value]", propertycode);
-                    someDictMail.Add("emailData[3][update]", "undefined");
+                    someDictMail.Add("emailData[4][key]", "url");
+                    someDictMail.Add("emailData[4][value]", clientUrl);
+                    someDictMail.Add("emailData[4][update]", "undefined");
+                    someDictMail.Add("emailData[5][key]", "PROPERTY_STATE_CODE");
+                    someDictMail.Add("emailData[5][value]", propertycode);
+                    someDictMail.Add("emailData[5][update]", "undefined");
                     someDictMail.Add("update", "undefined");
 
-
                     var contentmail = new FormUrlEncodedContent(someDictMail);
-                    var responsemail = await API_Connection.PostAsync(tokenValue, "/api/EmailNotification/SendEmailConfirmationForTemplate/?template=LoanCareRegistration&toEmail=" + decodeduserEmail + "&pageName=disclosure&userID=" + strUserID, contentmail);
+                    var responsemail = await API_Connection.PostUserRegisAsync("/api/EmailNotification/SendEmailConfirmationForTemplate/?template=LoanCareRegistration&toEmail=" + decodeduserEmail + "&pageName=disclosure&userID=" + strUserID, contentmail);
                 }
 
+                //Email User Registration ... Updated on 10th March 2018 by BBSR Team : Defect # 1162 & 1068 : END
 
-                    return new ResponseModel(objUser);
+                return new ResponseModel(objUser);
             }
             catch (Exception Ex)
             {
@@ -2439,6 +2708,16 @@ namespace Business_Services
                 return new ResponseModel(null, 1, Ex.Message);
             }
         }
-
+        public async Task<string> trackinglog(string lcAuthToken, Tracking tracking)
+        {
+            //HttpContent content = null;
+            TokenServices tokenServices = new TokenServices();
+            string lcToken = tokenServices.GetLctoken(lcAuthToken);
+            string Mobile_resource = "Mobile_" + tracking.resourcename;
+            var toEmail = "";
+            var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + tracking.eventId + "&resourceName=" + Mobile_resource + "&toEmail=" + toEmail + "&log=" + tracking.Log + "&actionName=" + tracking.action);
+            string returnedData = await trackresponse.Content.ReadAsStringAsync();
+            return returnedData;
+        }
     }
 }

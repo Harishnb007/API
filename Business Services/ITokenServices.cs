@@ -26,7 +26,7 @@ namespace Business_Services
 
         Task<ResponseModel> TestAuthAsync();
 
-        Task<string> AuthenticateAsync(string userName, string password);
+        Task<ResponseWithToken> AuthenticateAsync(string userName, string password);
 
         string GetLctoken(string mobileToken);
     

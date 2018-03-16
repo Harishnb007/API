@@ -95,14 +95,14 @@ namespace Business_Services
             try
             {
 
-                var eventId = 2;
-                var resourceName = "Payment";
-                var toEmail = "";
-                var log = "Viewed+Autodraft";
-                var actionName = "VIEW";
+                //var eventId = 2;
+                //var resourceName = "Payment";
+                //var toEmail = "";
+                //var log = "Viewed+Autodraft";
+                //var actionName = "VIEW";
 
-                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+                //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
 
                 var response = await API_Connection.GetAsync(lcToken, "/api/AutoDraft/GetAutoDraft/" + loanNumber);
@@ -187,14 +187,14 @@ namespace Business_Services
                 TokenServices tokenServices = new TokenServices();
                 string lcToken = tokenServices.GetLctoken(mobileToken);
 
-                var eventId = 1;
-                var resourceName = "Others";
-                var toEmail = "";
-                var log = "Viewed+Notification";
-                var actionName = "VIEW";
+                //var eventId = 1;
+                //var resourceName = "Others";
+                //var toEmail = "";
+                //var log = "Viewed+Notification";
+                //var actionName = "VIEW";
 
-                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+                //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
 
                 var response = await API_Connection.GetAsync(lcToken, "/api/EStatement/GetAllNotificationByLoanNumber/?loanNo=" + loanNumber);
@@ -389,29 +389,55 @@ namespace Business_Services
             }
         }
 
-        public async Task<ResponseModel> GetgetstatementspdfAsync(string lcAuthToken, string loan_number, string Date,string Key)
+        //public async Task<HttpResponseMessage> GetgetstatementspdfAsync(string lcAuthToken, GeneratePdf generatePdf)
+        //{
+        //    string lcToken = tokenServices.GetLctoken(lcAuthToken);
+        //    try
+        //    {
+        //        var statement_url = "/Statements/EStatementHandler.Pdf?loanNo=" + generatePdf.LoanNumber + "&statementDate=" + generatePdf.date + "&statementKey=" + generatePdf.Key;
+        //        // MemoryStream mem = new MemoryStream();
+        //        var responsestream = await API_Connection.GetAsync(lcToken, statement_url);
+        //        string returnedDatastream = await responsestream.Content.ReadAsStringAsync();
+
+
+        //        return returnedDatastream;
+
+        //        // return Task.FromResult(returnedDatastream);
+        //    }
+
+        //    catch (Exception Ex)
+        //    {
+
+        //        return null;
+        //    }
+        //}
+
+
+        public async Task<HttpResponseMessage> GetgetstatementspdfAsync(string tokenValue, GeneratePdf generatePdf)
+
         {
+
             string lcToken = tokenServices.GetLctoken(tokenValue);
+
             try
             {
-                var statement_url = "/Statements/EStatementHandler.Pdf?loanNo=" + loan_number + "&statementDate=" + Date + "&statementKey=" + Key;
-               // MemoryStream mem = new MemoryStream();
-                var responsestream = await API_Connection.GetAsync(lcToken, statement_url);
-                string returnedDatastream = await responsestream.Content.ReadAsStringAsync();
+                var statement_url = "/Statements/EStatementHandler.Pdf?loanNo=" + generatePdf.LoanNumber + "&statementDate=" + generatePdf.date + "&statementKey=" + generatePdf.Key;
 
-                retArr = await responsestream.Content.ReadAsByteArrayAsync();
-                //   return     responsestream.setContentType("application/pdf");
-                 return new ResponseModel(returnedDatastream);
-               // var x = retArr.Skip(1).Take(y.Length - 2).ToArray();
-
-               // return new File(retArr, "application/pdf","Pd")
+                      var responsestream = await API_Connection.GetAsync(lcToken, statement_url);
+                     string returnedDatastream = await responsestream.Content.ReadAsStringAsync();
+                return responsestream;
             }
+
             catch (Exception Ex)
+
             {
 
-                return new ResponseModel(null, 1, Ex.Message);
+                return null;
+
             }
+
         }
+
 
 
         public async Task<ResponseModel> GetgetstatementsAsync(string lcAuthToken, string loan_number)
@@ -424,15 +450,7 @@ namespace Business_Services
                 var response = await API_Connection.GetAsync(lcToken, "/api/EStatement/GetPdfListStr/?loanNo=" + loan_number);
                 string returnedData = await response.Content.ReadAsStringAsync();
                 Getdetails_estatement getEstatementInfo = JsonConvert.DeserializeObject<Getdetails_estatement>(returnedData);
-
-                var eventId = 4;
-                var resourceName = "eStatement";
-                var toEmail = "";
-                var log = "Viewed+eStatement";
-                var actionName = "VIEW";
-
-                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+           
 
                 List<EsatementDateurl> estatement = new List<EsatementDateurl>();
 
@@ -455,51 +473,7 @@ namespace Business_Services
                 {
                     estatement = estatement
                 };
-                foreach (var estatemen in estatement)
-                {
-
-                    MemoryStream mem = new MemoryStream();
-                    var responsestream = await API_Connection.GetAsync(lcToken, estatemen.statement_url);
-                    string returnedDatastream = await responsestream.Content.ReadAsStringAsync();
-                    //byte[] datastream = Encoding.ASCII.GetBytes(returnedDatastream);
-                    var byteArray = Encoding.UTF8.GetBytes(returnedDatastream);
-                    //byte[] byteArray = Encoding.ASCII.GetBytes(contents);
-                    MemoryStream stream = new MemoryStream(byteArray);
-
-
-                    // MemoryStream stream =  byteArray;
-                    // String outputFilePath = "C:\\Users\\harivigneshm\\Desktop\\pdfurl.pdf";
-                    //  MemoryStream outputStream = new MemoryStream();
-                    // DocumentConverter.ToDocument(returnedDatastream, outputFilePath, FileType.DOC_PDF);
-
-
-                    //byte[] bytes;
-                    //BinaryFormatter bf = new BinaryFormatter();
-                    //MemoryStream ms = new MemoryStream();
-                    //bf.Serialize(ms, returnedDatastream);
-                    //bytes = ms.ToArray();
-                    //System.IO.File.WriteAllBytes("C:\\Users\\harivigneshm\\Desktop\\pdfhello.pdf", bytes);
-                    //string sampleHtml = "<html><body><p>Simple HTML string</p></body></html> ";
-                    // Converter.ConvertHtmlString(sampleHtml, @"C:\\Document.pdf");
-
-                    //using (FileStream stream = new FileStream("C:\\Users\\harivigneshm.FNFSECURE.003\\Desktop\\pdf" + "\\" + datastream, FileMode.CreateNew))
-
-                    //{
-
-                    //    using (StreamWriter writer = new StreamWriter(stream, Encoding.UTF8))
-
-                    //    {
-
-                    //        byte[] buffer = datastream;
-
-                    //        stream.Write(buffer, 0, buffer.Length);
-
-                    //        writer.Close();
-
-                    //    }
-
-                    //}
-                }
+               
 
                 return new ResponseModel(estatementresult);
             }
@@ -537,25 +511,7 @@ namespace Business_Services
             }
         }
 
-        //private static Stream ConvertToStream(string fileUrl)
-        //{
-        //    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(fileUrl);
-        //    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-
-        //    try
-        //    {
-        //        MemoryStream mem = new MemoryStream();
-        //        Stream stream = response.GetResponseStream();
-
-        //        stream.CopyTo(mem, 4096);
-
-        //        return mem;
-        //    }
-        //    finally
-        //    {
-        //        response.Close();
-        //    }
-        //}
+      
 
         public async Task<ResponseModel> GetLoanInfoForLoanAsync(string lcAuthToken, string loan_number)
         {
@@ -833,17 +789,18 @@ namespace Business_Services
                     phone_other_2_number = LoanDetailsemail.phone_other_2_number,
                     phone_other_2_type = LoanDetailsemail.phone_other_2_type,
                     phone_other_3_number = LoanDetailsemail.phone_other_3_number,
-                    phone_other_3_type = LoanDetailsemail.phone_other_3_type
+                    phone_other_3_type = LoanDetailsemail.phone_other_3_type,
+                    country = Convert.ToString(getuserinfoPhoneNo.contactinfo.contactInfo.mailingAddressCountry)
                 };
 
-                var eventId = 5;
-                var resourceName = "Profile+Information";
-                var toEmail = "";
-                var log = "Viewed+Contactdetails";
-                var actionName = "VIEW";
+                //var eventId = 5;
+                //var resourceName = "Profile+Information";
+                //var toEmail = "";
+                //var log = "Viewed+Contactdetails";
+                //var actionName = "VIEW";
 
-                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+                //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
                 return new ResponseModel(LoanDetails);
             }
@@ -856,6 +813,7 @@ namespace Business_Services
         }
 
 
+        //Modified by BBSR Team on 14th March 2018 : Wrong Enrollment Value in "/api/user/loan/{loan_number} : START
         public async Task<ResponseModel> GetLoanAsync(string mobileToken, string loanNumber)
         {
             // To do - Use DI
@@ -869,7 +827,9 @@ namespace Business_Services
             dynamic ObjUserId = JsonConvert.DeserializeObject(Decryptdata);
             bool objisenrolled = ObjUserId.eStatement;
 
-
+            var responseEscrow = await API_Connection.GetAsync(lcToken, "/api/Escrow/CallEscrow/?LoanNo=" + loanNumber);
+            string returnedEscrowData = await responseEscrow.Content.ReadAsStringAsync();
+            Escrow_CallEscrow escrowInfo = JsonConvert.DeserializeObject<Escrow_CallEscrow>(returnedEscrowData);
 
             Loan LoanStatus = new Loan();
             var response = await API_Connection.GetAsync(lcToken, "/api/Loan/GetCurrentLoanInfo/" + loanNumber);
@@ -931,7 +891,7 @@ namespace Business_Services
                 {
                     AutoLoan.is_enrolled = true;
                 }
-               // AutoLoan.is_enrolled = objisenrolled;
+                // AutoLoan.is_enrolled = objisenrolled;
                 AutoLoan.loan_interest_rate = loanInfo.intRate;
                 AutoLoan.escrow_balance = Convert.ToDecimal(loanInfo.escrowBalance);
                 AutoLoan.property_value = Convert.ToDecimal(loanInfo.propertyValue);
@@ -976,7 +936,8 @@ namespace Business_Services
                 loan_total_amount = Convert.ToDecimal(loanInfo.netPresent),
                 loan_duedate = loanInfo.dueDate.Substring(5, 2) + "/" + loanInfo.dueDate.Substring(8, 2) + "/" + loanInfo.dueDate.Substring(2, 2),
                 loan_type = loanInfo.loanType,
-                is_enrolled = (userInfo.currentUserLoan.eStatement == null) ? false : true,
+                //is_enrolled = (userInfo.currentUserLoan.eStatement == null) ? false : true, //Commented by BBSr Team on 14th March 2018 : Wrong Enrollment Value in "/api/user/loan/{loan_number}"
+                is_enrolled = (isenrolledloan == null) ? false : true, //Added by BBSr Team on 14th March 2018 : Wrong Enrollment Value in "/api/user/loan/{loan_number}"
                 loan_interest_rate = loanInfo.intRate,
                 escrow_balance = Convert.ToDecimal(loanInfo.escrowBalance),
                 property_value = Convert.ToDecimal(loanInfo.propertyValue),
@@ -985,9 +946,11 @@ namespace Business_Services
                 maturity_date = loanInfo.maturityDate,
                 co_borrower_name = acctInfo.msg.coBorrower,
                 is_autodraft = autoDrftInfo.nextDraftDate != "" ? true : false,
+                is_escrow_loan = Convert.ToString(escrowInfo.pmtEscrow) == "0.00" ? false : true,
                 auto_draftdate = Convert.ToString((autoDrftInfo.nextDraftDate != "") ? DateTime.ParseExact(autoDrftInfo.nextDraftDate, "MM/dd/yyyy", CultureInfo.InvariantCulture) : new DateTime())
             });
         }
+        //Modified by BBSR Team on 14th March 2018 : Wrong Enrollment Value in "/api/user/loan/{loan_number} : END
 
         public async Task<ResponseModel> PostLogoutForAsync(string MobileToken)
         {
@@ -1022,6 +985,10 @@ namespace Business_Services
             decimal paymentAmt = 0.0M;
             AutoDraft_GetAutoDraft pendingInfoAutoDraft = new AutoDraft_GetAutoDraft();
             bool autodraft = false;
+            decimal onetimePayFee = 0.0M;
+
+            string straquisitiondate = string.Empty;
+
             try
             {
                 var response = await API_Connection.GetAsync(lcToken, "/api/OnetimePayment/GetPaymentInfo/?loanNo=" + loanNumber + "&schDate=" + "");
@@ -1033,6 +1000,15 @@ namespace Business_Services
                 var pendingresponse = await API_Connection.GetAsync(lcToken, "/api/OneTimePayment/GetMockedPendingTransactions/?loanNo=" + loanNumber + "&schDate=&");
                 returnedData = await pendingresponse.Content.ReadAsStringAsync();
                 pendingInfoPayment = JsonConvert.DeserializeObject<List<OneTimePayment_GetMockedPendingTransactions>>(returnedData);
+
+                var getAcquisitionData = await API_Connection.GetAsync(lcToken, "/api/OneTimePayment/GetAcquisitionDate/" + loanNumber + "? _");
+
+                string returnedaquisitiondata = await getAcquisitionData.Content.ReadAsStringAsync();
+
+                dynamic objaquisitiondata = JsonConvert.DeserializeObject(returnedaquisitiondata);
+
+                straquisitiondate = objaquisitiondata.acquisitionDate;
+
 
                 try
                 {
@@ -1090,6 +1066,16 @@ namespace Business_Services
                 paymentAmt = paymentAmt * Convert.ToInt32(noOfPayments);
             }
 
+            if ((DateTime.Now - Convert.ToDateTime(straquisitiondate)).Days < 67)
+            {
+                onetimePayFee = 0;
+            }
+            else
+            {
+                onetimePayFee = loanInfo.payment.delqFee;
+            }
+
+
             Payment paymentData = new Payment
             {
                 isAutoDraftAvailable = autodraft,
@@ -1114,14 +1100,14 @@ namespace Business_Services
                 total_amount = paymentAmt
                 + loanInfo.payment.addlFees
                                  + loanInfo.payment.nsfFeesDue + loanInfo.payment.otherFeesDue +
-                                 loanInfo.payment.delqFee,
+                                 onetimePayFee,
                 number_of_payments = noOfPayments,
                 additional_principal = 0,
                 additional_escrow = 0,
                 late_fees_due = loanInfo.payment.addlFees,
                 nsf_fees_due = loanInfo.payment.nsfFeesDue,
                 other_fees_due = loanInfo.payment.otherFeesDue,
-                onetime_payment_fees = loanInfo.payment.delqFee,
+                onetime_payment_fees = onetimePayFee,
                 loanType = loanInfo.payment.loanType,
                 userRowId = loanInfo.payment.userRowId,
                 principal_balance = loanInfo.payment.principalBalance,
@@ -1132,14 +1118,14 @@ namespace Business_Services
 
             };
 
-            var eventId = 2;
-            var resourceName = "Payment";
-            var toEmail = "";
-            var log = "Viewed+Payment";
-            var actionName = "VIEW";
+            //var eventId = 2;
+            //var resourceName = "Payment";
+            //var toEmail = "";
+            //var log = "Viewed+Payment";
+            //var actionName = "VIEW";
 
-            var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-            string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+            //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+            //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
 
             return new ResponseModel(paymentData);
@@ -1210,6 +1196,9 @@ namespace Business_Services
             bool account_status = false;
             AutoDraft_GetAutoDraft pendingInfoAutoDraft = new AutoDraft_GetAutoDraft();
             bool autodraft = false;
+            string straquisitiondate;
+            decimal onetimePayFee;
+
 
             try
             {
@@ -1218,6 +1207,16 @@ namespace Business_Services
                 //to do get account status
                 account_status = true;
                 loanInfo = JsonConvert.DeserializeObject<OnetimePayment_GetPaymentInfo>(returnedData);
+
+
+                var getAcquisitionData = await API_Connection.GetAsync(lcToken, "/api/OneTimePayment/GetAcquisitionDate/" + loanNumber + "? _");
+
+                string returnedaquisitiondata = await getAcquisitionData.Content.ReadAsStringAsync();
+
+                dynamic objaquisitiondata = JsonConvert.DeserializeObject(returnedaquisitiondata);
+
+                straquisitiondate = objaquisitiondata.acquisitionDate;
+
 
                 try
                 {
@@ -1238,6 +1237,16 @@ namespace Business_Services
             {
                 return new ResponseModel(null, 1, Ex.Message);
             }
+
+            if ((DateTime.Now - Convert.ToDateTime(straquisitiondate)).Days < 67)
+            {
+                onetimePayFee = 0;
+            }
+            else
+            {
+                onetimePayFee = loanInfo.payment.delqFee;
+            }
+
             Payment paymentData = new Payment
             {
                 isAutoDraftAvailable = autodraft,
@@ -1265,7 +1274,7 @@ namespace Business_Services
                 late_fees_due = loanInfo.payment.addlFees,
                 nsf_fees_due = loanInfo.payment.nsfFeesDue,
                 other_fees_due = loanInfo.payment.otherFeesDue,
-                onetime_payment_fees = loanInfo.payment.delqFee,
+                onetime_payment_fees = onetimePayFee,
                 loanType = loanInfo.payment.loanType,
                 userRowId = loanInfo.payment.userRowId,
                 principal_balance = loanInfo.payment.principalBalance,
@@ -1291,14 +1300,14 @@ namespace Business_Services
                 }
             }
 
-            var eventId = 2;
-            var resourceName = "Edit+Payment";
-            var toEmail = "";
-            var log = "Viewed+Edit+Payment";
-            var actionName = "VIEW";
+            //var eventId = 2;
+            //var resourceName = "Edit+Payment";
+            //var toEmail = "";
+            //var log = "Viewed+Edit+Payment";
+            //var actionName = "VIEW";
 
-            var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-            string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+            //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+            //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
             return new ResponseModel(paymentData);
 
@@ -1361,9 +1370,7 @@ namespace Business_Services
         //}
 
 
-        //Modified by BBSR Team on 10th Jan 2018
-
-        // Modified By BBSR Team on 6th March 2018 : Defect # 955
+        // Modified By BBSR Team on 6th March 2018 : Defect # 955 : Start
         public async Task<ResponseModel> GetPaymentFeeSchedule(string loanNumber, string MobileToken)
         {
             // To do - Use DI
@@ -1384,44 +1391,35 @@ namespace Business_Services
                 string returnedaquisitiondate = await responseaquisitiondate.Content.ReadAsStringAsync();
                 dynamic objaquisitiondate = JsonConvert.DeserializeObject(returnedaquisitiondate);
                 string straquisitiondate = objaquisitiondate.acquisitionDate;
-                string acqMsg = "As a courtesy no fee will be assessed for utilizing this service during your initial 60 days as a new customer";
+                string straquisitionmessage = string.Empty;
 
                 List<PaymentFeeSheduledate> feeList = new List<PaymentFeeSheduledate>();
-                //Need to add the >= 60 Aquisition date Condition
 
-                if ((DateTime.Now - Convert.ToDateTime(straquisitiondate)).Days > 60)
-                {
-                    acqMsg = "";
-                    //As a courtesy no fee will be assessed for utilizing this service during your initial 60 days as a new customer
-                    foreach (var duedate in paymentInfo.clientFeeCollection)
-                    {
-                        feeList.Add(new PaymentFeeSheduledate
-                        {
-                            OverdueStartdays = duedate.daysOverdueStart,
-                            OverdueEnddays = duedate.daysOverdueEnd,
-                            FeeAmount = duedate.feeAmount
-                        });
-                    }
-                }
-                else
+                foreach (var duedate in paymentInfo.clientFeeCollection)
                 {
                     feeList.Add(new PaymentFeeSheduledate
                     {
-                        OverdueStartdays = 0,
-                        OverdueEnddays = 0,
-                        FeeAmount = 0
+                        OverdueStartdays = duedate.daysOverdueStart,
+                        OverdueEnddays = duedate.daysOverdueEnd,
+                        FeeAmount = duedate.feeAmount
+
                     });
-
                 }
-                
-
+                //Need to add the >60 Aquisition date Condition
+                //Modified By BBSR Team on 8th March 2018 : Defect # 955
+                //if ((DateTime.Now - Convert.ToDateTime(straquisitiondate)).Days < 60)
+                //Modified By BBSR Team on 12th March 2018 (Days Diff modified to 67): Defect # 955
+                if ((DateTime.Now - Convert.ToDateTime(straquisitiondate)).Days < 67)
+                {
+                    straquisitionmessage = "As a courtesy no fee will be assessed for utilizing this service during your initial 60 days as a new customer.";
+                }
 
                 PaymentFeeShedule paymentData = new PaymentFeeShedule()
                 {
                     dueDate = calenderDuedate.Payment.dueDate,
                     aquisitiondDate = objaquisitiondate.acquisitionDate,
-                    paymentFeesheduledate = feeList,
-                    AquisitionMessage = acqMsg
+                    AquisitionMessage = straquisitionmessage,
+                    paymentFeesheduledate = feeList
                 };
 
                 var eventId = 2;
@@ -1441,60 +1439,81 @@ namespace Business_Services
             }
         }
 
+        // Modified By BBSR Team on 6th March 2018 : Defect # 955 : End
+
+
+        //Modified by BBSR Team on 10th Jan 2018
+        //Modified by BBSR Team on 9th March 2018 : Defect # 1218 : START
+
         //Modified by BBSR Team on 10th Jan 2018
         public async Task<ResponseModel> GetPaymentHistoryForLoanAsync(string mobileToken, string loanNumber)
         {
-
-        //Modified by BBSR Team on 10th Jan 2018
-        public async Task<ResponseModel> GetPaymentHistoryForLoanAsync(string mobileToken, string loanNumber)
-        {
-
-
             string lcToken = tokenServices.GetLctoken(mobileToken);
             try
             {
-
-
-
                 var response = await API_Connection.GetAsync(lcToken, "/api/Loan/GetLoanActivity/" + loanNumber);
                 string returnedData = await response.Content.ReadAsStringAsync();
                 Activity_AccountActivity historyInfo = JsonConvert.DeserializeObject<Activity_AccountActivity>(returnedData);
 
                 List<String> descriptionlist = new List<String>();
+
+                string strpayment_description = string.Empty;
+                string strpayment_descriptioncode = string.Empty;
                 foreach (FullMortageHistory a in historyInfo.fullMortageHistory)
                 {
-                    descriptionlist.Add(a.tranCodeDesc);
+                    strpayment_descriptioncode = a.historyTransactionCode;
+
+
+                    //Need to add the code here...
+                    //strpayment_description = a.tranCodeDesc;
+                    using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
+                    {
+                        var transCod = ctx.TransDescriptions.Where(s => s.TransCode == strpayment_descriptioncode).FirstOrDefault();
+
+                        if (transCod != null)
+                        {
+                            strpayment_description = transCod.TargetDesc;
+                        }
+                        else
+                        {
+                            //1218 : Change - Added "Other" as extra group for those not matches in Document or DataBase Table.
+                            //strpayment_description = a.tranCodeDesc;
+                            strpayment_description = "Other";
+                        }
+                    }
+
+
+                    //Need to add the code here...
+                    //descriptionlist.Add(a.tranCodeDesc);
+                    descriptionlist.Add(strpayment_description);
 
                 }
+                descriptionlist = descriptionlist.Distinct().ToList();
 
-                var eventId = 2;
-                var resourceName = "Payment";
-                var toEmail = "";
-                var log = "Viewed+Payment+Description";
-                var actionName = "VIEW";
+                //var eventId = 2;
+                //var resourceName = "Payment";
+                //var toEmail = "";
+                //var log = "Viewed+Payment+History";
+                //var actionName = "VIEW";
 
-                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+                //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
-                return new ResponseModel(activityDetails);
+                return new ResponseModel(descriptionlist);
             }
-            catch (Exception ex)
+            catch (Exception Ex)
             {
-                return new ResponseModel(null, 1, ex.Message);
+                return new ResponseModel(null, 1, Ex.Message);
             }
-        }
 
+        }
 
         //Modified by BBSR Team on 10th Jan 2018 : The logic to extract the Activity details changed 
         public async Task<ResponseModel> GetPaymentDescriptionsForLoanAsync(string mobileToken, string loanNumber)
         {
-
             string lcToken = tokenServices.GetLctoken(mobileToken);
             try
             {
-
-
-
                 var response = await API_Connection.GetAsync(lcToken, "/api/Loan/GetLoanActivity/" + loanNumber);
                 string returnedData = await response.Content.ReadAsStringAsync();
                 Activity_AccountActivity historyInfo = JsonConvert.DeserializeObject<Activity_AccountActivity>(returnedData);
@@ -1517,13 +1536,18 @@ namespace Business_Services
                 string strlateChargeAmount;
                 string strmiscPaidAmount;
                 string strsuspenseAmount;
+                string strpayment_descriptioncode;
 
                 foreach (FullMortageHistory activity in historyInfo.fullMortageHistory)
                 {
 
                     strpayment_date = activity.transactionAppliedDate;
                     strtotal_amount = Convert.ToString(activity.totalPaymentReceivedAmount);
+
+                    //Need to add the code here...
                     strpayment_description = activity.tranCodeDesc;
+                    //Need to add the code here...
+
                     strdue_date = activity.dueDate;
                     strprincipal_amount = Convert.ToString(activity.principalPmtAmount);
                     strinterest_amount = Convert.ToString(activity.interestPaidAmount);
@@ -1535,18 +1559,39 @@ namespace Business_Services
                     strmiscPaidAmount = activity.miscPaidAmount;
                     strsuspenseAmount = activity.suspenseAmount;
 
+                    //Modified by BBSR Team on 5th March 2018 : Defect # 1218
+                    strpayment_descriptioncode = activity.historyTransactionCode;
+
+                    //Need to add the code here...
+                    //strpayment_description = a.tranCodeDesc;
+                    using (var ctx = new Business_Services.Models.DAL.LoancareDBContext.MDBService())
+                    {
+                        var transCod = ctx.TransDescriptions.Where(s => s.TransCode == strpayment_descriptioncode).FirstOrDefault();
+
+                        if (transCod != null)
+                        {
+                            strpayment_description = transCod.TargetDesc;
+                        }
+                        else
+                        {
+                            //1218 : Change - Added "Other" as extra group for those not matches in Document or DataBase Table.
+                            strpayment_description = "Other_" + activity.tranCodeDesc;
+                        }
+                    }
+                    //Modified by BBSR Team on 5th March 2018 : Defect # 1218
+
                     activityDetails.ActivityType.Add(new Activity() { payment_date = strpayment_date, total_amount = strtotal_amount, payment_description = strpayment_description, due_date = strdue_date, principal_amount = strprincipal_amount, interest_amount = strinterest_amount, escrow_amount = strescrow_amount, escrow_balance = strescrow_balance, principal_balance = strprincipal_balance, feeAmount = strfeeAmount, lateChargeAmount = strlateChargeAmount, miscPaidAmount = strmiscPaidAmount, suspenseAmount = strsuspenseAmount });
 
                 }
 
-                var eventId = 2;
-                var resourceName = "Payment";
-                var toEmail = "";
-                var log = "Viewed+Payment+Description";
-                var actionName = "VIEW";
+                //var eventId = 2;
+                //var resourceName = "Payment";
+                //var toEmail = "";
+                //var log = "Viewed+Payment+Description";
+                //var actionName = "VIEW";
 
-                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+                //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
                 return new ResponseModel(activityDetails);
             }
@@ -1555,6 +1600,8 @@ namespace Business_Services
                 return new ResponseModel(null, 1, ex.Message);
             }
         }
+
+        //Modified by BBSR Team on 9th March 2018 : Defect # 1218 : END
         public async Task<ResponseModel> GetPendingPaymentsAsync(string mobileToken, string loanNumber)
         {
             List<PendingPayment> pendingPayments = new List<PendingPayment>();
@@ -1575,14 +1622,14 @@ namespace Business_Services
                 pendingInfoPayment = JsonConvert.DeserializeObject<List<OneTimePayment_GetMockedPendingTransactions>>(returnedData);
                 pendingInfoPayment = pendingInfoPayment.OrderBy(x => x.schDT).ToList();
 
-                var eventId = 2;
-                var resourceName = "Payment";
-                var toEmail = "";
-                var log = "Viewed+Pending+Payment";
-                var actionName = "VIEW";
+                //var eventId = 2;
+                //var resourceName = "Payment";
+                //var toEmail = "";
+                //var log = "Viewed+Pending+Payment";
+                //var actionName = "VIEW";
 
-                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+                //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
                 try
                 {
@@ -1882,7 +1929,7 @@ namespace Business_Services
             var Decryptdata = objgenerateToken.Decrypt(MobileToken);
             string lcToken = tokenServices.GetLctoken(MobileToken);
             dynamic ObjUserId = JsonConvert.DeserializeObject(Decryptdata);
-            string objUId = ObjUserId.UserId;
+            string obj_UId = ObjUserId.UserId;
             string objPWd = ObjUserId.Password;
             int objCId = ObjUserId.ClientId;
             string objusername = ObjUserId.UserName;
@@ -1966,45 +2013,28 @@ namespace Business_Services
                 var ErrorMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(ErrMessage);
                 string Errmsg = ErrorMessage;
                 if (Errmsg == "Response status code does not indicate success: 401 (Unauthorized).") { }
-                
-                var eventId = 5;
-                var resourceName = "Update+Email";
-                var toEmail = "";
-                var log = "Viewed+Update+Email+page";
-                var actionName = "VIEW";
+      
 
-                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
-
-                var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", objPWd } });
+                var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", obj_UId }, { "password", objPWd } });
                 var responseregeneratedToken = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
 
                 var Token = responseregeneratedToken.tokenValue;
 
-
-                var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token, objusername, resourcename, logview, eStatemente);
+                var MobileTokenNew = objgenerateToken.GenerateToken(obj_UId, objPWd, objCId, Token, objusername, resourcename, logview, eStatemente);
                 loanDetails.Token = MobileTokenNew;
 
                 return new ResponseModel(loanDetails);
             }
             catch (Exception Ex)
             {
-                var eventId = 5;
-                var resourceName = "Update+Email";
-                var toEmail = "";
-                var log = "Viewed+Update+Email+page";
-                var actionName = "VIEW";
 
-                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
-
-                var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", objPWd } });
+                var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", obj_UId }, { "password", objPWd } });
                 var responseregeneratedToken = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
 
                 var Token = responseregeneratedToken.tokenValue;
 
 
-                var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token, objusername, resourcename, logview, eStatemente);
+                var MobileTokenNew = objgenerateToken.GenerateToken(obj_UId, objPWd, objCId, Token, objusername, resourcename, logview, eStatemente);
                 loanDetails.Token = MobileTokenNew;
                 return new ResponseModel(loanDetails);
             }
@@ -2040,25 +2070,26 @@ namespace Business_Services
                 var content = new FormUrlEncodedContent(someDict);
 
                 var response = await API_Connection.PostAsync(lcToken, "/api/Investor/SaveLinkLoan/", content);
-                dynamic Message = await response.message.Content.ReadAsStringAsync();
 
-                var ErrorMessage = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Message);
-                string ErrMsg = ErrorMessage.msg;
-                if (ErrMsg != "Success")
+                if (response.errorId != 0)
                 {
                     loanDetails.issuccess = false;
-                    loanDetails.Message = ErrMsg;
+                    loanDetails.Message = response.errorMessage;
                 }
-                var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", objPWd } });
-                var responseregeneratedToken = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
+                else
+                {
+                    var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", objPWd } });
+                    response = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
 
-                var Token = responseregeneratedToken.tokenValue;
-
-
-                var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token, objusername, resourcename, logview, eStatemente);
-                loanDetails.Token = MobileTokenNew;
-
-                return new ResponseModel(loanDetails, 0, ErrMsg);
+                    if (response.errorId == 0)
+                    {
+                        var Token = response.tokenValue;
+                        var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token, objusername, resourcename, logview, eStatemente);
+                        loanDetails.Token = MobileTokenNew;
+                        return new ResponseModel(loanDetails, 0, null);
+                    }
+                }
+                return new ResponseModel(null, response.errorId, response.errorMessage);
             }
             catch (Exception ex)
             {
@@ -2068,6 +2099,7 @@ namespace Business_Services
 
         }
 
+        // Modified by BBSr Team on 12th March 2018 : Defect # 1189 : START
         public async Task<ResponseModel> PosteStatementForLoanAsync(string MobileToken, Business_Services.Models.User estatementdetails)
         {
             // To do - Use DI
@@ -2095,19 +2127,28 @@ namespace Business_Services
                 string returnedData = await response.Content.ReadAsStringAsync();
                 MyAccount_GetAccountInfo getuserinfo = JsonConvert.DeserializeObject<MyAccount_GetAccountInfo>(returnedData);
 
+                //Defect#1189 : Added by BBSr Team on 12th March 2018
+                var responsepropertyCode = await API_Connection.GetAsync("/api/Helper/GetStatePropertyCode/?loanNo=" + estatementdetails.loanNumber);
+                string returnedpropertyCode = await responsepropertyCode.Content.ReadAsStringAsync();
+                dynamic propertycode = JsonConvert.DeserializeObject(returnedpropertyCode);
+                //Defect#1189 : Added by BBSr Team on 12th March 2018
+
                 Dictionary<string, string> someDict = new Dictionary<string, string>();
-                someDict.Add("email", getuserinfo.msg.emailAddress);
-                someDict.Add("loanNo", estatementdetails.loanNumber);
+                someDict.Add("LoanNo", estatementdetails.loanNumber);
+                someDict.Add("Email", getuserinfo.msg.emailAddress);
+                someDict.Add("PROPERTY_STATE_CODE", propertycode); //Defect#1189 : Added by BBSr Team on 12th March 2018
 
                 var content = new FormUrlEncodedContent(someDict);
 
+                //Defect#1189 : Added by BBSr Team on 12th March 2018
                 var responseEstatement = await API_Connection.PostAsync(lcToken, "/api/EStatement/EnrollStatement/", content);
+                //var responseEstatement = await API_Connection.PostUserRegisAsync("/api/EStatement/EnrollStatement/", content);
+                //Defect#1189 : Added by BBSr Team on 12th March 2018
                 dynamic Message = await responseEstatement.message.Content.ReadAsStringAsync();
                 var ResponseMsg = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Message);
                 string resmsg = ResponseMsg;
                 if (resmsg == "")
                 {
-
                     eStatementenroll = true;
                 }
 
@@ -2116,8 +2157,6 @@ namespace Business_Services
 
                 var Token = responseregeneratedToken.tokenValue;
 
-
-                //var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token,resourcename,logview, eStatementenroll);
                 var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token, objusername, resourcename, logview, eStatementenroll);
                 estatementdetails.Token = MobileTokenNew;
                 return new ResponseModel(estatementdetails);
@@ -2131,7 +2170,6 @@ namespace Business_Services
 
 
         }
-
 
 
         public async Task<ResponseModel> PostCancelStatementForLoanAsync(string MobileToken, Business_Services.Models.User Cstatementdetails)
@@ -2158,27 +2196,37 @@ namespace Business_Services
                 string returnedData = await response.Content.ReadAsStringAsync();
                 MyAccount_GetAccountInfo getuserinfo = JsonConvert.DeserializeObject<MyAccount_GetAccountInfo>(returnedData);
 
+
+                //Defect#1189 : Added by BBSr Team on 12th March 2018
+                var responsepropertyCode = await API_Connection.GetAsync("/api/Helper/GetStatePropertyCode/?loanNo=" + Cstatementdetails.loanNumber);
+                string returnedpropertyCode = await responsepropertyCode.Content.ReadAsStringAsync();
+                dynamic propertycode = JsonConvert.DeserializeObject(returnedpropertyCode);
+                //Defect#1189 : Added by BBSr Team on 12th March 2018
+
                 Dictionary<string, string> someDict = new Dictionary<string, string>();
-                someDict.Add("email", getuserinfo.msg.emailAddress);
-                someDict.Add("loanNo", Cstatementdetails.loanNumber);
+                someDict.Add("LoanNo", Cstatementdetails.loanNumber);
+                someDict.Add("Email", getuserinfo.msg.emailAddress);
+                someDict.Add("PROPERTY_STATE_CODE", propertycode); //Defect#1189 : Added by BBSr Team on 12th March 2018
 
                 var content = new FormUrlEncodedContent(someDict);
 
+                //Defect#1189 : Added by BBSr Team on 12th March 2018
                 var responseCstatement = await API_Connection.PostAsync(lcToken, "/api/EStatement/CancelStatement/", content);
+                //var responseCstatement = await API_Connection.PostUserRegisAsync("/api/EStatement/CancelStatement/", content);
+                //Defect#1189 : Added by BBSr Team on 12th March 2018
+
                 dynamic Message = await responseCstatement.message.Content.ReadAsStringAsync();
                 var ResponseMsg = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Message);
                 string resmsg = ResponseMsg;
                 if (resmsg == "")
                 {
-
                     eStatemente = false;
                 }
+
                 var contentregeneratedToken = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", objUId }, { "password", objPWd } });
                 var responseregeneratedToken = await API_Connection.PostAsync("/api/Auth/Authenticate", contentregeneratedToken);
 
                 var Token = responseregeneratedToken.tokenValue;
-
-
                 var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token, objusername, resourcename, logview, eStatemente);
                 Cstatementdetails.Token = MobileTokenNew;
                 return new ResponseModel(Cstatementdetails);
@@ -2189,6 +2237,9 @@ namespace Business_Services
                 return new ResponseModel(null, 1, "Error cancelling e-Statement. Please contact Customer Service at 1-800-274-6600");
             }
         }
+
+        // Modified by BBSr Team on 12th March 2018 : Defect # 1189 : END
+
 
         //Modified By BBSR Team on 8th Jan 2018 : Cell Phone Disclosure Issue
         public async Task<ResponseModel> PostupdateprofileForAsync(string MobileToken, LoanContactDetail LoanContactDetail)
@@ -2788,6 +2839,11 @@ namespace Business_Services
                 var content = new FormUrlEncodedContent(someDict);
                 var response = await API_Connection.PostAsync(lcToken, "/api/OnetimePayment/InsertPaymentInfo/", content);
 
+                if(response.errorId != 0)
+                {
+                    return new ResponseModel(null, response.errorId, response.errorMessage);
+                }
+
                 return new ResponseModel(paymentdata);
             }
             catch (Exception ex)
@@ -2872,14 +2928,14 @@ namespace Business_Services
                 string returnedDataEscrow = await responseEscrow.Content.ReadAsStringAsync();
                 Escrow_CallEscrow escrowInfo = JsonConvert.DeserializeObject<Escrow_CallEscrow>(returnedDataEscrow);
 
-                var eventId = 2;
-                var resourceName = "Payment";
-                var toEmail = "";
-                var log = "Viewed+Payment+Details";
-                var actionName = "VIEW";
+                //var eventId = 2;
+                //var resourceName = "Payment";
+                //var toEmail = "";
+                //var log = "Viewed+Payment+Details";
+                //var actionName = "VIEW";
 
-                var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
-                string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
+                //var trackresponse = await API_Connection.GetAsync(lcToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourceName + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+                //string trackreturnedData = await trackresponse.Content.ReadAsStringAsync();
 
                 return new ResponseModel(NewMethod(loanInfo, loanactivityInfo, escrowInfo));
             }
@@ -2890,6 +2946,7 @@ namespace Business_Services
             }
         }
 
+        //Defect # 1070 : Modified By BBSR team on 12th March 2018 : START
         private static PaymentDetails NewMethod(Loan_GetCurrentLoanInfo loanInfo, Activity_AccountActivity loanactivityInfo, Escrow_CallEscrow escrowInfo)
         {
 
@@ -2903,8 +2960,6 @@ namespace Business_Services
 
                 Pendingloandetails paymentdetails = new Pendingloandetails
                 {
-
-
                     totalPaymentReceivedAmount = objpaymentdetail.totalPaymentReceivedAmount,
                     escrowPaidAmount = objpaymentdetail.escrowPaidAmount,
                     principalPmtAmount = objpaymentdetail.principalPmtAmount,
@@ -2940,19 +2995,17 @@ namespace Business_Services
                     paymentList.Add(paymentdetails);
                 }
             }
+
+            //Defect # 1070 : START
+
             var transactiondate = paymentList.Max(x => x.dueDate);
 
             var Paymentdata = (from paymentdetails in paymentList
-                               where paymentdetails.dueDate == transactiondate
+                               where paymentdetails.principalPmtAmount > 0 && paymentdetails.interestPaidAmount > 0
+                               orderby paymentdetails.transactionAppliedDate descending
                                select paymentdetails).FirstOrDefault();
 
-
-            //var Paymentdata = (from paymentde in Paymentdatapending
-            //                   where paymentdetails.dueDate == transactiondate
-            //                   select paymentdetails).First();
-            //var q = from n in pendingpaymentList
-            //        //group n by n.transactionAppliedDate into g
-            //        select new { totalPaymentReceivedAmount = , Date = g.Max(t => t.transactionAppliedDate) };
+            //Defect # 1070 : END
 
             PaymentDetails loan_duedatedate = new PaymentDetails();
 
@@ -2960,57 +3013,63 @@ namespace Business_Services
 
             LastRegularPayment last_regular_payment = new LastRegularPayment();
 
-            last_regular_payment.principal_amount = Convert.ToString(Paymentdata.principalPmtAmount);
-
-            if (Convert.ToString(Paymentdata.principalPmtAmount) == "")
+            if (Paymentdata != null)
             {
+                if (Convert.ToString(Paymentdata.principalPmtAmount) == "")
+                {
+                    last_regular_payment.principal_amount = "0.00";
+                }
+                else
+                {
+                    last_regular_payment.principal_amount = Convert.ToString(Paymentdata.principalPmtAmount);
+                }
 
+                if (Convert.ToString(Paymentdata.interestPaidAmount) == "")
+                {
+                    last_regular_payment.interest_amount = "0.00";
+                }
+                else
+                {
+                    last_regular_payment.interest_amount = Convert.ToString(Paymentdata.interestPaidAmount);
+                }
+
+                if (Convert.ToString(Paymentdata.transactionAppliedDate) == "")
+                {
+                    last_regular_payment.last_payment_date = "";
+                }
+                else if (Convert.ToString(Paymentdata.transactionAppliedDate) != "")
+                {
+                    last_regular_payment.last_payment_date = Convert.ToDateTime(Paymentdata.transactionAppliedDate).ToString("MM/dd/yy");
+                }
+
+                if (Convert.ToString(Paymentdata.escrowPaidAmount) == "")
+                {
+                    last_regular_payment.escrow_amount = "0.00";
+                }
+                else
+                {
+                    last_regular_payment.escrow_amount = Convert.ToString(Paymentdata.escrowPaidAmount);
+                }
+
+                if (Convert.ToString(Paymentdata.totalPaymentReceivedAmount) == "")
+                {
+                    last_regular_payment.total_amount = "0.00";
+                }
+                else
+                {
+                    last_regular_payment.total_amount = Convert.ToString(Paymentdata.totalPaymentReceivedAmount);
+                }
+
+            }
+            else
+            {
                 last_regular_payment.principal_amount = "0.00";
-            }
-            //var ip = Paymentdata.interestPaidAmount * 100;
-            //float ipm = ip;
-            last_regular_payment.interest_amount = Convert.ToString(Paymentdata.interestPaidAmount);
-            if (Convert.ToString(Paymentdata.interestPaidAmount) == "")
-            {
                 last_regular_payment.interest_amount = "0.00";
-            }
-            if (Convert.ToString(Paymentdata.transactionAppliedDate) == "")
-            {
-
                 last_regular_payment.last_payment_date = "";
-            }
-            else if (Convert.ToString(Paymentdata.transactionAppliedDate) != "")
-            {
-                last_regular_payment.last_payment_date = Convert.ToDateTime(Paymentdata.transactionAppliedDate).ToString("MM/dd/yy");
-            }
-
-            last_regular_payment.escrow_amount = Convert.ToString(Paymentdata.escrowPaidAmount);
-            if (Convert.ToString(Paymentdata.escrowPaidAmount) == "")
-            {
-
                 last_regular_payment.escrow_amount = "0.00";
+                last_regular_payment.total_amount = "0.00";
             }
 
-            //if (loanInfo.lastEscrowPD == "")
-            //{
-
-            //    loanInfo.lastEscrowPD = "0.00";
-            //}
-            //if (loanInfo.lastPrinPD == "")
-            //{
-            //    loanInfo.lastPrinPD = "0.00";
-            //}
-            //if (loanInfo.lastIntPD == "")
-            //{
-            //    loanInfo.lastIntPD = "0.00";
-            //}
-
-            //var lastescrowlenth = Convert.ToDecimal(loanInfo.lastEscrowPD);
-            //var lastPrinPDlenth = Convert.ToDecimal(loanInfo.lastPrinPD);
-            //var lastintPDlenth = Convert.ToDecimal(loanInfo.lastIntPD);
-
-            var Total_Amount = loanInfo.netPresent;
-            last_regular_payment.total_amount = Convert.ToString(Total_Amount);
             loan_duedatedate.last_regular_payment = last_regular_payment;
 
             NextMonthlyPayment next_monthly_payment = new NextMonthlyPayment();
@@ -3027,6 +3086,7 @@ namespace Business_Services
             loan_duedatedate.next_monthly_payment = next_monthly_payment;
             return (loan_duedatedate);
         }
+        //Defect # 1070 : Modified By BBSR team on 12th March 2018 : END
 
 
         public async Task<ResponseModel> UpdatePaymentAsync(string mobileToken, string loanNumber, DateTime payment_date, Payment payment)

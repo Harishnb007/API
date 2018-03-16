@@ -35,7 +35,7 @@ namespace Business_Services.Models
 
         public decimal original_mortgageAmt { get; set; }
 
-        public DateTime date_created { get; set; }
+        public string date_created { get; set; }
         public decimal late_fees_due_input { get; set; }
         public decimal nsf_fees_due_input { get; set; }
         public decimal other_fees_due_input { get; set; }

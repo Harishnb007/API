@@ -28,6 +28,7 @@ namespace Business_Services
         //Task<ResponseModel> PostsetpinAsync(UpdatePassword PinDetail, string MobileToken);
         Task<ResponseModel> GetManageAccountForUser(string mobileToken, string LoanNumber);
         Task<ResponseModel> getUserDetailsAsync(string lcAuthToken, string loan_number, bool Is_New_MobileUser);
+        Task<ResponseModel> getPartialUserDetailsAsync(string lcAuthToken, string loan_number, bool Is_New_MobileUser);
         Task<ResponseModel> GetSecurityQuestions(string lcAuthToken);
         Task<ResponseModel> ForgotPassword(string Loan_Number, string ssn);
         //Added by BBSR_Team on 9th Jan 2018
@@ -52,7 +53,10 @@ namespace Business_Services
         Task<ResponseModel> ResetSendPassword(Business_Services.Models.User userDetail);
         Task<ResponseModel> SetPinAsync(string MobileToken, UpdatePassword loanDetails);
         //Modified by BBSR Team on 18th Jan 2018 : Forgot User / Password
-
+        Task<string> trackinglog(string lcAuthToken, Tracking tracking);
         Task<ResponseModel> GetPinforMobileAsync(string MobileToken);
+      //  Task<string> trackinglogfile(string TrackingLog);
+        Task<ResponseModel> ChangePasswordAsync(string lcAuthToken, ChangePassword passwordData);
+        Task<ResponseModel> GetSecurityQuestionsValidatePwd(string lcAuthToken, string NewPassword);
     }
 }

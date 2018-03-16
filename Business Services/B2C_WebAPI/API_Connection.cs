@@ -3,6 +3,7 @@ using Business_Services.Models.LC_WebApi_Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -20,10 +21,9 @@ namespace Business_Services.B2C_WebAPI
 
         private static HttpClientHandler handler;
         private static HttpClient client;
-        /*SIT URL*/
-        private static Uri baseAddress = new Uri("https://lcuiqa.test.servicelinkfnf.com");
-        /*UAT URL*/
-         //private static Uri baseAddress = new Uri("https://lcui.test.servicelinkfnf.com");
+      
+       private static Uri baseAddress = new Uri(ConfigurationManager.AppSettings["B2Curl"]);
+
         static API_Connection()
         {
           
@@ -88,6 +88,46 @@ namespace Business_Services.B2C_WebAPI
 
             return result;
         }
+
+
+        public static async Task<ResponseWithToken> GetDeletePaymentAsync(string tokenValue, string url)
+        {
+            ResponseWithToken returnData = new ResponseWithToken();
+            returnData.errorId = 0;
+            returnData.errorMessage = "";
+            var message = new HttpRequestMessage(HttpMethod.Get, url);
+            message.Headers.Add("Cookie", "locale=en-US; .lcauth=" + tokenValue);
+            var result = await client.SendAsync(message);
+
+
+            if (result.IsSuccessStatusCode)
+            {
+                result.EnsureSuccessStatusCode();
+
+                if (result.Headers.TryGetValues("Set-Cookie", out IEnumerable<string> cookieValues))
+                {
+                    string setCookieValue = HttpUtility.UrlDecode(result.Headers.GetValues("Set-Cookie").FirstOrDefault());
+                    Regex regex = new Regex("lcauth=(.*?);");
+                    var v = regex.Match(setCookieValue);
+
+                    if (v != null)
+                    {
+                        returnData.tokenValue = v.Groups[1].ToString();
+                    }
+                }
+            }
+            else
+            {
+                var responseAsString = await result.Content.ReadAsStringAsync();
+                ErrorModel resultSet = JsonConvert.DeserializeObject<ErrorModel>(responseAsString);
+                returnData.errorId = resultSet.errorID;
+                returnData.errorMessage = resultSet.message;
+            }
+
+            returnData.message = result;
+            return returnData;
+        }
+
         public static async Task<HttpResponseMessage> GetAsync(string url)
         {
             var message = new HttpRequestMessage(HttpMethod.Get, url);
@@ -107,14 +147,58 @@ namespace Business_Services.B2C_WebAPI
             message.Headers.Add("Cookie", "locale=en-US");
             message.Content = content;
             var result = await client.SendAsync(message);
-            result.EnsureSuccessStatusCode();
+            returnData.errorId = 0;
+            returnData.tokenValue = "";
+            returnData.errorMessage = "";
+            returnData.changePassword = "N";
+            returnData.authenticateResult = new Authenticate();
 
-            string setCookieValue = HttpUtility.UrlDecode(result.Headers.GetValues("Set-Cookie").FirstOrDefault());
-            Regex regex = new Regex("lcauth=(.*?);");
-            var v = regex.Match(setCookieValue);
+            if (result.IsSuccessStatusCode)
+            {
+                result.EnsureSuccessStatusCode();
 
-            returnData.message = result;
-            returnData.tokenValue = v.Groups[1].ToString();
+                if (result.Headers.TryGetValues("Set-Cookie", out IEnumerable<string> cookieValues))
+                {
+                    string setCookieValue = HttpUtility.UrlDecode(result.Headers.GetValues("Set-Cookie").FirstOrDefault());
+                    Regex regex = new Regex("lcauth=(.*?);");
+                    var v = regex.Match(setCookieValue);
+
+                    var responseAsString = await result.Content.ReadAsStringAsync();
+                    returnData.tokenValue = v.Groups[1].ToString();
+
+                    if (responseAsString.Contains("loanPaid"))
+                    {
+                        Authenticate resultSet = JsonConvert.DeserializeObject<Authenticate>(responseAsString);
+                        if (resultSet.objUserInfo.user.changePassword == "Y")
+                        {
+                            returnData.authenticateResult = resultSet;
+                            returnData.authenticateResult.AuthorizationToken = v.Groups[1].ToString();
+                            returnData.changePassword = "Y";
+                        }                        
+                    }
+                    else
+                    {
+                        ErrorModel contentError = JsonConvert.DeserializeObject<ErrorModel>(responseAsString);
+                        returnData.errorId = 1;
+                        returnData.errorMessage = contentError.msg;
+                    }
+                    returnData.message = result;
+                }
+                else
+                {
+                    var responseAsString = await result.Content.ReadAsStringAsync();
+                    ErrorModel resultSet = JsonConvert.DeserializeObject<ErrorModel>(responseAsString);
+                    returnData.errorId = 1;
+                    returnData.errorMessage = resultSet.msg;
+                }
+            }
+            else
+            {
+                var responseAsString = await result.Content.ReadAsStringAsync();
+                ErrorModel resultSet = JsonConvert.DeserializeObject<ErrorModel>(responseAsString);
+                returnData.errorId = resultSet.errorID;
+                returnData.errorMessage = resultSet.message;                
+            }
 
             return returnData;
         }
@@ -177,17 +261,49 @@ namespace Business_Services.B2C_WebAPI
             message.Headers.Add("formToken", tokens.formToken);
             message.Content = content;
             var result = await client.SendAsync(message);
-            result.EnsureSuccessStatusCode();
+            
             ResponseWithToken returnData = new ResponseWithToken();
-            if (result.Headers.TryGetValues("Set-Cookie", out IEnumerable<string> cookieValues))
+
+            returnData.errorId = 0;
+            //if (result.Headers.TryGetValues("Set-Cookie", out IEnumerable<string> cookieValues))
+            //{
+            //    string setCookieValue = HttpUtility.UrlDecode(cookieValues.FirstOrDefault());
+            //    Regex regex = new Regex("lcauth=(.*?);");
+            //    var v = regex.Match(setCookieValue);
+            //    if (v != null)
+            //    {
+            //        returnData.tokenValue = v.Groups[1].ToString(); 
+            //    }
+            //}
+
+            //returnData.message = result;
+
+            //return returnData;
+
+
+
+            if (result.IsSuccessStatusCode)
             {
-                string setCookieValue = HttpUtility.UrlDecode(cookieValues.FirstOrDefault());
-                Regex regex = new Regex("lcauth=(.*?);");
-                var v = regex.Match(setCookieValue);
-                if (v != null)
+                result.EnsureSuccessStatusCode();
+
+                if (result.Headers.TryGetValues("Set-Cookie", out IEnumerable<string> cookieValues))
                 {
-                    returnData.tokenValue = v.Groups[1].ToString(); 
+                    string setCookieValue = HttpUtility.UrlDecode(result.Headers.GetValues("Set-Cookie").FirstOrDefault());
+                    Regex regex = new Regex("lcauth=(.*?);");
+                    var v = regex.Match(setCookieValue);
+
+                    if (v != null)
+                    {
+                        returnData.tokenValue = v.Groups[1].ToString();
+                    }
                 }
+            }
+            else
+            {
+                var responseAsString = await result.Content.ReadAsStringAsync();
+                ErrorModel resultSet = JsonConvert.DeserializeObject<ErrorModel>(responseAsString);
+                returnData.errorId = resultSet.errorID;
+                returnData.errorMessage = resultSet.message;
             }
 
             returnData.message = result;

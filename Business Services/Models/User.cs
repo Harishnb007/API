@@ -28,6 +28,7 @@ namespace Business_Services.Models
         public string NotifyEmail { get; set; }
         public string discVer { get; set; }
         public string ClientName { get; set; }
+        public string[] userLoansList { get; set; }
         //Added by BBSR Team on 16th Jan 2018
         public string discAccept { get; set; }
         public string BorrowerName { get; set; }
@@ -50,6 +51,8 @@ namespace Business_Services.Models
         public string phone_other_2_type_concern { get; set; }
         public string phone_other_3_number_concern { get; set; }
         public string phone_other_3_type_concern { get; set; }
+
+        public string MobileSignedUp { get; set; }
         public List<LoanSummary> loanss { get; set; }
     }
 
