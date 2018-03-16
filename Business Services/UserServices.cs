@@ -467,7 +467,7 @@ namespace Business_Services
 
                 string returnedData = await UserDetails.Content.ReadAsStringAsync();
 
-                ForgotPassword objForgotPassword = JsonConvert.DeserializeObject<ForgotPassword>(returnedData);
+                ForgotPassword_SecurityQuestion objForgotPassword = JsonConvert.DeserializeObject<ForgotPassword_SecurityQuestion>(returnedData);
                 if (objForgotPassword.msg == "success")
                 {
                     secQuesCollectionforgotuser listsecquestion = new secQuesCollectionforgotuser();
@@ -476,7 +476,7 @@ namespace Business_Services
                     SequrityQuestionUserLoan objsequserloan = new SequrityQuestionUserLoan()
                     {
                         id = objForgotPassword.user.id,
-                        loanNo = Loan_Number
+                        loanNo = objForgotPassword.user.userLoansList[0]
                     };
 
                     SequrityQuestionUser objsequstionuser = new SequrityQuestionUser()
@@ -614,7 +614,7 @@ namespace Business_Services
                     string returnedDataemail = await response.Content.ReadAsStringAsync();
                 }
 
-                return new ResponseModel(null, 0, "success");
+                return new ResponseModel(objData, 0, "success");
 
 
             }

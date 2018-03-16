@@ -110,6 +110,7 @@
     <Compile Include="Models\LC_WebApi_Models\Eft_disclosure.cs" />
     <Compile Include="Models\LC_WebApi_Models\Escrow_CallEscrow.cs" />
     <Compile Include="Models\LC_WebApi_Models\ForgotPassword.cs" />
+    <Compile Include="Models\LC_WebApi_Models\ForgotPassword_SecurityQuestion.cs" />
     <Compile Include="Models\LC_WebApi_Models\ForgotUser_UserId.cs" />
     <Compile Include="Models\LC_WebApi_Models\Getdetails_estatement.cs" />
     <Compile Include="Models\LC_WebApi_Models\getuserInfo.cs" />
