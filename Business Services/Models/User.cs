@@ -28,6 +28,7 @@ namespace Business_Services.Models
         public string NotifyEmail { get; set; }
         public string discVer { get; set; }
         public string ClientName { get; set; }
+        public string[] userLoansList { get; set; }
         //Added by BBSR Team on 16th Jan 2018
         public string discAccept { get; set; }
         public string BorrowerName { get; set; }
