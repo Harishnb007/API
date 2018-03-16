@@ -23,10 +23,12 @@ namespace Business_Services
             
         }
 
-        public string GenerateToken(string userId,string password,int ClientId, string lcAuthToken)
+        public  string GenerateToken(string userId,string password,int ClientId, string lcAuthToken,string UserName,string resourcename,string log, bool eStatemente,string LoanNumber)
         {
             DateTime issuedOn = DateTime.Now;
             DateTime expiresOn = DateTime.Now.AddSeconds(Convert.ToDouble(ConfigurationManager.AppSettings["AuthTokenExpiry"]));
+
+          var Tracking =  trackinglog(lcAuthToken,log,resourcename);
 
             var tokendomain = new Token
             {
@@ -35,29 +37,50 @@ namespace Business_Services
                 Lcauth = lcAuthToken,
                 ExpiresOn = expiresOn,
                 Password = password,
-                ClientId = ClientId
+                ClientId = ClientId,
+                UserName = UserName,
+                resourcename =resourcename,
+                log = log,
+                eStatement=eStatemente,
+                Loan_Number = LoanNumber
             };
            
             return Encryptor.Encrypt(JsonConvert.SerializeObject(tokendomain));
         }
 
-        public async Task<string> AuthenticateAsync(string userName, string password)
+
+        public async Task<string> trackinglog(string lcAuthToken, string log, string resourcename)
         {
-           
+
+            var eventId = 1;
+            var toEmail = "";
+            var actionName = "VIEW";
+
+            var trackresponse = await API_Connection.GetAsync(lcAuthToken, "/api/Helper/AddTrackingInfo/?eventId=" + eventId + "&resourceName=" + resourcename + "&toEmail=" + toEmail + "&log=" + log + "&actionName=" + actionName);
+            string returnedData = await trackresponse.Content.ReadAsStringAsync();
+            return returnedData;
+        }
+        public async Task<ResponseWithToken> AuthenticateAsync(string userName, string password)
+        {
+
             HttpContent content;
             ResponseWithToken response;
             Payment AuthUser = new Payment();
             AuthUser.loan_number = "";
             try
             {
-                  content = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", userName }, { "password", password } });
-                  response = await API_Connection.PostAsync("/api/Auth/Authenticate", content);
-               
-                return response.tokenValue;
-            }
-            catch (Exception Ex) {
+                content = new FormUrlEncodedContent(new Dictionary<string, string> { { "userID", userName }, { "password", password }, { "ssn", "" } });
+                response = await API_Connection.PostAsync("/api/Auth/Authenticate", content);
 
-                return "Problem occurred trying to validate the user credentials. Please try again.";
+
+
+                return response;
+            }
+            catch (Exception Ex)
+            {
+                response = new ResponseWithToken();
+                response.errorMessage = "Problem occurred trying to validate the user credentials. Please try again.";
+                return response;
             }
         }
 

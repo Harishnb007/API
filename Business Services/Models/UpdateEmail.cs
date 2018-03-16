@@ -27,5 +27,10 @@ namespace Business_Services.Models
         [JsonProperty]
         internal string Token { get; set; }
 
+        [JsonProperty]
+        internal bool issuccess { get; set; }
+
+        [JsonProperty]
+        internal string Message { get; set; }
     }
 }

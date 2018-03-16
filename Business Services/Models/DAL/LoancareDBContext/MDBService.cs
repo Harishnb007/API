@@ -20,7 +20,7 @@ namespace Business_Services.Models.DAL.LoancareDBContext
         public virtual DbSet<PaymentTransactionMapping> PaymentTransactionMappings { get; set; }
         public virtual DbSet<UserAlert> UserAlerts { get; set; }
         public virtual DbSet<UserFeedback> UserFeedbacks { get; set; }
-
+        public virtual DbSet<TransDescription> TransDescriptions { get; set; }
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Entity<AlertTemplate>()
@@ -132,6 +132,28 @@ namespace Business_Services.Models.DAL.LoancareDBContext
             modelBuilder.Entity<UserFeedback>()
                 .Property(e => e.created_by)
                 .IsUnicode(false);
+
+            //Added by BBSR Team on 8th March 2018 : Defect # 1218
+            modelBuilder.Entity<TransDescription>()
+               .Property(e => e.TransCode)
+               .IsUnicode(false);
+
+            modelBuilder.Entity<TransDescription>()
+               .Property(e => e.TargetDesc)
+               .IsUnicode(false);
+
+            modelBuilder.Entity<TransDescription>()
+               .Property(e => e.GroupName)
+               .IsUnicode(false);
+
+            modelBuilder.Entity<TransDescription>()
+               .Property(e => e.SourceDesc)
+               .IsUnicode(false);
+            //Added by BBSR Team on 8th March 2018 : Defect # 1218
         }
+
+        //Added by BBSR Team on 5th March 2018 : Defect # 1218
+        // public virtual DbSet<TransDescription> TransDescription { get; set; }
+
     }
 }

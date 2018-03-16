@@ -103,7 +103,7 @@ namespace Business_Services.Models
         //Added By BBSR Team on 6th Jan 2018
         [JsonProperty]
         internal string consentRevokeIndicatorCode_other3 { get; set; }
-
-
+        [JsonProperty]
+        internal string country { get; set; }
     }
 }

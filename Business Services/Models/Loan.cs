@@ -31,5 +31,7 @@ namespace Business_Services.Models
         public string origination_date { get; set; }
         public decimal original_loan_amount { get; set; }
         public string maturity_date { get; set; }
+
+        public bool is_escrow_loan { get; set; }
     }
 }

@@ -15,8 +15,8 @@ namespace Business_Services
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        string GenerateToken(string userId, string password, int ClientId, string lcAuthToken);
-
+        // string GenerateToken(string userId, string password, int ClientId, string lcAuthToken, string UserName, string resourcename, string log, bool eStatementenroll);
+        string GenerateToken(string userId, string password, int ClientId, string lcAuthToken, string UserName, string resourcename, string log, bool eStatemente, string LoanNumber);
         /// <summary>
         /// Function to validate token against expiry
         /// </summary>
@@ -26,7 +26,7 @@ namespace Business_Services
 
         Task<ResponseModel> TestAuthAsync();
 
-        Task<string> AuthenticateAsync(string userName, string password);
+        Task<ResponseWithToken> AuthenticateAsync(string userName, string password);
 
         string GetLctoken(string mobileToken);
     

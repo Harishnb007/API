@@ -22,7 +22,7 @@ namespace LoanCare_Mobile_API.Controllers
         public AppController()
         {
             // To do - utilize dependency injection instead of initializing in the constructor
-            appService = new AppService();
+            appService = new AppService(new TokenServices()); 
         }
 
         [Route("draftdatedelay")]
@@ -73,16 +73,18 @@ namespace LoanCare_Mobile_API.Controllers
         [HttpGet]
         public IHttpActionResult GetLegalTermsPrivacyText(string type)
         {
-            ResponseModel legal_text = appService.GetLegalTermsPrivacy(type);
-
-            if (legal_text != null)
+            IEnumerable<string> tokenValues;
+            string tokenValue = "";
+            if (Request.Headers.TryGetValues("AuthorizationToken", out tokenValues))
             {
-                return Ok(legal_text);
+                tokenValue = tokenValues.FirstOrDefault();
             }
-            else
+            var payment = appService.GetLegalTermsPrivacy(type);
+            if (payment == null)
             {
-                return InternalServerError();
+                return NotFound();
             }
+            return Ok(payment);
         }
         [Route("getAlert/{loan_number}")]
         [HttpGet]

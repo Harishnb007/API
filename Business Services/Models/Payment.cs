@@ -12,7 +12,7 @@ namespace Business_Services.Models
         public bool account_status { get; set; }
         public decimal payment_amount { get; set; }
         public BankAccount bank_account { get; set; }
-        public DateTime payment_date { get; set; }
+        public string payment_date { get; set; }
         public string due_date { get; set; }
         public decimal total_amount { get; set; }
         public string number_of_payments { get; set; }
@@ -31,10 +31,15 @@ namespace Business_Services.Models
 
         public bool override_payment { get; set; }
 
-        public DateTime initial_schDate { get; set; }
+        public string initial_schDate { get; set; }
 
         public decimal original_mortgageAmt { get; set; }
 
-        public DateTime date_created { get; set; }
+        public string date_created { get; set; }
+        public decimal late_fees_due_input { get; set; }
+        public decimal nsf_fees_due_input { get; set; }
+        public decimal other_fees_due_input { get; set; }
+
+        public bool isAutoDraftAvailable { get; set; } 
     }
 }

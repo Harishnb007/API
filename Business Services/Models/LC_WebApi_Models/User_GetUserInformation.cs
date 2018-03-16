@@ -22,7 +22,7 @@ namespace Business_Services.Models.LC_WebApi_Models
         public bool skipChildrenRead { get; set; }
         public string password { get; set; }
         public string ssn { get; set; }
-        public object changePassword { get; set; }
+        public string changePassword { get; set; }
         public object status { get; set; }
         public int recordCount { get; set; }
         public bool loadLinkedLoans { get; set; }
@@ -79,7 +79,7 @@ namespace Business_Services.Models.LC_WebApi_Models
         public bool isarm { get; set; }
         public string ssn { get; set; }
         public bool isPurged { get; set; }
-        public DateTime estatementPrefDate { get; set; }
+        public DateTime? estatementPrefDate { get; set; }
     }
 
 

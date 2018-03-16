@@ -8,7 +8,7 @@ namespace Business_Services.Models
 {
  public  class UserAuth
     {
-        public string username { get; set; }
-        public string password { get; set; }
+        public string user_id { get; set; }
+        public string user_pwd { get; set; }
     }
 }

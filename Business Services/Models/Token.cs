@@ -12,8 +12,12 @@ namespace Business_Services.Models
         public string UserId { get; set; }
         public DateTime ExpiresOn { get; set; }
         public string Lcauth { get; set; }
+        public bool eStatement { get; set; }
         public string Password { get; set; }
-
+        public string UserName { get; set; }
         public int ClientId { get; set; }
+        public string resourcename { get; set; }
+        public string log { get; set; }
+        public string Loan_Number { get; set; }
     }
 }
