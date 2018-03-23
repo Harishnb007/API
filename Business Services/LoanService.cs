@@ -821,6 +821,7 @@ namespace Business_Services
             Business_Services.Models.GenerateNewToken objgenerateToken = new GenerateNewToken();
 
             string lcToken = tokenServices.GetLctoken(mobileToken);
+            string processCode = string.Empty;
 
             var Decryptdata = objgenerateToken.Decrypt(mobileToken);
 
@@ -845,7 +846,7 @@ namespace Business_Services
             MyAccount_GetAccountInfo acctInfo = JsonConvert.DeserializeObject<MyAccount_GetAccountInfo>(acctInfoData);
             AutoDraft_GetAutoDraft autoDrftInfo = new AutoDraft_GetAutoDraft();
             bool temp_is_autodraft = false;
-
+            processCode = acctInfo.msg.processStop;
 
 
             var responseEstatement = await API_Connection.GetAsync(lcToken, "/api/User/GetLoanData/?id=" + loanNumber);
@@ -947,6 +948,7 @@ namespace Business_Services
                 co_borrower_name = acctInfo.msg.coBorrower,
                 is_autodraft = autoDrftInfo.nextDraftDate != "" ? true : false,
                 is_escrow_loan = Convert.ToString(escrowInfo.pmtEscrow) == "0.00" ? false : true,
+                is_bankruptcy = (processCode == "K" || processCode == "k") ? true : false,
                 auto_draftdate = Convert.ToString((autoDrftInfo.nextDraftDate != "") ? DateTime.ParseExact(autoDrftInfo.nextDraftDate, "MM/dd/yyyy", CultureInfo.InvariantCulture) : new DateTime())
             });
         }

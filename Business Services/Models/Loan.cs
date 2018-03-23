@@ -33,5 +33,7 @@ namespace Business_Services.Models
         public string maturity_date { get; set; }
 
         public bool is_escrow_loan { get; set; }
+
+        public bool is_bankruptcy { get; set; }
     }
 }
