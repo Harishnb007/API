@@ -8,11 +8,11 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("LoanCare_Mobile_API")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("TCS")]
+[assembly: AssemblyCompany("Loancare")]
 [assembly: AssemblyProduct("LoanCare_Mobile_API")]
-[assembly: AssemblyCopyright("Copyright © TCS 2017")]
+[assembly: AssemblyCopyright("Copyright © Loancare 2018")]
 [assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
+//[assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
