@@ -840,6 +840,7 @@ namespace Business_Services
             var responseUserInfo = await API_Connection.GetAsync(lcToken, "/api/User/GetUserInformation");
             string returnedDataUserInfo = await responseUserInfo.Content.ReadAsStringAsync();
             dynamic userInfo = JsonConvert.DeserializeObject(returnedDataUserInfo);
+            int isenrolledloan = (userInfo.currentUserLoan.userLoanDisclosure != null) ? userInfo.currentUserLoan.userLoanDisclosure.isAccepted : 0;
 
             var acctInforesponse = await API_Connection.GetAsync(lcToken, "/api/MyAccount/GetAccountInfo/" + loanNumber);
             string acctInfoData = await acctInforesponse.Content.ReadAsStringAsync();
@@ -847,12 +848,6 @@ namespace Business_Services
             AutoDraft_GetAutoDraft autoDrftInfo = new AutoDraft_GetAutoDraft();
             bool temp_is_autodraft = false;
             processCode = acctInfo.msg.processStop;
-
-
-            var responseEstatement = await API_Connection.GetAsync(lcToken, "/api/User/GetLoanData/?id=" + loanNumber);
-            string returnedDateEstement = await responseEstatement.Content.ReadAsStringAsync();
-            dynamic getloanestatement = JsonConvert.DeserializeObject(returnedDateEstement);
-            string isenrolledloan = getloanestatement.currentUserLoan.eStatement;
 
             try
             {
@@ -884,15 +879,10 @@ namespace Business_Services
                 AutoLoan.loan_total_amount = Convert.ToDecimal(loanInfo.netPresent);
                 AutoLoan.loan_duedate = loanInfo.dueDate.Substring(5, 2) + "/" + loanInfo.dueDate.Substring(8, 2) + "/" + loanInfo.dueDate.Substring(2, 2);
                 AutoLoan.loan_type = loanInfo.loanType;
-                if (isenrolledloan == null)
-                {
-                    AutoLoan.is_enrolled = false;
-                }
-                if (isenrolledloan != null)
-                {
+                if (isenrolledloan == 1)
                     AutoLoan.is_enrolled = true;
-                }
-                // AutoLoan.is_enrolled = objisenrolled;
+                else
+                    AutoLoan.is_enrolled = false;
                 AutoLoan.loan_interest_rate = loanInfo.intRate;
                 AutoLoan.escrow_balance = Convert.ToDecimal(loanInfo.escrowBalance);
                 AutoLoan.property_value = Convert.ToDecimal(loanInfo.propertyValue);
@@ -937,8 +927,7 @@ namespace Business_Services
                 loan_total_amount = Convert.ToDecimal(loanInfo.netPresent),
                 loan_duedate = loanInfo.dueDate.Substring(5, 2) + "/" + loanInfo.dueDate.Substring(8, 2) + "/" + loanInfo.dueDate.Substring(2, 2),
                 loan_type = loanInfo.loanType,
-                //is_enrolled = (userInfo.currentUserLoan.eStatement == null) ? false : true, //Commented by BBSr Team on 14th March 2018 : Wrong Enrollment Value in "/api/user/loan/{loan_number}"
-                is_enrolled = (isenrolledloan == null) ? false : true, //Added by BBSr Team on 14th March 2018 : Wrong Enrollment Value in "/api/user/loan/{loan_number}"
+                is_enrolled = (isenrolledloan == 1) ? true : false,
                 loan_interest_rate = loanInfo.intRate,
                 escrow_balance = Convert.ToDecimal(loanInfo.escrowBalance),
                 property_value = Convert.ToDecimal(loanInfo.propertyValue),
@@ -2072,7 +2061,8 @@ namespace Business_Services
                 var content = new FormUrlEncodedContent(someDict);
 
                 var response = await API_Connection.PostAsync(lcToken, "/api/Investor/SaveLinkLoan/", content);
-
+                string responseAsString = await response.message.Content.ReadAsStringAsync();
+                ErrorModel resultSet = JsonConvert.DeserializeObject<ErrorModel>(responseAsString);
                 if (response.errorId != 0)
                 {
                     loanDetails.issuccess = false;
@@ -2088,6 +2078,8 @@ namespace Business_Services
                         var Token = response.tokenValue;
                         var MobileTokenNew = objgenerateToken.GenerateToken(objUId, objPWd, objCId, Token, objusername, resourcename, logview, eStatemente);
                         loanDetails.Token = MobileTokenNew;
+                        if (!string.IsNullOrEmpty(resultSet.msg))
+                            return new ResponseModel(loanDetails, response.errorId, resultSet.msg);
                         return new ResponseModel(loanDetails, 0, null);
                     }
                 }

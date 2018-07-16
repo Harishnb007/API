@@ -54,6 +54,7 @@ namespace Business_Services.Models
 
         public string MobileSignedUp { get; set; }
         public List<LoanSummary> loanss { get; set; }
+        public List<string> answers { get; set; }
     }
 
     public class Address
