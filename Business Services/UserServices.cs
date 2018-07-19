@@ -22,6 +22,7 @@ namespace Business_Services
 {
     public class UserServices : IUserServices
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private Business_Services.Models.User user;
         public async Task<ResponseModel> GetPushNotificationForUser(string mobileToken, PushNotificationUser pushNotification)
         {
@@ -444,8 +445,6 @@ namespace Business_Services
                 return new ResponseModel(null, 1, "Your account has not been registered or wrong credentials are provided. Please check your LoanNo and SSN/TaxID.");
             }
         }
-
-        //Modified by BBSR_Team on 17th Jan 2018
         public async Task<ResponseModel> ForgotPassword(Business_Services.Models.User userDetail)
         {
             try
@@ -453,96 +452,29 @@ namespace Business_Services
                 string ssn = userDetail.ssn;
                 byte[] userSSN = System.Text.ASCIIEncoding.ASCII.GetBytes(ssn);
                 string decodeduserSSN = System.Convert.ToBase64String(userSSN);
-
                 string Loan_Number = userDetail.loanNumber;
 
-                //Modified by BBSR_Team on 17th Jan 2018
                 Dictionary<string, string> forgotDict = new Dictionary<string, string>();
-                forgotDict.Add("userID", Loan_Number);
+                forgotDict.Add("userId", Loan_Number);
                 forgotDict.Add("ssn", decodeduserSSN);
 
                 var forgotcontent = new FormUrlEncodedContent(forgotDict);
                 var UserDetails = await API_Connection.PostUserAsync("/api/Register/SendPassword", forgotcontent);
-                //Modified by BBSR_Team on 17th Jan 2018           
 
                 string returnedData = await UserDetails.Content.ReadAsStringAsync();
-
                 ForgotPassword_SecurityQuestion objForgotPassword = JsonConvert.DeserializeObject<ForgotPassword_SecurityQuestion>(returnedData);
+                log.Debug("ForgotPassword" + objForgotPassword);
                 if (objForgotPassword.msg == "success")
                 {
                     secQuesCollectionforgotuser listsecquestion = new secQuesCollectionforgotuser();
-                    List<SecurityQuestionForgotUser> objSecurity = new List<SecurityQuestionForgotUser>();
-
-                    SequrityQuestionUserLoan objsequserloan = new SequrityQuestionUserLoan()
-                    {
-                        id = objForgotPassword.user.id,
-                        loanNo = objForgotPassword.user.userLoansList[0]
-                    };
-
-                    SequrityQuestionUser objsequstionuser = new SequrityQuestionUser()
-                    {
-                        id = objForgotPassword.user.id,
-                        ssn = ssn
-                    };
-
+                    List<string> objSecurity = new List<string>();
                     foreach (var SecQues in objForgotPassword.secQuesCollection)
                     {
-                        SecurityQuestionForgotUser ObjsecQuesCollection = new SecurityQuestionForgotUser()
-                        {
-                            isNew = SecQues.isNew,
-                            phrases = SecQues.phrases,
-                            questionID = SecQues.questionID,
-                            questionNo = SecQues.questionNo,
-                            secretQuestion = SecQues.secretQuestion,
-                            securityAnswer = SecQues.securityAnswer,
-                            skipChildrenRead = SecQues.skipChildrenRead,
-                            userFrom = SecQues.userFrom,
-                            userID = SecQues.userID
-                        };
-                        objSecurity.Add(ObjsecQuesCollection);
+                        objSecurity.Add(SecQues);
                     }
-                    SecurityQuestionstatus objSecurityQuestionstatus = new SecurityQuestionstatus();
-                    if (objSecurity.Count == 0)
-                    {
-                        objSecurityQuestionstatus.SecurityStatus = false;
-                    }
-                    else
-                    {
-                        objSecurityQuestionstatus.SecurityStatus = true;
-                    }
-
-
                     listsecquestion.secQuesCollection = objSecurity;
-                    listsecquestion.user = objsequstionuser;
-                    listsecquestion.userLoan = objsequserloan;
-                    listsecquestion.secQuesstatus = objSecurityQuestionstatus;
-                    //listsecquestion.secQuesstatus = objSecurityQuestionstatus;
-                    //if (!returnedData.Contains("success"))
-                    //{
-
-
-                    //    return new ResponseModel(listsecquestion, 1, "Error");
-                    //}
-
-                    //string clientUrl = "www.myloancare.com";
-                    //string userName = objForgotPassword.user.userName;
-                    //string Password = objForgotPassword.user.password;
-                    //string emailAddress = objForgotPassword.user.emailAddress;
-                    //string clientName= objForgotPassword.client.clientName;
-                    //string clientPhone = objForgotPassword.client.clientPhone;
-                    //Dictionary<string, string> someDict = new Dictionary<string, string>();
-
-                    //someDict.Add("LoanNo", Loan_Number);
-                    //someDict.Add("email", emailAddress);
-                    //someDict.Add("clientName", clientName);
-                    //someDict.Add("password", Password);
-                    //someDict.Add("url", clientUrl);
-                    //someDict.Add("PROPERTY_STATE_CODE", "");
-                    //var content = new FormUrlEncodedContent(someDict);
-                    //var response = await API_Connection.PostUserAsync("/api/Register/SendEmailforPassword/", content);
-                    //string returnedDataemail = await response.Content.ReadAsStringAsync();
-                    //dynamic objForgotemail = JsonConvert.DeserializeObject(returnedDataemail);
-
+                    listsecquestion.ssn = ssn;
+                    listsecquestion.loanNo = Loan_Number;
                     return new ResponseModel(listsecquestion);
                 }
                 return new ResponseModel(null, 1, returnedData);
@@ -553,73 +485,35 @@ namespace Business_Services
             }
         }
 
-        //public async Task<string> trackinglogfile(string TrackingLog)
-        //{
-        //    try
-        //    {
-
-
-
-        //        return "";
-                
-               
-        //    }
-        //    catch (Exception Ex)
-        //    {
-        //        return Ex.Message;
-        //    }
-        //}
-
-        //Added by BBSR_Team on 24th Jan 2018
         public async Task<ResponseModel> ValidateSecurityAnswer(Business_Services.Models.User userDetail)
         {
             try
             {
-                string strUserId = Convert.ToString(userDetail.id);
-                string strStatus = Convert.ToString(userDetail.status);
+                string strUserId = Convert.ToString(userDetail.username);
                 string strAttempt = Convert.ToString(userDetail.noOfAttempts);
                 string userName = Convert.ToString(userDetail.username);
-                string loanNo = Convert.ToString(userDetail.last_name);
+                string ssn = Convert.ToString(userDetail.last_name);
+                string[] answers = userDetail.answers.ToArray();
+                byte[] userSSN = System.Text.ASCIIEncoding.ASCII.GetBytes(ssn);
+                string decodeduserSSN = System.Convert.ToBase64String(userSSN);
 
-                //Validate Security Answers.
-                Dictionary<string, string> ConfDict = new Dictionary<string, string>();
-                ConfDict.Add("noOfAttempts", strAttempt);
-                ConfDict.Add("status", strStatus);
-                ConfDict.Add("userId", strUserId);
-                ConfDict.Add("userName", userName);
-                ConfDict.Add("lastName", loanNo);
-
-                var Confcontent = new FormUrlEncodedContent(ConfDict);
-                var ConfDetails = await API_Connection.PostUserAsync("/api/Register/ValidateSecurityAnswers", Confcontent);
-
-                string returnedConfData = await ConfDetails.Content.ReadAsStringAsync();
-                ValidateSecurityAnswer objData = JsonConvert.DeserializeObject<ValidateSecurityAnswer>(returnedConfData);
-
-                if (objData.msg == "success")
+                List<KeyValuePair<string, string>> forgotList = new List<KeyValuePair<string, string>>();
+                forgotList.Add(new KeyValuePair<string, string>("userId", strUserId));
+                forgotList.Add(new KeyValuePair<string, string>("noOfAttempts", strAttempt));
+                forgotList.Add(new KeyValuePair<string, string>("ssn", decodeduserSSN));
+                foreach (var ans in answers)
                 {
-                    string clientUrl = "www.myloancare.com";
-                    string clientName = objData.client.clientName;
-                    string Password = objData.user.password;
-                    string emailAddress = objData.userLoan.emailAddress;
-                    Dictionary<string, string> someDict = new Dictionary<string, string>();
-
-                    someDict.Add("LoanNo", loanNo);
-                    someDict.Add("email", emailAddress);
-                    someDict.Add("clientName", clientName);
-                    someDict.Add("password", Password);
-                    someDict.Add("url", clientUrl);
-                    someDict.Add("PROPERTY_STATE_CODE", "");
-                    var content = new FormUrlEncodedContent(someDict);
-                    var response = await API_Connection.PostUserAsync("/api/Register/SendEmailforPassword/", content);
-                    string returnedDataemail = await response.Content.ReadAsStringAsync();
+                    forgotList.Add(new KeyValuePair<string, string>("answers[]", ans));
                 }
-
+                var Confcontent = new FormUrlEncodedContent(forgotList.ToArray());
+                var ConfDetails = await API_Connection.PostUserAsync("/api/Register/ValidateSecurityAnswers", Confcontent);
+                string returnedConfData = await ConfDetails.Content.ReadAsStringAsync();
+                dynamic objData = JsonConvert.DeserializeObject(returnedConfData);
                 return new ResponseModel(objData, 0, "success");
-
-
             }
             catch (Exception Ex)
             {
+                log.Debug("Error ", Ex);
                 return new ResponseModel(null, 1, Ex.Message);
             }
         }
@@ -654,51 +548,26 @@ namespace Business_Services
         }
 
 
-        //Modified by BBSR_Team on 24th Jan 2018
         public async Task<ResponseModel> ResetSendPassword(Business_Services.Models.User userDetail)
         {
+            log.Debug("Method enter");
+
             try
             {
                 string ssn = userDetail.ssn;
                 byte[] userSSN = System.Text.ASCIIEncoding.ASCII.GetBytes(ssn);
                 string decodeduserSSN = System.Convert.ToBase64String(userSSN);
-
                 string Loan_Number = userDetail.loanNumber;
 
-                //Modified by BBSR_Team on 17th Jan 2018
                 Dictionary<string, string> forgotDict = new Dictionary<string, string>();
                 forgotDict.Add("userID", Loan_Number);
                 forgotDict.Add("ssn", decodeduserSSN);
 
                 var forgotcontent = new FormUrlEncodedContent(forgotDict);
                 var UserDetails = await API_Connection.PostUserAsync("/api/Register/SendPassword", forgotcontent);
-                //Modified by BBSR_Team on 17th Jan 2018           
 
                 string returnedData = await UserDetails.Content.ReadAsStringAsync();
-                dynamic objForgotUser = JsonConvert.DeserializeObject(returnedData);
-
-                string clientName = objForgotUser.client.clientName;
-                string strUserId = Convert.ToString(objForgotUser.user.id);
-                string loanNo = objForgotUser.userLoan.loanNo;
-                string clientUrl = objForgotUser.client.privateLabelURL;
-                string strUserEmail = objForgotUser.userLoan.emailAddress;
-                string strPassword = objForgotUser.user.password;
-
-                //Reset Password and Send email to user.
-                Dictionary<string, string> ResetDict = new Dictionary<string, string>();
-                ResetDict.Add("LoanNo", loanNo);
-                ResetDict.Add("email", strUserEmail);
-                ResetDict.Add("clientName", clientName);
-                ResetDict.Add("password", strPassword);
-                ResetDict.Add("url", clientUrl);
-                ResetDict.Add("PROPERTY_STATE_CODE", string.Empty);
-
-                var Resetcontent = new FormUrlEncodedContent(ResetDict);
-                var ResetDetails = await API_Connection.PostUserAsync("/api/Register/SendEmailforPassword", Resetcontent);
-
-                string returnedResetData = await ResetDetails.Content.ReadAsStringAsync();
-                dynamic objResetPassword = JsonConvert.DeserializeObject(returnedResetData);
-
+                dynamic objResetPassword = JsonConvert.DeserializeObject(returnedData);
                 return new ResponseModel(objResetPassword);
             }
             catch (Exception Ex)
@@ -706,6 +575,7 @@ namespace Business_Services
                 return new ResponseModel(null, 1, Ex.Message);
             }
         }
+
 
         public async Task<ResponseModel> getUserDetailsAsync(string lcAuthToken, string loan_number, bool Is_New_MobileUser)
         {
@@ -972,7 +842,7 @@ namespace Business_Services
                     {
                         var Message = ex.Message;
                         userDetails.username = objUserName.user.userName;
-                        userDetails.is_enrolled = (objUserName.currentUserLoan.eStatement == null) ? false : true;
+                        userDetails.is_enrolled = ((objUserName.currentUserLoan.userLoanDisclosure != null) && objUserName.currentUserLoan.userLoanDisclosure.isAccepted == 1);
                         userDetails.email = getuserinfoUserName.msg.emailAddress;
                         userDetails.addresss.isForeign = getuserinfoPhoneNo.contactinfo.contactInfo.isInternationalAddress;
                         userDetails.addresss.street = getuserinfoPhoneNo.contactinfo.contactInfo.mailingAddressStreet;
@@ -1000,7 +870,7 @@ namespace Business_Services
                 userDetails.BorrowerName = getuserinfoPhoneNo.contactinfo.contactInfo.borrower;
                 userDetails.id = objUserName.user.id;
                 userDetails.LoginId = loan_number;
-                userDetails.is_enrolled = (objUserName.currentUserLoan.eStatement == null) ? false : true;
+                userDetails.is_enrolled = ((objUserName.currentUserLoan.userLoanDisclosure != null) && objUserName.currentUserLoan.userLoanDisclosure.isAccepted == 1) ? true : false;
                 userDetails.MobileSignedUp = Client_MobileSignedUp;
                 return new ResponseModel(userDetails);
             }
@@ -1026,19 +896,15 @@ namespace Business_Services
                 string returnedDataClientName = await responseClientName.Content.ReadAsStringAsync();
                 dynamic objClientName = JsonConvert.DeserializeObject(returnedDataClientName);
 
-
                 userDetails.ClientId = objUserName.currentUserLoan.clientID;
                 userDetails.username = objUserName.user.userName;
-                userDetails.is_enrolled = (objUserName.currentUserLoan.eStatement == null) ? false : true;
-
+                userDetails.is_enrolled = ((objUserName.currentUserLoan.userLoanDisclosure != null) && objUserName.currentUserLoan.userLoanDisclosure.isAccepted == 1);
                 return new ResponseModel(userDetails);
             }
             catch (Exception Ex)
             {
-
                 return new ResponseModel(null, 1, Ex.Message);
             }
-
         }
 
         public async Task<ResponseModel> getUserDetailsAsyn(string lcAuthToken, string loan_number)
@@ -1071,17 +937,12 @@ namespace Business_Services
                 string returnedDataUser = await responseGetUserInfo.Content.ReadAsStringAsync();
                 dynamic getuserinfo = JsonConvert.DeserializeObject(returnedDataUser);
                 string userName = getuserinfo.user.userName;
+                int isenrolledloan = (getuserinfo.currentUserLoan.userLoanDisclosure != null) ? getuserinfo.currentUserLoan.userLoanDisclosure.isAccepted : 0;
 
                 var responseLP = await API_Connection.GetAsync(lcToken, "/api/User/LanguagePref/?userId=" + userName);
                 string returnedDataLP = await responseLP.Content.ReadAsStringAsync();
 
-                var responseEstatement = await API_Connection.GetAsync(lcToken, "/api/User/GetLoanData/?id=" + loan_number);
-                string returnedDateEstement = await responseEstatement.Content.ReadAsStringAsync();
-                dynamic getloanestatement = JsonConvert.DeserializeObject(returnedDateEstement);
-                string isenrolledloan = getloanestatement.currentUserLoan.eStatement;
-
                 Business_Services.Models.User userDetails = new Business_Services.Models.User();
-
 
                 if (getuserinfo.currentUserLoan.roleId == 5)
                 {
@@ -1151,18 +1012,10 @@ namespace Business_Services
                 userLoanAmount.last_pending_payments = Convert.ToString(no_of_payments);
                 userLoanAmount.last_payment_date = loan_duedate;
                 userDetails.username = getuserinfo.user.userName;
-
-
-                if (isenrolledloan == null)
-                {
-                    userLoanAmount.is_enrolled = false;
-                }
-                if (isenrolledloan != null)
-                {
+                if (isenrolledloan == 1)
                     userLoanAmount.is_enrolled = true;
-                }
-
-
+                else
+                    userLoanAmount.is_enrolled = false;
                 DateTime date = new DateTime();
                 date = Convert.ToDateTime(userLoanAmount.loan_duedate);
 
@@ -1278,55 +1131,22 @@ namespace Business_Services
                 byte[] userSSN = System.Text.ASCIIEncoding.ASCII.GetBytes(ssn);
                 string decodeduserSSN = System.Convert.ToBase64String(userSSN);
 
-                var UserDetails = await API_Connection.GetAsync("/api/Register/SendPassword/?loanNo=" + Loan_Number + "&ssn=" + decodeduserSSN + "&userId=");
+                Dictionary<string, string> forgotDict = new Dictionary<string, string>();
+                forgotDict.Add("userId", Loan_Number);
+                forgotDict.Add("ssn", decodeduserSSN);
+
+                var forgotcontent = new FormUrlEncodedContent(forgotDict);
+                var UserDetails = await API_Connection.PostUserAsync("/api/Register/SendPassword", forgotcontent);
 
                 string returnedData = await UserDetails.Content.ReadAsStringAsync();
-                dynamic objForgotUser = JsonConvert.DeserializeObject(returnedData);
-                string clientName = objForgotUser.client.clientName;
 
-                string strUserName = objForgotUser.user.userName;
-                byte[] userName = System.Text.ASCIIEncoding.ASCII.GetBytes(strUserName);
-                string decodeduserName = System.Convert.ToBase64String(userName);
-
-                string loanNo = objForgotUser.userLoan.loanNo;
-                string clientPhone = objForgotUser.client.clientPhone;
-                string clientUrl = "www.myloancare.com";
-
-                string strUserEmail = objForgotUser.userLoan.emailAddress;
-                byte[] userEmail = System.Text.ASCIIEncoding.ASCII.GetBytes(strUserEmail);
-                string decodeduserEmail = System.Convert.ToBase64String(userEmail);
-
-                Dictionary<string, string> someDict = new Dictionary<string, string>();
-                someDict.Add("emailData[0][key]", "clientname");
-                someDict.Add("emailData[0][value]", clientName);
-                someDict.Add("emailData[0][update]", "undefined");
-                someDict.Add("emailData[1][key]", "username");
-                someDict.Add("emailData[1][value]", decodeduserName);
-                someDict.Add("emailData[1][update]", "undefined");
-                someDict.Add("emailData[2][key]", "loanNo");
-                someDict.Add("emailData[2][value]", loanNo);
-                someDict.Add("emailData[2][update]", "undefined");
-                someDict.Add("emailData[3][key]", "clientPhone");
-                someDict.Add("emailData[3][value]", clientPhone);
-                someDict.Add("emailData[3][update]", "undefined");
-                someDict.Add("emailData[4][key]", "url");
-                someDict.Add("emailData[4][value]", clientUrl);
-                someDict.Add("emailData[4][update]", "undefined");
-                someDict.Add("update", "undefined");
-                strUserEmail = "vignesh.hari1-external@tcs.com";
-                var content = new FormUrlEncodedContent(someDict);
-
-                var response = await API_Connection.PostUserRegisAsync("/api/EmailNotification/SendEmailConfirmationForTemplate/?template=Forgotpassword&toEmail=" + strUserEmail + "&pageName=forgotPassword&userID=" + objForgotUser.user.id, content);
-
-
-                return new ResponseModel(response);
+                return new ResponseModel(returnedData);
             }
             catch (Exception Ex)
             {
                 return new ResponseModel(null, 1, Ex.Message);
             }
         }
-
 
         public async Task<ResponseModel> ContactUsAsync(string mobileToken)
         {

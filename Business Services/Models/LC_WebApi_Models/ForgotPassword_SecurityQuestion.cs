@@ -14,6 +14,6 @@ namespace Business_Services.Models.LC_WebApi_Models
         [JsonProperty]
         public User user { get; set; }
         [JsonProperty]
-        public List<secQuesCollection> secQuesCollection { get; set; }
+        public List<string> secQuesCollection { get; set; }
     } 
 }
