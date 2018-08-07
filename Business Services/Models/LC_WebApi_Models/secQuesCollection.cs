@@ -8,24 +8,9 @@ namespace Business_Services.Models.LC_WebApi_Models
 {
     public class secQuesCollectionforgotuser
     {
-        public SequrityQuestionUser user { get; set; }
-        public SequrityQuestionUserLoan userLoan { get; set; }
-
-        public SecurityQuestionstatus secQuesstatus { get; set; }
-       public List<SecurityQuestionForgotUser> secQuesCollection { get; set; }
-    }
-    public class SequrityQuestionUser {
-
-        public int id { get; set; }
-        public string ssn { get; set; }
-    }
-
-    public class SequrityQuestionUserLoan {
-
-        public int id { get; set; }
-
         public string loanNo { get; set; }
-
+        public string ssn { get; set; }
+        public List<string> secQuesCollection { get; set; }
     }
 
     public class SecurityQuestionForgotUser
@@ -49,10 +34,5 @@ namespace Business_Services.Models.LC_WebApi_Models
         public string userFrom { get; set; }
 
         public int questionNo { get; set; }
-    }
-
-    public class SecurityQuestionstatus {
-
-        public bool SecurityStatus { get; set; }
     }
 }
