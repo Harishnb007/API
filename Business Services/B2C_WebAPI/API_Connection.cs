@@ -21,17 +21,20 @@ namespace Business_Services.B2C_WebAPI
 
         private static HttpClientHandler handler;
         private static HttpClient client;
-      
-       private static Uri baseAddress = new Uri(ConfigurationManager.AppSettings["B2Curl"]);
+
+        private static Uri baseAddress = new Uri(ConfigurationManager.AppSettings["B2Curl"]);
+        private static string securityProtocolType = ConfigurationManager.AppSettings["securityProtocolTypeValue"].ToString();
 
         static API_Connection()
         {
-          
+
             handler = new HttpClientHandler() { UseCookies = false };
             client = new HttpClient(handler) { BaseAddress = baseAddress };
 
             // To avoid certificate errors thrown due to the Fiddler interception
-            ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
+            ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;          
+            var securityprotcolValue = (SecurityProtocolType)Enum.Parse(typeof(SecurityProtocolType), securityProtocolType, true);
+            ServicePointManager.SecurityProtocol = (SecurityProtocolType)securityprotcolValue;
         }
 
         public static async Task<HttpResponseMessage> DeleteAsync(string tokenValue, string url)
