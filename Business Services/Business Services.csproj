@@ -62,7 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppService.cs" />
-   
+    <Compile Include="B2C_WebAPI\API_Connection.cs" />
     <Compile Include="IAppService.cs" />
     <Compile Include="ILoanService.cs" />
     <Compile Include="ITokenServices.cs" />
